@@ -7,6 +7,8 @@ import TopHeader from './top-header/top-header';
 
 require("./app.scss");
 
+// TODO: Clean up this routing and remove the added snippets from examples
+
 export default class App extends React.Component {
 
   render() {

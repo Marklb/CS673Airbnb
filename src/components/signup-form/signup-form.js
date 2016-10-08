@@ -4,58 +4,195 @@ import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 're
 
 require("./signup-form.scss");
 
-// TODO: Get the Email icon for the Sign up with Email button
+const FORM_IDS = {
+  SIGNUP_SELECTION: 1,
+  SIGNUP_WITH_EMAIL: 2
+};
 
 export default class SignUpForm extends React.Component {
+  constructor(props) {
+    super(props);
 
-  render() {
+    this.state = {
+      activeForm: FORM_IDS.SIGNUP_WITH_EMAIL
+    };
+  }
+
+  renderFormBottom() {
     return (
-      <div className="signup-form" onClick={this.onClickLoginForm.bind(this)}>
-        <input type="checkbox" id="tos-mandatory-checkbox" />
-        <label for="tos-mandatory-checkbox">
-          <div>
-            <div className="tos-mandatory-checkbox-label-text">
-              <small>By signing up, I agree to Airbnb's <Link to="#">Term of Service</Link>, <Link
-              to="#">Payments Terms of Service</Link>, <Link to="#">Privacy Policy</Link>, <Link
-              to="#">Guest Refund Policy</Link>, and <Link to="#">Host Guarantee Terms
-              </Link>.</small>
-            </div>
-            <div className="tos-mandatory-checkbox-label-text">
-              <small>I also agree to follow Airbnb's <Link to="#">Nondiscrimination Policy</Link> and help our community build a world where people of all backgrounds feel included and respected.</small>
-            </div>
-          </div>
-        </label>
-
-        <div className="signup-facebook">Sign Up with Facebook</div>
-        <div className="signup-google">Sign Up with Google</div>
-
-        <div className="or-separator">
-          <span className="or-text">or</span>
-        </div>
-
-        <form onSubmit={this.handleLoginForm.bind(this)}>
-          <button className="signup-btn">Sign up with Email</button>
-        </form>
-
+      <div>
         <div className="or-separator"></div>
 
-        <div className="form-opts-container">
-          <div className="have-account-text">Already have an Airbnb account?</div>
-          <Link to="#" className="login-btn">Log in</Link>
+        <div className="bottom-opts-container">
+          <div className="left-text">Already have an Airbnb account?</div>
+          <Link to="#" className="login-btn">Log In</Link>
         </div>
       </div>
     );
   }
 
-  onClickLoginForm(event) {
+  renderFormSignUpSelection() {
+    return (
+      <div>
+        <div className="social-buttons">
+          <Link to="#" className="btn btn-facebook">Sign Up with Facebook</Link>
+          <Link to="#" className="btn btn-google">Sign Up with Google</Link>
+        </div>
+
+        <div className="or-separator">
+          <span className="or-text">or</span>
+        </div>
+
+        <div className="btn btn-signup-with-email"
+          onClick={this.handleSignUpWithEmailBtnClick.bind(this)}
+        >
+          <span>Sign Up with Email</span>
+        </div>
+
+        <div className="tos-info">
+          <div className="tos-info-text">
+            <small>By signing up, I agree to Airbnb's <Link to="#">Term of Service</Link>, <Link
+            to="#">Payments Terms of Service</Link>, <Link to="#">Privacy Policy</Link>, <Link
+            to="#">Guest Refund Policy</Link>, and <Link to="#">Host Guarantee Terms
+            </Link>.</small>
+          </div>
+          <div className="tos-info-text">
+            <small>I also agree to follow Airbnb's <Link to="#">Nondiscrimination Policy</Link> and help our community build a world where people of all backgrounds feel included and respected.</small>
+          </div>
+        </div>
+
+        {this.renderFormBottom()}
+
+      </div>
+    );
+  }
+
+  renderFormSignUpWithEmail() {
+    return (
+      <div>
+        <div className="social-links">
+          Sign up with <Link to="#">Facebook</Link> or <Link to="#">Google</Link>
+        </div>
+
+        <div className="or-separator">
+          <span className="or-text">or</span>
+        </div>
+
+        <form onSubmit={this.handleSignUpForm.bind(this)}>
+
+          <div className="input-text-boxes">
+            <input className="" type="text" placeholder="First name" ref=""/>
+            <input className="" type="text" placeholder="Last name" ref=""/>
+            <input className="" type="email" placeholder="Email address" ref=""/>
+            <input className="" type="password" placeholder="Password" ref=""/>
+          </div>
+
+          {/* TODO: Add Birthdat selection and maybe remove receive ... checkbox */}
+
+          <div className="tos-info">
+            <div className="tos-info-text">
+              <small>By signing up, I agree to Airbnb's <Link to="#">Term of Service</Link>, <Link
+              to="#">Payments Terms of Service</Link>, <Link to="#">Privacy Policy</Link>, <Link
+              to="#">Guest Refund Policy</Link>, and <Link to="#">Host Guarantee Terms
+              </Link>.</small>
+            </div>
+            <div className="tos-info-text">
+              <small>I also agree to follow Airbnb's <Link to="#">Nondiscrimination Policy</Link> and help our community build a world where people of all backgrounds feel included and respected.</small>
+            </div>
+          </div>
+
+          <div className="btn btn-signup-with-email"
+            onClick={this.handleSignUpBtnClick.bind(this)}
+          >
+            <span>Sign Up</span>
+          </div>
+        </form>
+
+        {this.renderFormBottom()}
+
+      </div>
+    );
+  }
+
+  renderForm() {
+    switch(this.state.activeForm){
+      case FORM_IDS.SIGNUP_SELECTION:
+        return this.renderFormSignUpSelection();
+        break;
+      case FORM_IDS.SIGNUP_WITH_EMAIL:
+        return this.renderFormSignUpWithEmail();
+        break;
+      default:
+        return (<div>Form ID not valid</div>);
+    };
+  }
+
+  render() {
+    return (
+      <div className='signup-modal' onClick={this.onClickModal.bind(this)}>
+        <div className='form-container'>
+          {this.renderForm()}
+        </div>
+      </div>
+    );
+  }
+
+  handleSignUpForm(event) {
+    event.preventDefault();
+
+  }
+
+  onClickModal(event) {
     event.stopPropagation();
   }
 
-  handleLoginForm(event) {
+  handleSignUpWithEmailBtnClick(event) {
     event.preventDefault();
 
-    // this.props.createTask(this.refs.createInput.value);
-    // this.refs.createInput.value = '';
+    this.setState({ activeForm: FORM_IDS.SIGNUP_WITH_EMAIL});
+  }
+
+  handleSignUpBtnClick(event) {
+    event.preventDefault();
+
+    this.setState({ activeForm: FORM_IDS.SIGNUP_WITH_EMAIL});
   }
 
 };
+
+
+// <div className="signup-form" onClick={this.onClickLoginForm.bind(this)}>
+//   <div className="signup-facebook">Log in with Facebook</div>
+//   <div className="signup-google">Log in with Google</div>
+//
+//   <div className="or-separator">
+//     <span className="or-text">or</span>
+//   </div>
+//
+//   <form onSubmit={this.handleLoginForm.bind(this)}>
+//     <button className="signup-btn">Sign Up</button>
+//
+//
+//     <div className="tos-info">
+//       <div className="tos-info-text">
+//         <small>By signing up, I agree to Airbnb's <Link to="#">Term of Service</Link>, <Link
+//         to="#">Payments Terms of Service</Link>, <Link to="#">Privacy Policy</Link>, <Link
+//         to="#">Guest Refund Policy</Link>, and <Link to="#">Host Guarantee Terms
+//         </Link>.</small>
+//       </div>
+//       <div className="tos-info-text">
+//         <small>I also agree to follow Airbnb's <Link to="#">Nondiscrimination Policy</Link> and help our community build a world where people of all backgrounds feel included and respected.</small>
+//       </div>
+//     </div>
+//
+//   </form>
+//
+//
+//
+//   <div className="or-separator"></div>
+//
+//   <div className="form-opts-container">
+//     <div className="no-account-text">Already have an Airbnb account?</div>
+//     <Link to="#" className="login-btn">Log In</Link>
+//   </div>
+// </div>
