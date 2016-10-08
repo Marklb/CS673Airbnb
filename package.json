@@ -4,7 +4,8 @@
   "description": "CS673 team 2 project recreating the website of Airbnb.",
   "main": "src/app.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start-hot-reloader": "./node_modules/.bin/webpack-dev-server",
+    "start": "./node_modules/.bin/webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

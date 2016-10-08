@@ -14,7 +14,7 @@ export default class SignUpForm extends React.Component {
     super(props);
 
     this.state = {
-      activeForm: FORM_IDS.SIGNUP_WITH_EMAIL
+      activeForm: FORM_IDS.SIGNUP_SELECTION
     };
   }
 
