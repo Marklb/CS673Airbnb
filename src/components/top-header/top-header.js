@@ -15,7 +15,7 @@ export default class TopHeader extends React.Component {
 
     this.state = {
       loginModalVisible: false,
-      signInModalVisible: false
+      signInModalVisible: true
     };
   }
 
