@@ -68,6 +68,7 @@ $topHeaderHeight: 61px;
       padding: 0 19px;
       float: right;
       background-color: #bgColor;
+      text-decoration: none;
 
       &:hover {
         background-color: $bgColorHover;
@@ -100,27 +101,6 @@ $topHeaderHeight: 61px;
           }
         }
       }
-
-      // &.become-a-host {
-      //   border-left: 0;
-      //
-      //   * {
-      //     pointer-events: none;
-      //   }
-      //
-      //   .btn-rect {
-      //     border: 2px solid $borderColor;
-      //     border-radius: 2px;
-      //     padding: 4px 12px;
-      //     line-height: 1.43;
-      //     font-weight: normal;
-      //     text-align: center;
-      //     /*vertical-align: middle;*/
-      //     display: inline-block;
-      //   }
-      //
-      // }
-
 
 
     }

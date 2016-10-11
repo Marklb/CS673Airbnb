@@ -2,18 +2,23 @@ import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
 import TopHeaderBecomeAHostBtn from './top-header-become-a-host-btn';
+import TopHeaderTripsBtn from './top-header-trips-btn';
+import TopHeaderMessagesBtn from './top-header-messages-btn';
+import TopHeaderProfileBtn from './top-header-profile-btn';
+
 import LoginForm from '../login-form/login-form';
 import SignUpForm from '../signup-form/signup-form';
 
 require("./top-header.scss");
 
-
+// TODO: Fix login/signup modals
 
 export default class TopHeader extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      isLoggedIn: false, // TODO: Remove this from being hard-coded
       loginModalVisible: false,
       signInModalVisible: false
     };
@@ -44,22 +49,41 @@ export default class TopHeader extends React.Component {
     return <div className="header-container modal-container"></div>;
   }
 
+  renderRightButtons() {
+    if(this.state.isLoggedIn === true){
+      return (
+        <div>
+          <TopHeaderProfileBtn />
+          <TopHeaderMessagesBtn />
+          <TopHeaderTripsBtn />
+          <TopHeaderBecomeAHostBtn className="become-a-host" />
+        </div>
+      );
+    }else{
+      return (
+        <div>
+          <div className="right-btn login" onClick={this.onClickLoginBtn.bind(this)}>Log In</div>
+          <div className="right-btn signup" onClick={this.onClickSignUpBtn.bind(this)}>Sign Up</div>
+          {/*<div className="right-btn help">Help</div>*/}
+          <TopHeaderBecomeAHostBtn className="become-a-host" />
+        </div>
+      );
+    }
+  }
+
   render() {
     return (
       <div className="header-container">
         <div className="header-main">
 
-        <Link to="/" className="icon-logo-container">
-          <div className="icon-logo">
-            <div></div>
-          </div>
-        </Link>
+          {/* TODO: Add logged in logo version */}
+          <Link to="/" className="icon-logo-container">
+            <div className="icon-logo">
+              <div></div>
+            </div>
+          </Link>
 
-
-          <div className="right-btn login" onClick={this.onClickLoginBtn.bind(this)}>Log In</div>
-          <div className="right-btn signup" onClick={this.onClickSignUpBtn.bind(this)}>Sign Up</div>
-          <div className="right-btn help">Help</div>
-          <TopHeaderBecomeAHostBtn className="become-a-host" />
+          {this.renderRightButtons()}
 
           <div className="search-bar-wrapper">
             <form className="search-form">
