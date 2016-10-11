@@ -252,6 +252,15 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
     -webkit-writing-mode: horizontal-tb;
   }
 
+  .invalid-input {
+    border-color: #ffb400 !important;
+    background-color: #fff8e5 !important;
+  }
+
+  .valid-input {
+    border-color: #3fb34f !important;
+  }
+
   .birthday-label {
     padding: 15px 0 5px 0;
     font-weight: bold;

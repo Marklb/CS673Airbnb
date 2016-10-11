@@ -1,233 +1,233 @@
+@import "../common.scss";
+
+$bgColor: #fff;
+$bgColorHover: rgba(245, 245, 245, 1);
+$borderColor: rgba(210,210,210,1);
+$fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
+$topHeaderHeight: 61px;
+
 .header-container {
 
-}
+  .header-main {
+    @include fixed-pos(0, 0, auto, 0);
+    z-index: 3;
+    display: block;
+    height: $topHeaderHeight;
+    @include box-sizing(border-box);
+    font-family: $fontFamily;
+    font-size: 14px;
+    line-height: 1.43;
+    color: #484848;
+    background-color: $bgColor;
+    padding: 0;
+    border-bottom: 1px solid $borderColor;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: default;
 
-.header-container > .modal-container.visible{
-  position: fixed; /* Stay in place */
-  z-index: 10000; /* Sit on top */
-  /*width: 100%;*/
-  /*width: 800px;*/
-  /*height: 100%;*/
-  bottom: 0;
-  left: 0;
-  right: 0;
-  top: 0;
-  /*margin: 0 auto;*/
-  display: block;
-  box-sizing: border-box;
-  /*background-color: rgba(40,80,150,1);*/
-  background-color: rgba(0, 0, 0, 0.5);
-  /*pointer-events: none;*/
-}
+    .icon-logo-container {
+      height: $topHeaderHeight;
+      line-height: $topHeaderHeight;
+      border-right: 2px solid $borderColor;
+      position: relative;
+      float: left;
+      background-color: $bgColor;
 
-.header-main {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 3;
-  display: block;
-  height: 61px;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  font-family: Circular, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.43;
-  color: #484848;
-  background: #fff;
-  background-color: #f5f5f5;
-  padding: 0;
-  border-bottom: 1px solid rgba(210,210,210, 1);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  cursor: default;
-  // background: url('./Airbnb_Logo.svg');
-}
+      .icon-logo {
+        width: 98.73px;
+        border-left: 1px solid $borderColor;
+        padding: 0 19px;
+        padding-top: 14px;
 
-.header-main > .icon-logo-container {
-  height: 61px;
-  line-height: 61px;
-  border-right: 2px solid rgba(210,210,210, 1);
-  position: relative;
-  float: left;
-  background-color: #fff;
-}
+        div {
+          width: 98.73px;
+          height: ($topHeaderHeight/2);
+          line-height: ($topHeaderHeight/2);
+          font-size: 24px;
+          background-repeat: no-repeat;
+          background-image: url('./Airbnb_Logo.svg');
+          max-height: ($topHeaderHeight/2);
+          max-width: 98.73px;
+        }
+      }
 
-.header-main > a > .icon-logo {
-  height: 30px;
-  width: 98.73px;
-  line-height: 30px;
-  border-left: 1px solid rgba(210,210,210, 1);
-  padding: 0 19px;
-  padding-top: 14px;
-  font-size: 24px;
-}
+    }
 
-.header-main > a > .icon-logo > div {
-  height: 30px;
-  width: 98.73px;
-  line-height: 30px;
-  font-size: 24px;
-  background-repeat: no-repeat;
-  background-image: url('./Airbnb_Logo.svg');
-  max-height: 30px;
-  max-width: 98.73px;
-}
+    .right-btn {
+      position: relative;
+      height: $topHeaderHeight;
+      line-height: $topHeaderHeight;
+      border-left: 1px solid $borderColor;
+      @include box-sizing(border-box);
+      font-family: $fontFamily;
+      font-weight: 550;
+      font-size: 14px;
+      color: #484848;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding: 0 19px;
+      float: right;
+      background-color: #bgColor;
 
-.header-main > .right-btn {
-  position: relative;
-  height: 61px;
-  line-height: 61px;
-  border-left: 1px solid rgba(210,210,210, 1);
-  box-sizing: border-box;
-  font-family: Verdana, Geneva, sans-serif;
-  font-weight: 550;
-  font-size: 14px;
-  color: #484848;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  padding: 0 19px;
-  float: right;
-  background-color: #fff;
-}
+      &:hover {
+        background-color: $bgColorHover;
+      }
 
-.header-main > .right-btn.become-a-host {
-  border-left: 0;
-  // background-color: blue;
-}
+      .dropdown-container {
+        max-width: 0;
+        max-height: 0;
+        padding: 0;
+        background-color: $bgColorHover;
+        right: 0;
+        position: absolute;
+        // pointer-events: auto;
+        display: block;
+        overflow: hidden;
+        @include box-sizing(border-box);
 
-.header-main > .right-btn.become-a-host * {
-   pointer-events: none;
-}
+        &.visible {
+          width: 280px;
+          max-width: 280px;
+          height: 94px;
+          max-height: 94px;
+          padding: 20px;
+          border: 1px solid $borderColor;
 
-.header-main > .right-btn.become-a-host > .btn-rect {
-  border: 2px solid rgba(200,200,200, 1);
-  border-radius: 2px;
-  padding: 4px 12px;
-  line-height: 1.43;
-  font-weight: normal;
-  text-align: center;
-  /*vertical-align: middle;*/
-  display: inline-block;
-}
+          div {
+            font-family: $fontFamily;
+            font-size: 14px;
+            line-height: 1.3;
+          }
+        }
+      }
 
-.header-main > .right-btn.become-a-host > .dropdown-container {
-  max-width: 0;
-  max-height: 0;
-  padding: 0;
-  background-color: rgba(245, 245, 245, 1);
-  right: 0;
-  position: absolute;
-  pointer-events: auto;
-  display: block;
-  overflow: hidden;
-  box-sizing: border-box;
-}
+      // &.become-a-host {
+      //   border-left: 0;
+      //
+      //   * {
+      //     pointer-events: none;
+      //   }
+      //
+      //   .btn-rect {
+      //     border: 2px solid $borderColor;
+      //     border-radius: 2px;
+      //     padding: 4px 12px;
+      //     line-height: 1.43;
+      //     font-weight: normal;
+      //     text-align: center;
+      //     /*vertical-align: middle;*/
+      //     display: inline-block;
+      //   }
+      //
+      // }
 
-.header-main > .right-btn.become-a-host > .dropdown-container.visible > div {
-  font-family: Circular, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.3;
-}
 
-.header-main > .right-btn.become-a-host > .dropdown-container.visible {
-  width: 280px;
-  max-width: 280px;
-  height: 94px;
-  max-height: 94px;
-  padding: 20px;
-  border: 1px solid rgba(210,210,210, 1);
-}
 
-.header-main > .right-btn:hover {
-  background-color: rgba(245, 245, 245, 1);
-}
+    }
 
-.header-main > .search-bar-wrapper {
-  padding-top: 0;
-  display: table-cell;
-  width: 10000px;
-  height: 61px;
-  line-height: 61px;
-  // border-left: 1px solid rgba(200,200,200, 1);
-  position: relative;
-  box-sizing: border-box;
-  font-size: 14px;
-  color: #484848;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+    .become-a-host {
+      border-left: 0;
 
-.header-main > .search-bar-wrapper .search-bar {
-  display: block;
-  line-height: 61px;
-  font-size: 14px;
-  color: #484848;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
-}
+      * {
+        pointer-events: none;
+      }
 
-.header-main > .search-bar-wrapper .search-bar input {
-  /*height: auto;*/
-  height: 61px;
-  width: 100%;
-  padding: 19.5px 0 19.5px 48px;
-  border: 0;
-  outline: 0;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  line-height: 21px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  display: block;
-  -webkit-transition: border-color 0.2s;
-  -moz-transition: border-color 0.2s;
-  -o-transition: border-color 0.2s;
-  transition: border-color 0.2s;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  background-color: #fff;
-  color: #484848;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  -webkit-rtl-ordering: logical;
-  -webkit-user-select: text;
-  cursor: auto;
-  text-rendering: auto;
-  letter-spacing: normal;
-  word-spacing: normal;
-  text-transform: none;
-  text-indent: 0px;
-  text-shadow: none;
-  text-align: start;
-  font: 13.3333px Arial;
-  -webkit-writing-mode: horizontal-tb;
-}
+      .btn-rect {
+        border: 2px solid $borderColor;
+        border-radius: 2px;
+        padding: 4px 12px;
+        line-height: 1.43;
+        font-weight: normal;
+        text-align: center;
+        /*vertical-align: middle;*/
+        display: inline-block;
+      }
 
-.header-main > .search-bar-wrapper .search-bar .search-bar-icon {
-  position: absolute;
-  top: 19px;
-  left: 16px;
-  z-index: 1;
-  background-repeat: no-repeat;
-  background-image: url('./search-bar-icon.png');
-  width: 24px;
-  height: 24px;
-  display: inline-block;
-  background-color: transparent;
-  vertical-align: baseline;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  font-style: italic;
-  line-height: 61px;
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    }
+
+
+
+    .search-bar-wrapper {
+      padding-top: 0;
+      display: table-cell;
+      width: 10000px;
+      height: $topHeaderHeight;
+      line-height: $topHeaderHeight;
+      // border-left: 1px solid rgba(200,200,200, 1);
+      position: relative;
+      @include box-sizing(border-box);
+      font-size: 14px;
+      color: #484848;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+
+      .search-bar {
+        display: block;
+        line-height: $topHeaderHeight;
+        color: #484848;
+        // @include box-sizing(border-box);
+
+        input {
+          /*height: auto;*/
+          height: $topHeaderHeight;
+          width: 100%;
+          padding: 19.5px 0 19.5px 48px;
+          margin: 0;
+          border: 0;
+          outline: 0;
+          @include box-sizing(border-box);
+          line-height: 21px;
+          @include appearance(none);
+          display: block;
+          @include transition(border-color 0.2s);
+          @include border-radius(2px);
+          background-color: $bgColor;
+          color: #484848;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          -webkit-rtl-ordering: logical;
+          -webkit-user-select: text;
+          cursor: auto;
+          text-rendering: auto;
+          letter-spacing: normal;
+          word-spacing: normal;
+          text-transform: none;
+          text-indent: 0px;
+          text-shadow: none;
+          text-align: start;
+          font: 13.3333px Arial;
+          -webkit-writing-mode: horizontal-tb;
+        }
+
+        .search-bar-icon {
+          position: absolute;
+          top: 19px;
+          left: 16px;
+          z-index: 1;
+          background-repeat: no-repeat;
+          background-image: url('./search-bar-icon.png');
+          width: 24px;
+          height: 24px;
+          display: inline-block;
+          background-color: transparent;
+          vertical-align: baseline;
+          @include box-sizing(border-box);
+          font-style: italic;
+          line-height: $topHeaderHeight;
+          font-size: 14px;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+      }
+
+
+    }
+
+  }
+
+
+
+
+
 }

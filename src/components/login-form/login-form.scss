@@ -1,186 +1,200 @@
+@import "../common.scss";
+
+$bgColor: #f5f5f5;
+$fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
+
 .login-form {
-  min-width: 450px;
-  max-width: 450px;
-  min-height: 535px;
-  max-height: 535px;
-  padding-top: 32px;
-  padding-left: 32px;
-  padding-right: 32px;
-  padding-bottom: 20px;
+  width: 450px;
+  padding: 32px 32px 20px 32px;
   position: relative;
   margin: 50px auto;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  @include box-sizing(border-box);
   display: block;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-family: $fontFamily;
   font-size: 14px;
   line-height: 1.43;
   color: #484848;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
+  background-color: $bgColor;
   border-radius: 2px;
+
+  .btn {
+    padding: 20px 27px 20px 27px;
+    display: block;
+    white-space: normal;
+    border-radius: 2px;
+    border: 1px solid;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    line-height: 1.43;
+    font-size: 16px;
+    @include user-select;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    @include box-sizing(border-box);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
+
+  .or-separator{
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #dce0e0;;
+    line-height: 0.1em;
+    margin: 20px 0 20px;
+
+    .or-text{
+      background-color: #f5f5f5;
+      padding: 0 10px;
+    }
+  }
+
+  .form-container {
+    width: 100%;
+    // background-color: rgba(20,40,80,0.2);
+    // border: 1px solid red;
+    @include box-sizing(border-box);
+    display: block;
+  }
+
+  .btn-login {
+    border-color: #ff5a5f;
+    background-color: #ff5a5f;
+    color: #fff;
+    margin-bottom: 12px;
+
+    &:hover {
+      @include opacity(0.9);
+    }
+  }
+
+  .social-buttons {
+    width: 100%;
+    display: block;
+    // border: 1px solid green;
+    @include box-sizing(border-box);
+
+    .btn {
+      margin-bottom: 8px;
+    }
+
+    .btn-facebook {
+      border-color: rgba(59,89,152,1);
+      background-color: rgba(59,89,152,1);
+      color: #fff;
+
+      &:hover {
+        border-color: rgba(59,89,172,1);
+        background-color: rgba(59,89,172,1);
+        // @include opacity(0.95);
+      }
+    }
+
+    .btn-google {
+      border-color: #c4c4c4;
+      background: white;
+      color: #484848;
+    }
+  }
+
+  .invalid-input {
+    border-color: #ffb400 !important;
+    background-color: #fff8e5 !important;
+  }
+
+  .valid-input {
+    border-color: #3fb34f !important;
+  }
+
+  .field-required-label {
+    display: block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    @include box-sizing(border-box);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    height: 64px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    background-image: url(./text-field-icons-72d5ec863b1ef7c22391015ec8af5906.png);
+    background-repeat: no-repeat;
+    @include background-size(40px, 171px);
+    @include box-sizing(border-box);
+    display: block;
+    padding: 10px 35px 10px 10px;
+    @include transition(border-color .2s);
+    border: 1px solid #aaa;
+    @include border-radius(2px);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-appearance: textfield;
+    -webkit-rtl-ordering: logical;
+    -webkit-user-select: text;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    text-align: start;
+    -webkit-writing-mode: horizontal-tb;
+  }
+
+  .user_email{
+    background-position: right -28px;
+  }
+
+  .user_password{
+    background-position: right -79px;
+  }
+
+  .bottom-opts-container {
+    @extend %clearfix;
+
+    .left-text {
+      float: left;
+      display: inline-block;
+      margin-right: 4px;
+      line-height: 34px;
+      font-size: 16px;
+      @include box-sizing(border-box);
+    }
+
+    .signup-btn{
+      border: 1px solid #ff5a5f;
+      color: #ff5a5f;
+      float: right;
+      padding: 7px 21px;
+      font-size: 14px;
+      display: inline-block;
+      @include border-radius(2px);
+      text-align: center;
+      vertical-align: middle;
+      font-weight: bold;
+      @include user-select;
+      white-space: nowrap;
+      cursor: pointer;
+      text-decoration: none;
+      @include box-sizing(border-box);
+    }
+  }
+
 }
 
-.login-form > .login-facebook{
-  border-color: #c4c4c4;
-  background-color: #f5f5f5;
-  color: #484848;
-  font-size: 16px;
-  border-radius: 2px;
-  border: 1px solid;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 1.43;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  cursor: pointer;
-  text-decoration: none;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin-bottom: 10px;
-  height: 64px;
-}
 
-.login-form > .login-google{
-  border-color: #c4c4c4;
-  background-color: #f5f5f5;
-  color: #484848;
-  font-size: 16px;
-  border-radius: 2px;
-  border: 1px solid;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 1.43;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  cursor: pointer;
-  text-decoration: none;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin-bottom: 10px;
-  height: 64px;
-}
 
-.login-form > .or-separator{
-  width: 100%;
-  text-align: center;
-  border-bottom: 1px solid #dce0e0;;
-  line-height: 0.1em;
-  margin: 20px 0 20px;
-}
 
-.login-form > .or-separator > .or-text{
-  background-color: #f5f5f5;
-  padding: 0 10px;
-}
 
-.login-form > form > input.login{
-  width: 100%;
-  // width: 100% !important;
-  height: 64px;
-  font-size: 16px;
-  margin-bottom: 10px;
-  cursor: auto;
-  background-position: right -28px;
-  // background-image: url(https://a1.muscache.com/airbnb/static/signinup/text-field-icons-72d5ec863b1ef7c22391015ec8af5906.png);
-  background-image: url(./text-field-icons-72d5ec863b1ef7c22391015ec8af5906.png);
-  background-repeat: no-repeat;
-  -webkit-background-size: 40px 171px;
-  -moz-background-size: 40px 171px;
-  -o-background-size: 40px 171px;
-  background-size: 40px 171px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  display: block;
-  padding: 10px 35px 10px 10px;
-  -webkit-transition: border-color .2s;
-  -moz-transition: border-color .2s;
-  -o-transition: border-color .2s;
-  transition: border-color .2s;
-  border: 1px solid #aaa;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  background-color: #fff;
-  color: #484848;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  line-height: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-appearance: textfield;
-  -webkit-rtl-ordering: logical;
-  -webkit-user-select: text;
-  text-rendering: auto;
-  letter-spacing: normal;
-  word-spacing: normal;
-  text-transform: none;
-  text-indent: 0px;
-  text-shadow: none;
-  text-align: start;
-  font: 13.3333px Arial;
-  -webkit-writing-mode: horizontal-tb;
-}
-
-.login-form > form > input.password{
-  width: 100%;
-  // width: 100% !important;
-  height: 64px;
-  font-size: 16px;
-  margin-bottom: 10px;
-  cursor: auto;
-  background-position: right -79px;
-  // background-image: url(https://a1.muscache.com/airbnb/static/signinup/text-field-icons-72d5ec863b1ef7c22391015ec8af5906.png);
-  background-image: url(./text-field-icons-72d5ec863b1ef7c22391015ec8af5906.png);
-  background-repeat: no-repeat;
-  -webkit-background-size: 40px 171px;
-  -moz-background-size: 40px 171px;
-  -o-background-size: 40px 171px;
-  background-size: 40px 171px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  display: block;
-  padding: 10px 35px 10px 10px;
-  -webkit-transition: border-color .2s;
-  -moz-transition: border-color .2s;
-  -o-transition: border-color .2s;
-  transition: border-color .2s;
-  border: 1px solid #aaa;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  background-color: #fff;
-  color: #484848;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  line-height: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-appearance: textfield;
-  -webkit-rtl-ordering: logical;
-  -webkit-user-select: text;
-  text-rendering: auto;
-  letter-spacing: normal;
-  word-spacing: normal;
-  text-transform: none;
-  text-indent: 0px;
-  text-shadow: none;
-  text-align: start;
-  font: 13.3333px Arial;
-  -webkit-writing-mode: horizontal-tb;
-}
 
 .login-form > form > .form-opts-container{
   margin-bottom: 6px;
@@ -274,54 +288,6 @@
   background-color: #f5f5f5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.login-form > form > .login-btn{
-  padding: 20px 0;
-  padding-top: 20px !important;
-  padding-bottom: 20px !important;
-  padding-left: 27px !important;
-  padding-right: 27px !important;
-  font-weight: normal;
-  display: block;
-  white-space: normal;
-  width: 100%;
-  border-color: #ff5a5f;
-  border-bottom-color: #e00007;
-  background-color: #ff5a5f;
-  color: #fff;
-  font-size: 16px;
-  margin-bottom: 0;
-
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-
-  border: 1px solid;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 1.43;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  cursor: pointer;
-  font-family: inherit;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-appearance: button;
-  text-transform: none;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  align-items: flex-start;
-  text-rendering: auto;
-  letter-spacing: normal;
-  word-spacing: normal;
-  text-indent: 0px;
-  text-shadow: none;
-  font: 13.3333px Arial;
-  -webkit-writing-mode: horizontal-tb;
 }
 
 .login-form > .form-opts-container > .no-account-text{

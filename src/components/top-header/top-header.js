@@ -15,12 +15,12 @@ export default class TopHeader extends React.Component {
 
     this.state = {
       loginModalVisible: false,
-      signInModalVisible: true
+      signInModalVisible: false
     };
   }
 
   renderModalContainer() {
-    console.log(this.state);
+    // console.log(this.state);
     if(this.state.loginModalVisible){
       return (
         <div className="header-container modal-container visible"
@@ -59,7 +59,7 @@ export default class TopHeader extends React.Component {
           <div className="right-btn login" onClick={this.onClickLoginBtn.bind(this)}>Log In</div>
           <div className="right-btn signup" onClick={this.onClickSignUpBtn.bind(this)}>Sign Up</div>
           <div className="right-btn help">Help</div>
-          <TopHeaderBecomeAHostBtn />
+          <TopHeaderBecomeAHostBtn className="become-a-host" />
 
           <div className="search-bar-wrapper">
             <form className="search-form">
@@ -77,19 +77,19 @@ export default class TopHeader extends React.Component {
   }
 
   onModalContainerClicked(event){
-    console.log('onModalContainerClicked');
+    // console.log('onModalContainerClicked');
     this.state.loginModalVisible = false;
     this.state.signInModalVisible = false;
     this.setState(this.state);
   }
 
   onClickLoginBtn(event){
-    console.log('onClickLoginBtn');
+    // console.log('onClickLoginBtn');
     this.setState({loginModalVisible: true});
   }
 
   onClickSignUpBtn(event){
-    console.log('onClickSignUpBtn');
+    // console.log('onClickSignUpBtn');
     this.setState({signInModalVisible: true});
   }
 

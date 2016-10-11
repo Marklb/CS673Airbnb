@@ -1,3 +1,5 @@
+// TODO: Add tooltip
+
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
@@ -5,50 +7,224 @@ import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 're
 require("./login-form.scss");
 
 export default class LoginForm extends React.Component {
+  constructor(props) {
+    super(props);
 
-  render() {
+    this.inputFieldClasses = {
+      'default': '',
+      'invalid': 'invalid-input',
+      'valid': 'valid-input'
+    };
+
+    this.state = {
+      formEmailClassesDefault: `user_email`,
+      formEmailClasses: `user_email ${this.inputFieldClasses.default}`,
+      formEmailRequiredLabelVisible: false,
+      isValidEmailField: false,
+      formValuesEmail: "",
+
+      formPasswordClassesDefault: `user_password`,
+      formPasswordClasses: `user_password ${this.inputFieldClasses.default}`,
+      formPasswordRequiredLabelVisible: false,
+      isValidPasswordField: false,
+      formValuesPassword: "",
+    };
+  }
+
+  /*
+
+  */
+  renderFieldRequiredLabel(text) {
+    return <div className="field-required-label">{text}</div>
+  }
+
+  /*
+
+  */
+  renderFormBottom() {
     return (
-      <div className="login-form" onClick={this.onClickLoginForm.bind(this)}>
-        <div className="login-facebook">Log in with Facebook</div>
-        <div className="login-google">Log in with Google</div>
-
-        <div className="or-separator">
-          <span className="or-text">or</span>
-        </div>
-
-        <form onSubmit={this.handleLoginForm.bind(this)}>
-          <input className="login" type="text" placeholder="Email Address" ref="emailAddressInput"/>
-          <input className="password" type="text" placeholder="Password" ref="passwordInput"/>
-
-          <div className="form-opts-container">
-            <label>
-              <input className="remember-me" type="checkbox" value="true" />Remember me
-            </label>
-            <Link to="#" className="forgot-password">Forgot password?</Link>
-          </div>
-
-          <button className="login-btn">Log in</button>
-        </form>
-
+      <div>
         <div className="or-separator"></div>
 
-        <div className="form-opts-container">
-          <div className="no-account-text">Don't have an account?</div>
-          <Link to="#" className="sign-up-btn">Sign up</Link>
+        <div className="bottom-opts-container">
+          <div className="left-text">Don't have an account?</div>
+          <Link to="#" className="signup-btn">Sign Up</Link>
         </div>
       </div>
     );
   }
 
+  render() {
+    return (
+      <div className="login-form" onClick={this.onClickLoginForm.bind(this)}>
+        <div className='form-container'>
+          <div className="social-buttons">
+            <Link to="#" className="btn btn-facebook">Log in with Facebook</Link>
+            <Link to="#" className="btn btn-google">Log in with Google</Link>
+          </div>
+
+          <div className="or-separator">
+            <span className="or-text">or</span>
+          </div>
+
+          <form onSubmit={this.handleLoginForm.bind(this)}>
+              {(this.state.formEmailRequiredLabelVisible === true) ?
+                  this.renderFieldRequiredLabel('Email is required.') : null}
+                <input className={this.state.formEmailClasses}
+                  type="email"
+                  placeholder="Email Address"
+                  name="user[email]"
+                  value={this.state.formValuesEmail}
+                  onChange={this.handleEmailValueChange.bind(this)}
+                  onFocus={this.handleEmailFocus.bind(this)}
+                />
+
+              {(this.state.formPasswordRequiredLabelVisible === true) ?
+                  this.renderFieldRequiredLabel('Password is required.') : null}
+                <input className={this.state.formPasswordClasses}
+                  type="password"
+                  placeholder="Password"
+                  name="user[password]"
+                  value={this.state.formValuesPassword}
+                  onChange={this.handlePasswordValueChange.bind(this)}
+                  onFocus={this.handlePasswordFocus.bind(this)}
+                />
+
+            <div className="form-opts-container">
+              <label>
+                <input className="remember-me" type="checkbox" value="true" />Remember me
+              </label>
+              <Link to="#" className="forgot-password">Forgot password?</Link>
+            </div>
+
+            <div className="btn btn-login"
+              onClick={this.onClickLoginButton.bind(this)}
+            >
+              <span>Log in</span>
+            </div>
+          </form>
+
+          {this.renderFormBottom()}
+        </div>
+      </div>
+    );
+  }
+
+  /*
+
+  Event Callbacks
+
+  */
+
+  /*
+
+  */
   onClickLoginForm(event) {
     event.stopPropagation();
   }
 
+  /*
+
+  */
   handleLoginForm(event) {
     event.preventDefault();
 
     // this.props.createTask(this.refs.createInput.value);
     // this.refs.createInput.value = '';
+  }
+
+  onClickLoginButton(event) {
+    event.preventDefault();
+
+    let isValid = this.isFormValid();
+    this.setState({hasClickedSignUp: true});
+  }
+
+  /*
+
+  */
+  handleEmailValueChange(event) {
+    let value = event.target.value;
+    this.setState({formValuesEmail: value});
+    this.validateEmailValue(value);
+  }
+
+  /*
+
+  */
+  handleEmailFocus(event) {
+    if(this.state.formEmailRequiredLabelVisible === true){
+      this.setState({formEmailRequiredLabelVisible: false});
+    }
+  }
+
+  /*
+
+  */
+  handlePasswordValueChange(event) {
+    let value = event.target.value;
+    this.setState({formValuesPassword: value});
+    this.validatePasswordValue(value);
+  }
+
+  /*
+
+  */
+  handlePasswordFocus(event) {
+    if(this.state.formPasswordRequiredLabelVisible === true){
+      this.setState({formPasswordRequiredLabelVisible: false});
+    }
+  }
+
+  /*
+
+  Form Validations
+
+  */
+  isFormValid() {
+    let isValid = true;
+    let newState = {};
+
+    if(this.state.isValidEmailField === false){
+      newState.formEmailRequiredLabelVisible = true;
+      newState.formEmailClasses =
+        `${this.state.formEmailClassesDefault} ${this.inputFieldClasses.invalid}`;
+      isValid = false;
+    }else{
+      newState.formEmailClasses =
+        `${this.state.formEmailClassesDefault} ${this.inputFieldClasses.valid}`;
+    }
+
+    if(this.state.isValidPasswordField === false){
+      newState.formPasswordRequiredLabelVisible = true;
+      newState.formPasswordClasses =
+        `${this.state.formPasswordClassesDefault} ${this.inputFieldClasses.invalid}`;
+      isValid = false;
+    }else{
+      newState.formPasswordClasses =
+        `${this.state.formPasswordClassesDefault} ${this.inputFieldClasses.valid}`;
+    }
+
+
+    this.setState(newState);
+    return isValid;
+  }
+
+  validateEmailValue(value) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(re.test(value) === true){
+      this.setState({isValidEmailField: true});
+    }else{
+      this.setState({isValidEmailField: false});
+    }
+  }
+
+  validatePasswordValue(value) {
+    if(value.trim().length > 0){
+      this.setState({isValidPasswordField: true});
+    }else{
+      this.setState({isValidPasswordField: false});
+    }
   }
 
 };
