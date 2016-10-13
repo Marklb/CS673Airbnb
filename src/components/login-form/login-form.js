@@ -3,10 +3,11 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+import Modal from '../modal/modal';
 
 require("./login-form.scss");
 
-export default class LoginForm extends React.Component {
+export default class LoginForm extends Modal {
   constructor(props) {
     super(props);
 
@@ -54,13 +55,16 @@ export default class LoginForm extends React.Component {
     );
   }
 
-  render() {
+  renderContent() {
+    console.log(this.props);
+    console.log(`${this.props.name}: ${this.props.isVisible}`);
+    // if(this.props.)
     return (
-      <div className="login-form" onClick={this.onClickLoginForm.bind(this)}>
+      <div className="modal login-form" onClick={this.onClickLoginForm.bind(this)}>
         <div className='form-container'>
-          <div className="social-buttons">
-            <Link to="#" className="btn btn-facebook">Log in with Facebook</Link>
-            <Link to="#" className="btn btn-google">Log in with Google</Link>
+          <div className="social-auth-buttons">
+            <Link to="#" className="btn auth-btn-facebook">Log in with Facebook</Link>
+            <Link to="#" className="btn auth-btn-google">Log in with Google</Link>
           </div>
 
           <div className="or-separator">
@@ -92,7 +96,7 @@ export default class LoginForm extends React.Component {
 
             <div className="form-opts-container">
               <label>
-                <input className="remember-me" type="checkbox" value="true" />Remember me
+                <input className="remember-me" type="checkbox" />Remember me
               </label>
               <Link to="#" className="forgot-password">Forgot password?</Link>
             </div>

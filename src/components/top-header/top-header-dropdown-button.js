@@ -25,7 +25,7 @@ export default class TopHeaderDropdownButton extends React.Component {
 
     // let cn = (this.props) ? "right-btn "+this.props.className : "right-btn";
     return (
-      <Link to="#"
+      <div
         className={(this.props.className) ? "right-btn "+this.props.className : "right-btn"}
         onMouseOver={this.onMouseOver.bind(this)}
         onMouseOut={this.onMouseOut.bind(this)}
@@ -35,7 +35,7 @@ export default class TopHeaderDropdownButton extends React.Component {
           {this.renderDropdownContent()}
         </div>
 
-      </Link>
+      </div>
     );
   }
 

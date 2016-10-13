@@ -75,7 +75,7 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
     }
   }
 
-  .social-buttons {
+  .social-auth-buttons {
     width: 100%;
     display: block;
     // border: 1px solid green;
@@ -85,7 +85,7 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
       margin-bottom: 8px;
     }
 
-    .btn-facebook {
+    .auth-btn-facebook {
       border-color: rgba(59,89,152,1);
       background-color: rgba(59,89,152,1);
       color: #fff;
@@ -97,7 +97,7 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
       }
     }
 
-    .btn-google {
+    .auth-btn-google {
       border-color: #c4c4c4;
       background: white;
       color: #484848;
@@ -196,42 +196,23 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
 
 
 
-.login-form > form > .form-opts-container{
+.form-opts-container{
   margin-bottom: 6px;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  @include box-sizing(border-box);
   display: block;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 14px;
-  line-height: 1.43;
-  color: #484848;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  @extend %clearfix;
 }
 
-.login-form > form > .form-opts-container > label{
+.form-opts-container label{
   float: left;
   padding-top: 0;
   padding-bottom: 0;
   margin-bottom: 6px;
   display: block;
-  line-height: normal;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  cursor: default;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 14px;
-  color: #484848;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @include box-sizing(border-box);
 }
 
-.login-form > form > .form-opts-container > label > .remember-me{
+.form-opts-container label .remember-me{
   position: relative;
   -webkit-appearance: none;
   height: 1.25em;
@@ -239,31 +220,14 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
   margin-bottom: -.25em;
   margin-right: 5px;
   vertical-align: top;
-  -webkit-transition: border-color .2s;
-  -moz-transition: border-color .2s;
-  -o-transition: border-color .2s;
-  transition: border-color .2s;
+  @include transition(border-color .2s);
   border: 1px solid #aaa;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  @include border-radius(2px);
   background-color: #fff;
-  color: #484848;
-  line-height: normal;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+  @include box-sizing(border-box);
   padding: 0;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: inherit;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   -webkit-rtl-ordering: logical;
   -webkit-user-select: text;
-  cursor: auto;
-  text-rendering: auto;
-  letter-spacing: normal;
-  word-spacing: normal;
   text-transform: none;
   text-indent: 0px;
   text-shadow: none;
@@ -271,41 +235,31 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
   text-align: start;
   font: 13.3333px Arial;
   -webkit-writing-mode: horizontal-tb;
+
+  &:checked {
+    background-image: url(./273-red-checkmark.svg);
+  }
 }
 
-.login-form > form > .form-opts-container > .forgot-password{
+.form-opts-container .forgot-password{
   float: right;
   color: #d43242;
   text-decoration: none;
   background: transparent;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  cursor: auto;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 14px;
-  line-height: 1.43;
+  @include box-sizing(border-box);
   background-color: #f5f5f5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-.login-form > .form-opts-container > .no-account-text{
+.form-opts-container .no-account-text{
   float: left;
   display: inline-block;
   margin-right: 4px;
   line-height: 34px;
   font-size: 16px;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  color: #484848;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @include box-sizing(border-box);
 }
 
-.login-form > .form-opts-container > .sign-up-btn{
+.form-opts-container .sign-up-btn{
   font-weight: normal;
   border: 1px solid #ff5a5f;
   color: #ff5a5f;

@@ -65,7 +65,7 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
     }
   }
 
-  .social-buttons {
+  .social-auth-buttons {
     width: 100%;
     display: block;
     // border: 1px solid green;
@@ -75,7 +75,7 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
       margin-bottom: 8px;
     }
 
-    .btn-facebook {
+    .auth-btn-facebook {
       border-color: rgba(59,89,152,1);
       background-color: rgba(59,89,152,1);
       color: #fff;
@@ -87,7 +87,7 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
       }
     }
 
-    .btn-google {
+    .auth-btn-google {
       border-color: #c4c4c4;
       background: white;
       color: #484848;
