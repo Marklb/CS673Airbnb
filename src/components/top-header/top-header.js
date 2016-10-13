@@ -6,9 +6,6 @@ import TopHeaderTripsBtn from './top-header-trips-btn';
 import TopHeaderMessagesBtn from './top-header-messages-btn';
 import TopHeaderProfileBtn from './top-header-profile-btn';
 
-import LoginForm from '../login-form/login-form';
-import SignUpForm from '../signup-form/signup-form';
-
 require("./top-header.scss");
 
 // TODO: Fix login/signup modals
@@ -18,35 +15,8 @@ export default class TopHeader extends React.Component {
     super(props);
 
     this.state = {
-      isLoggedIn: false, // TODO: Remove this from being hard-coded
-      loginModalVisible: false,
-      signInModalVisible: false
+      isLoggedIn: true // TODO: Remove this from being hard-coded
     };
-  }
-
-  renderModalContainer() {
-    // console.log(this.state);
-    if(this.state.loginModalVisible){
-      return (
-        <div className="header-container modal-container visible"
-          onClick={this.onModalContainerClicked.bind(this)}
-        >
-          <LoginForm />
-        </div>
-      );
-    }
-
-    if(this.state.signInModalVisible){
-      return (
-        <div className="header-container modal-container visible"
-          onClick={this.onModalContainerClicked.bind(this)}
-        >
-          <SignUpForm />
-        </div>
-      );
-    }
-
-    return <div className="header-container modal-container"></div>;
   }
 
   renderRightButtons() {
@@ -95,26 +65,19 @@ export default class TopHeader extends React.Component {
           </div>
 
         </div>
-        {this.renderModalContainer()}
+
       </div>
     );
   }
 
-  onModalContainerClicked(event){
-    // console.log('onModalContainerClicked');
-    this.state.loginModalVisible = false;
-    this.state.signInModalVisible = false;
-    this.setState(this.state);
-  }
 
+  // TODO: Fix these buttons
   onClickLoginBtn(event){
-    // console.log('onClickLoginBtn');
-    this.setState({loginModalVisible: true});
+    this.props.showModal('login_form');
   }
 
   onClickSignUpBtn(event){
-    // console.log('onClickSignUpBtn');
-    this.setState({signInModalVisible: true});
+    this.props.showModal('signup_form');
   }
 
 };
