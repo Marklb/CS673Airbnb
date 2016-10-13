@@ -17,8 +17,12 @@ export default class Container extends React.Component {
   constructor(props) {
     super(props);
 
-
+    // Probably not the best was to organized props, but works fine for now.
     this.state = {
+      // TODO: Make a proper implementation for logged in status
+      isLoggedIn: false,
+
+      // Some states intended to be only used by the modal components
       modalVars: {
         isVisible: {
           // Only put booleans in this object

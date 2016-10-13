@@ -15,12 +15,12 @@ export default class TopHeader extends React.Component {
     super(props);
 
     this.state = {
-      isLoggedIn: true // TODO: Remove this from being hard-coded
+      searchInputText: ''
     };
   }
 
   renderRightButtons() {
-    if(this.state.isLoggedIn === true){
+    if(this.props.isLoggedIn === true){
       return (
         <div>
           <TopHeaderProfileBtn />
@@ -59,7 +59,13 @@ export default class TopHeader extends React.Component {
             <form className="search-form">
               <div className="search-bar">
                 <div className="search-bar-icon"></div>
-                <input type="text" placeholder="Where to?" autoComplete="off" name="location" id="header-search-form" className="location" />
+                <input type="text" placeholder="Where to?"
+                  autoComplete="off"
+                  name="location"
+                  id="header-search-form"
+                  className="location"
+                  onKeyPress={this.onKeyPressSearchInput.bind(this)}
+                />
               </div>
             </form>
           </div>
@@ -78,6 +84,19 @@ export default class TopHeader extends React.Component {
 
   onClickSignUpBtn(event){
     this.props.showModal('signup_form');
+  }
+
+  onKeyPressSearchInput(event){
+    console.log('Clicked Enter');
+    console.log(event.target.value);
+    // console.log(event.charCode);
+    if(event.charCode === 13){
+      event.preventDefault();
+
+      $.get(`/s/${event.target.value}`);
+      // console.log(this.state.searchInputText);
+    }
+
   }
 
 };
