@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/Marklb/CS673Airbnb#readme",
   "dependencies": {
-    "ajax": "0.0.4",
     "jquery": "^3.1.1",
     "lodash": "^4.16.2",
     "react": "^15.3.2",

@@ -4,7 +4,12 @@ import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
 import Container from './container/container';
+import Dashboard from './dashboard/dashboard';
+import Inbox from './inbox/inbox';
+import UsersRooms from './users-rooms/users-rooms';
+import UsersTrips from './users-trips/users-trips';
 import UsersEdit from './users-edit/users-edit';
+import UsersNotifications from './users-notifications/users-notifications';
 import FilterForm from './filter-form/filter-form';
 
 require("./app.scss");
@@ -27,8 +32,12 @@ export default class App extends React.Component {
       <Router history={browserHistory}>
         <Route path='/' component={Container}>
           <IndexRoute component={Home} />
-          {/*<Route path='/dashboard' component={Dashboard} />*/}
+          <Route path='/dashboard' component={Dashboard} />
+          <Route path='/inbox' component={Inbox} />
+          <Route path='/rooms' component={UsersRooms} />
+          <Route path='/trips/current' component={UsersTrips} />
           <Route path='/users/edit' component={UsersEdit} />
+          <Route path='/users/notifications' component={UsersNotifications} />
           <Route path='/s/:place' component={FilterForm} />
           <Route path='*' component={NotFound} />
         </Route>
