@@ -1,0 +1,12 @@
+@import "../common.scss";
+
+.dashboard-container {
+
+
+  .dashboard-content {
+    @include box-sizing(border-box);
+    display: block;
+    width: 1000px;
+    margin: 0 auto;
+  }
+}

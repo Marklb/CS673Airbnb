@@ -1,7 +1,5 @@
-Add Component Dashboard
-Add Component DashboardPagesHeader
-Add Component Inbox
-Add Component UsersNotifications
-Add Component UsersRooms
-Add Component UsersTrips
-Add routes to new page components
+Add Component DashboardContainer
+Add Buttons to DashboardPagesHeader
+Implement links for buttons on DashboardPagesHeader
+Add initial styles to DashboardContainer and DashboardPagesHeader
+Fix TopHeader right-btn padding

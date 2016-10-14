@@ -33,8 +33,12 @@ export default class TopHeader extends React.Component {
     }else{
       return (
         <div>
-          <div className="right-btn login" onClick={this.onClickLoginBtn.bind(this)}>Log In</div>
-          <div className="right-btn signup" onClick={this.onClickSignUpBtn.bind(this)}>Sign Up</div>
+          <div className="right-btn login" onClick={this.onClickLoginBtn.bind(this)}>
+            <div>Log In</div>
+          </div>
+          <div className="right-btn signup" onClick={this.onClickSignUpBtn.bind(this)}>
+            <div>Sign Up</div>
+          </div>
           {/*<div className="right-btn help">Help</div>*/}
           <TopHeaderBecomeAHostBtn className="become-a-host" />
         </div>

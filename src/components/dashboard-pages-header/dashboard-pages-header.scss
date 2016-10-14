@@ -1,0 +1,44 @@
+@import "../common.scss";
+
+.dashboard-pages-header {
+  background-color: #484848;
+  @include user-select;
+  @include box-sizing(border-box);
+  display: block;
+  font-size: 14px;
+  line-height: 1.43;
+
+  .links-container {
+    @include box-sizing(border-box);
+    display: block;
+    width: 1000px;
+    margin: 0 auto;
+
+    a {
+      text-decoration: none;
+      color: #bbb;
+      padding: 10px 14px;
+      padding-bottom: 0;
+      @include box-sizing(border-box);
+      display: inline-block;
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      div {
+        height: 100%;
+        @include box-sizing(border-box);
+        padding-bottom: 3px;
+      }
+
+      &.active {
+
+        div {
+          color: #fff;
+          border-bottom: 4px solid #bbb;
+        }
+      }
+    }
+  }
+}

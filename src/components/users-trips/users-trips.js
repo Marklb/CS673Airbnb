@@ -1,6 +1,7 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+import DashboardContainer from '../dashboard-container/dashboard-container';
 
 require("./users-trips.scss");
 
@@ -20,9 +21,11 @@ export default class UsersTrips extends React.Component {
 
   render() {
     return (
-      <div>
-
-      </div>
+      <DashboardContainer headerTab='your-trips' >
+        <div>
+          Your Trips
+        </div>
+      </DashboardContainer>
     );
   }
 

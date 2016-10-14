@@ -11,7 +11,7 @@ export default class TopHeaderBecomeAHostBtn extends TopHeaderDropdownButton {
   }
 
   renderButton() {
-    return (<div className="btn-rect">Become a Host</div>);
+    return (<div><div className="btn-rect">Become a Host</div></div>);
   }
 
   renderDropdownContent() {
