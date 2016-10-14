@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
@@ -93,8 +94,20 @@ export default class TopHeader extends React.Component {
     if(event.charCode === 13){
       event.preventDefault();
 
-      $.get(`/s/${event.target.value}`);
+      // $.get(`/s/${event.target.value}`);
       // console.log(this.state.searchInputText);
+
+      let url = `/s/${event.target.value}`;
+      // console.log(`Going to ${url}`);
+
+      // Navigate to url (Makes page refresh)
+      // window.location.href = url;
+
+      // Navigate to url (Page does not refresh)
+      history.pushState(null, null, url);
+
+      // Clearing the text manually since the page isn't refreshing
+      event.target.value = '';
     }
 
   }

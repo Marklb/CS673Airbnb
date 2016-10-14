@@ -9,16 +9,25 @@ import FilterForm from './filter-form/filter-form';
 
 require("./app.scss");
 
-// TODO: Clean up this routing and remove the added snippets from examples
+/*
+I set up the App component where it just handles routing.
 
+If you want to add something that will be included on any page then add it to the Container
+component located at ./src/components/container/container.js
+
+*/
 export default class App extends React.Component {
 
   render() {
+    // To use react-hot-reloader only instead of express replace browserHistory with hashHistory.
+    // It is probably better that we stick with browserHistory, since the urls are cleaner and we
+    // are being served by express incase we need any thing more advanced that requires more
+    // than just react.
     return (
-      <Router history={hashHistory}>
+      <Router history={browserHistory}>
         <Route path='/' component={Container}>
           <IndexRoute component={Home} />
-          {/* TODO: Add base /users/ route component */}
+          {/*<Route path='/dashboard' component={Dashboard} />*/}
           <Route path='/users/edit' component={UsersEdit} />
           <Route path='/s/:place' component={FilterForm} />
           <Route path='*' component={NotFound} />
@@ -29,6 +38,13 @@ export default class App extends React.Component {
 
 };
 
-const Home = () => <h1>Hello from Home!<Link to="/s/eriogj" className="btn-rect">Search</Link></h1>
-const Address = () => <h1>We are located at 555 Jackson St.</h1>
+// Temporary mini placeholder components
+const Home = () => <h1>Home Page</h1>
 const NotFound = () => <h1>404.. This page is not found!</h1>
+
+
+
+// This should fix the issue with hot reloader saying that a component isn't sure how to update
+if (module.hot) {
+  module.hot.accept();
+}
