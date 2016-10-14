@@ -2,4 +2,4 @@ node_modules/
 .npmrc
 npm-debug.log*
 
-private_notes/**
+private_notes/
