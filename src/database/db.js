@@ -9,7 +9,6 @@ var db = function(app){
 		database : 'airbnb'
 	});
 
- 
 	connection.connect(function(err){
 		if(!err) {
 			console.log("Database is connected ... \n\n");  
@@ -17,6 +16,9 @@ var db = function(app){
 			console.log("Error connecting database ... \n\n");  
 		}
 	});
+
+	// API series
+	// Login verification
 	var session_key_counter = 0;
 	app.post("/api/verifyLogin",function(req,res){
 		var email = req.body.email;
@@ -43,6 +45,27 @@ var db = function(app){
 			}
 		});
 		
+	});
+
+	// Sign up information inserting
+	app.post("/api/signupinfo",function(req,res){
+		var username = req.body.username;
+		var password = req.body.password;
+		var fname = req.body.fname;
+		var lname = req.body.lname;
+		var name = req.body.name;
+		var email = req.body.email;
+		var gender = req.body.gender;
+		var dob = req.body.dob;
+		connection.query(
+		"INSERT INTO Users (username,password,Fname,Lname,email,gender,DOB) VALUES (" + 
+		"'" + username + "'," + "'" + password + "'," + "'" + fname + "'," + "'" + lname +"'," +
+		"'" + name + "'," + "'" + email + "'," + "'" + gender + "'," + "'" + dob + "')");
+		if (!err) {
+			console.log('number of row : ' + rows.length);
+		} else {
+			console.log('Error while performing Query.');
+		}
 	});
 
 	// A get request api call
