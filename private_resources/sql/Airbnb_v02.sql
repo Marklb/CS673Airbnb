@@ -1,15 +1,14 @@
 -- -----------------------------------------------------
--- Schema mokbnb
+-- Schema airbnb
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `airbnb` ;
-DROP SCHEMA IF EXISTS `mokbnb` ;
 
 -- -----------------------------------------------------
--- Schema mokbnb
+-- Schema airbnb
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mokbnb` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `airbnb` DEFAULT CHARACTER SET utf8 ;
 SHOW WARNINGS;
-USE `mokbnb` ;
+USE `airbnb` ;
 
 -- -----------------------------------------------------
 -- Table `Address`
@@ -231,7 +230,7 @@ SHOW WARNINGS;
 -- Still to Do --- Table `CreditCard, Paypal, Check, Reviews, Comments, Public Q&A`
 -- -----------------------------------------------------
 
-INSERT INTO mokbnb.Users (
+INSERT INTO airbnb.Users (
    username,password,Fname,
    Lname,email,gender,DOB
 ) VALUES (
