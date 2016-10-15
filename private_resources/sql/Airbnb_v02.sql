@@ -230,7 +230,7 @@ SHOW WARNINGS;
 -- Still to Do --- Table `CreditCard, Paypal, Check, Reviews, Comments, Public Q&A`
 -- -----------------------------------------------------
 
-INSERT INTO airbnb.Users (
+INSERT INTO Users (
    username,password,Fname,
    Lname,email,gender,DOB
 ) VALUES (
