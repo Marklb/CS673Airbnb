@@ -1,6 +1,8 @@
 var express = require('express');
 var path = require('path');
 var app = express();
+var db = require('./src/database/db');
+
 
 var webpack = require('webpack');
 var webpackDevMiddleware = require('webpack-dev-middleware');
@@ -46,25 +48,7 @@ if (process.env.NODE_ENV !== 'production') {
 // then it will get handled on the front-end by react-router.
 //=============================================================
 
-// A get request api call
-app.get('/api/names', function(req, res){
-  // Temporary string response until implemented
-  res.send('/api/names is not implemented.');
-});
-
-// If the api route is requested with no api call then maybe we could list the available api calls
-app.get('/api', function(req, res){
-  // Temporary string response until implemented
-  res.send('Available api calls are....');
-});
-
-// If an api call was attempted but there is no api call by that name display error page or an
-// error response depending how we want to handle this.
-app.get('/api/*', function(req, res){
-  // Temporary string response until implemented
-  res.send('This api call does not exist.');
-});
-
+db.start(app);
 
 // If route was not defined send the base html file that runs the react app, which will handle the
 // routes not defined
