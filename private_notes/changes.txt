@@ -1,5 +1,0 @@
-Add Component DashboardContainer
-Add Buttons to DashboardPagesHeader
-Implement links for buttons on DashboardPagesHeader
-Add initial styles to DashboardContainer and DashboardPagesHeader
-Fix TopHeader right-btn padding
