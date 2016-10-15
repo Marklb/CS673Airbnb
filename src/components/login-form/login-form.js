@@ -1,5 +1,5 @@
 // TODO: Add tooltip
-
+import $ from 'jquery';
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
@@ -141,6 +141,19 @@ export default class LoginForm extends Modal {
     event.preventDefault();
 
     let isValid = this.isFormValid();
+	
+	if(isValid === true){
+		$.post('/api/verifyLogin', {
+			'email': this.state.formValuesEmail,
+			'password': this.state.formValuesPassword
+		}, (data, status) => {
+			//console.log(data);
+			console.log(status);
+		});
+	}else{
+		
+	}
+	
     this.setState({hasClickedSignUp: true});
   }
 
