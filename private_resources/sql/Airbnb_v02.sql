@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `ListingType` (
 ENGINE = InnoDB;
 
 
-CREATE UNIQUE INDEX `listType_ID_UNIQUE` ON `ListType` (`listType_ID` ASC);
+CREATE UNIQUE INDEX `listType_ID_UNIQUE` ON `ListingType` (`listType_ID` ASC);
 SHOW WARNINGS;
 
 INSERT INTO `ListingType` (`listType_ID`, `listType_Name`) VALUES
