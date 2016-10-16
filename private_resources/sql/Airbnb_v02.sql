@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `DOB` VARCHAR(45) NOT NULL,
   `profile_pic` VARCHAR(45) NULL,
   `bio` VARCHAR(45) NULL,
-  `join_date` VARCHAR(45) NULL,
+  `join_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_ID`))
 ENGINE = InnoDB;
 
