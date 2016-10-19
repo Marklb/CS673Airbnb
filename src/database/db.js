@@ -1,19 +1,20 @@
-var db = function(app){ 
+var db = function(app){
 	console.log('Loading db');
 
 	var mysql      = require('mysql');
 	var connection = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '9993kuo',
+		// password : '9993kuo',
+		password : '',
 		database : 'airbnb'
 	});
 
 	connection.connect(function(err){
 		if(!err) {
-			console.log("Database is connected ... \n\n");  
+			console.log("Database is connected ... \n\n");
 		} else {
-			console.log("Error connecting database ... \n\n");  
+			console.log("Error connecting database ... \n\n");
 		}
 	});
 
@@ -44,7 +45,7 @@ var db = function(app){
 				res.json({'veri_success': false});
 			}
 		});
-		
+
 	});
 
 	// Sign up information inserting
@@ -58,7 +59,7 @@ var db = function(app){
 		var gender = req.body.gender;
 		var dob = req.body.dob;
 		connection.query(
-		"INSERT INTO Users (username,password,Fname,Lname,email,gender,DOB) VALUES (" + 
+		"INSERT INTO Users (username,password,Fname,Lname,email,gender,DOB) VALUES (" +
 		"'" + username + "'," + "'" + password + "'," + "'" + fname + "'," + "'" + lname +"'," +
 		"'" + name + "'," + "'" + email + "'," + "'" + gender + "'," + "'" + dob + "')");
 		if (!err) {
@@ -86,7 +87,7 @@ var db = function(app){
 		// Temporary string response until implemented
 		res.send('This api call does not exist.');
 	});
- 
+
 	console.log('Done Loading db');
 };
 
@@ -96,7 +97,7 @@ module.exports = {
 		if(dbInstance == null){
 			dbInstance = new db(app);
 		}
-		
+
 		return dbInstance;
 	}
 }

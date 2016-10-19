@@ -20,7 +20,7 @@ export default class Modal extends React.Component {
   }
 
   render() {
-    console.log(this.props);
+    // console.log(this.props);
     return (
       <div className={(this.props.isVisible) ? "modal visible" : "modal hidden"}>
         {this.renderContent()}
