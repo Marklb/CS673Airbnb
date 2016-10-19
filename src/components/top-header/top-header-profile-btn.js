@@ -17,7 +17,7 @@ export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
 
   renderButton() {
     // return (<div>{fakeInfo.username}</div>);
-    return (<Link to="/users/edit">{fakeInfo.username}</Link>);
+    return (<Link to="/dashboard">{fakeInfo.username}</Link>);
   }
 
   renderDropdownContent() {

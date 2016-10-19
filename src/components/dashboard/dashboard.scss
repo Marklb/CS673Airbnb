@@ -1,0 +1,36 @@
+@import "../common.scss";
+
+.dashboard-panels {
+
+  .dashboard-group {
+    margin: 15px 0 15px 0;
+    display: block;
+
+    .dashboard-group-title {
+      @include box-sizing(border-box);
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 1.1;
+      color: #484848;
+      padding-bottom: 15px;
+    }
+
+    .dashboard-subgroup-title {
+      font-size: 18px;
+      padding-bottom: 10px;
+      @include box-sizing(border-box);
+      display: block;
+    }
+
+    .dashboard-items-container {
+      // border-top: 4px solid #dce0e0;
+      border-top: 4px solid rgba(230,230,230,1);
+      @include box-sizing(border-box);
+      display: block;
+      font-size: 15px;
+      line-height: 1.43;
+    }
+
+  }
+
+}

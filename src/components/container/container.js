@@ -20,7 +20,7 @@ export default class Container extends React.Component {
     // Probably not the best was to organized props, but works fine for now.
     this.state = {
       // TODO: Make a proper implementation for logged in status
-      isLoggedIn: false,
+      isLoggedIn: true,
 
       // Some states intended to be only used by the modal components
       modalVars: {
