@@ -149,11 +149,12 @@ export default class LoginForm extends Modal {
 		}, (data, status) => {
 			//console.log(data);
 			// console.log(status);
-      if(data.veri_success == false) console.log('Login Not Successful');
-      // If log In was successful then hide the modals which will hide the login model.
-      // May switch this to be more specific instead of all is needed.
-      this.props.hideAllModals();
-      this.props.isLoggedIn = true;
+			if(data.veri_success == false) console.log('Login Not Successful');
+			// If log In was successful then hide the modals which will hide the login model.
+			// May switch this to be more specific instead of all is needed.
+			this.props.hideAllModals();
+			// this.props.isLoggedIn = true;
+			this.props.loginSwitch();
 		});
 	}else{
 
