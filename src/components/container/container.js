@@ -46,6 +46,15 @@ export default class Container extends React.Component {
             newState.modalVars.isVisible[key] = false;
           });
         this.setState(newState);
+      },
+	  loginSwitch: () => {
+		  let newState = this.state;
+		if (newState.isLoggedIn === true) {
+			newState.isLoggedIn = false;
+		} else {
+			newState.isLoggedIn = true;
+		}
+        this.setState(newState);
       }
     };
   }
