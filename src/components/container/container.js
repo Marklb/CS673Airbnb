@@ -20,7 +20,7 @@ export default class Container extends React.Component {
     // Probably not the best was to organized props, but works fine for now.
     this.state = {
       // TODO: Make a proper implementation for logged in status
-      isLoggedIn: true,
+      isLoggedIn: false,
 
       // Some states intended to be only used by the modal components
       modalVars: {
@@ -47,13 +47,13 @@ export default class Container extends React.Component {
           });
         this.setState(newState);
       },
-	  loginSwitch: () => {
-		  let newState = this.state;
-		if (newState.isLoggedIn === true) {
-			newState.isLoggedIn = false;
-		} else {
-			newState.isLoggedIn = true;
-		}
+      loginSwitch: (newLoginState=null) => {
+        let newState = this.state;
+        if(newLoginState === true || newLoginState === false){
+          newState.isLoggedIn = newLoginState;
+        }else{
+          newState.isLoggedIn = !newState.isLoggedIn;
+        }
         this.setState(newState);
       }
     };
