@@ -42,42 +42,7 @@ export default class LoginForm extends Modal {
   }
 
   componentDidMount() {
-    // NOTE: Most of this function isn't working, but may use part of it, so
-    //        I will remove them when cleaning up the social logins.
 
-    // var auth2 = gapi.auth2.getAuthInstance();
-    // auth2.signOut().then(function () {
-    //     console.log('User signed out.');
-    // });
-
-    console.log( window.gapi);
-    var onSignIn2 = function(googleUser) {
-      var profile = googleUser.getBasicProfile();
-      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-      console.log('Name: ' + profile.getName());
-      console.log('Image URL: ' + profile.getImageUrl());
-      console.log('Email: ' + profile.getEmail());
-    }
-
-    // gapi.signin2.render('g-signin2', {
-    gapi.signin2.render('auth-btn-google', {
-      'scope': 'https://www.googleapis.com/auth/plus.login',
-      'width': 500,
-      'height': 50,
-      'longtitle': true,
-      'theme': 'dark',
-      'onsuccess': onSignIn2
-    });
-  }
-
-  responseGoogle(response) {
-    console.log(response);
-    this.setState({authedIdGoogle: response});
-  }
-
-  responseFacebook(response) {
-    console.log(response);
-    this.setState({authedIdFacebook: response});
   }
 
   /*
@@ -104,23 +69,17 @@ export default class LoginForm extends Modal {
   }
 
   renderContent() {
-    // console.log(this.props);
-    // console.log(`${this.props.name}: ${this.props.isVisible}`);
-    // if(this.props.)
     return (
       <div className="modal login-form" onClick={this.onClickLoginForm.bind(this)}>
-        <div className='g-signin2'></div>
         <div className='form-container'>
           <div className="social-auth-buttons">
-            <Link to="#" className="btn auth-btn-facebook">Log in with Facebook</Link>
-            <Link to="#" className="btn auth-btn-google">Log in with Google</Link>
-            <div className="btn auth-btn-google" onClick={this.onClickLoginForm2.bind(this)}>Log in with Google2</div>
             <FacebookLogin
               appId={FACEBOOK_API_APP_ID}
               autoLoad={true}
+              textButton="Log in with Facebook"
               fields="name,email,picture"
               callback={this.responseFacebook.bind(this)}
-              cssClass="my-facebook-button-class"
+              cssClass="btn auth-btn-facebook"
               icon="fa-facebook"
             />
             <GoogleLogin
@@ -129,7 +88,10 @@ export default class LoginForm extends Modal {
               buttonText="Login with google"
               onSuccess={this.responseGoogle.bind(this)}
               onFailure={this.responseGoogle.bind(this)}
-            />
+            >
+              <div className="icon-google" />
+              <span>Log in with Google</span>
+            </GoogleLogin>
           </div>
 
           <div className="or-separator">
@@ -184,12 +146,21 @@ export default class LoginForm extends Modal {
   Event Callbacks
 
   */
-  onSignIn(googleUser) {
-    var profile = googleUser.getBasicProfile();
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail());
+
+  /*
+
+  */
+  responseGoogle(response) {
+    console.log(response);
+    this.setState({authedIdGoogle: response});
+  }
+
+  /*
+
+  */
+  responseFacebook(response) {
+    console.log(response);
+    this.setState({authedIdFacebook: response});
   }
 
   /*
@@ -212,39 +183,39 @@ export default class LoginForm extends Modal {
   /*
   NOTE: Will be removed
   */
-  onClickLoginForm2(event) {
-    event.stopPropagation();
-    console.log(this.state.authedIdGoogle);
-    console.log(gapi.auth2.getAuthInstance());
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-    });
-
-  }
+  // onClickLoginForm2(event) {
+  //   event.stopPropagation();
+  //   console.log(this.state.authedIdGoogle);
+  //   console.log(gapi.auth2.getAuthInstance());
+  //   var auth2 = gapi.auth2.getAuthInstance();
+  //   auth2.signOut().then(function () {
+  //       console.log('User signed out.');
+  //   });
+  //
+  // }
 
   onClickLoginButton(event) {
     event.preventDefault();
 
     let isValid = this.isFormValid();
 
-	if(isValid === true){
-		$.post('/api/verifyLogin', {
-			'email': this.state.formValuesEmail,
-			'password': this.state.formValuesPassword
-		}, (data, status) => {
-			//console.log(data);
-			// console.log(status);
-			if(data.veri_success == false) console.log('Login Not Successful');
-			// If log In was successful then hide the modals which will hide the login model.
-			// May switch this to be more specific instead of all is needed.
-			this.props.hideAllModals();
-			// this.props.isLoggedIn = true;
-			this.props.loginSwitch();
-		});
-	}else{
+  	if(isValid === true){
+  		$.post('/api/verifyLogin', {
+  			'email': this.state.formValuesEmail,
+  			'password': this.state.formValuesPassword
+  		}, (data, status) => {
+  			//console.log(data);
+  			// console.log(status);
+  			if(data.veri_success == false) console.log('Login Not Successful');
+  			// If log In was successful then hide the modals which will hide the login model.
+  			// May switch this to be more specific instead of all is needed.
+  			this.props.hideAllModals();
+  			// this.props.isLoggedIn = true;
+  			this.props.loginSwitch();
+  		});
+  	}else{
 
-	}
+  	}
 
     this.setState({hasClickedSignUp: true});
   }
