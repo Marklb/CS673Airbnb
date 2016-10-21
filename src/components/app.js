@@ -1,16 +1,18 @@
-import _ from 'lodash';
-
 import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import Container from './container/container';
-import Dashboard from './dashboard/dashboard';
-import Inbox from './inbox/inbox';
-import UsersRooms from './users-rooms/users-rooms';
-import UsersTrips from './users-trips/users-trips';
-import UsersEdit from './users-edit/users-edit';
-import UsersNotifications from './users-notifications/users-notifications';
-import FilterForm from './filter-form/filter-form';
+// Javascript Modules
+import _ from 'lodash';
+
+// React Components
+import Container from './container';
+import Dashboard from './dashboard';
+import Inbox from './inbox';
+import UsersRooms from './users-rooms';
+import UsersTrips from './users-trips';
+import UsersEdit from './users-edit';
+import UsersNotifications from './users-notifications';
+import FilterForm from './filter-form';
 
 require("./app.scss");
 
@@ -46,6 +48,7 @@ export default class App extends React.Component {
   }
 
 };
+
 
 // Temporary mini placeholder components
 const Home = () => <h1>Home Page</h1>

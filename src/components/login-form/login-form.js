@@ -1,19 +1,28 @@
 // TODO: Add tooltip
-import $ from 'jquery';
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+// Javascript Modules
+import $ from 'jquery';
+import UserSessionHandler from '../../user-session-handler';
+import ModalsHandler from '../../modals-handler';
+
+// React Components
 import GoogleLogin from 'react-google-login';
 import FacebookLogin from 'react-facebook-login';
 
-import Modal from '../modal/modal';
 
 require("./login-form.scss");
 
-const GOOGLE_API_CLIENT_ID = '997870016673-18k8dg853j7uau7ol95juckeqoarhq23.apps.googleusercontent.com';
-const FACEBOOK_API_APP_ID = '193972817678388';
 
-export default class LoginForm extends Modal {
+export default class LoginForm extends React.Component {
+  static contextTypes = {
+    googleApiClientId: React.PropTypes.string.isRequired,
+    facebookApiAppId: React.PropTypes.string.isRequired,
+    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
+    modalsHandler: React.PropTypes.instanceOf(ModalsHandler).isRequired
+  };
+
   constructor(props) {
     super(props);
 
@@ -24,6 +33,8 @@ export default class LoginForm extends Modal {
     };
 
     this.state = {
+      // isVisible: true,
+
       formEmailClassesDefault: `user_email`,
       formEmailClasses: `user_email ${this.inputFieldClasses.default}`,
       formEmailRequiredLabelVisible: false,
@@ -68,13 +79,13 @@ export default class LoginForm extends Modal {
     );
   }
 
-  renderContent() {
+  render() {
     return (
-      <div className="modal login-form" onClick={this.onClickLoginForm.bind(this)}>
+      <div className="login-form" onClick={this.onClickLoginForm.bind(this)}>
         <div className='form-container'>
           <div className="social-auth-buttons">
             <FacebookLogin
-              appId={FACEBOOK_API_APP_ID}
+              appId={this.context.facebookApiAppId}
               autoLoad={true}
               textButton="Log in with Facebook"
               fields="name,email,picture"
@@ -83,7 +94,7 @@ export default class LoginForm extends Modal {
               icon="fa-facebook"
             />
             <GoogleLogin
-              clientId={GOOGLE_API_CLIENT_ID}
+              clientId={this.context.googleApiClientId}
               className="btn auth-btn-google"
               buttonText="Login with google"
               onSuccess={this.responseGoogle.bind(this)}
@@ -151,16 +162,40 @@ export default class LoginForm extends Modal {
 
   */
   responseGoogle(response) {
-    console.log(response);
+    // console.log(response);
     this.setState({authedIdGoogle: response});
+    if(response.accessToken !== undefined){
+      this.context.userSessionHandler.loginSet({
+        isLoggedIn: true,
+        authType: 'google',
+        response: response
+      });
+
+      if(this.props.modalVars !== undefined){
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+          this.props.modalVars.name);
+      }
+    }
   }
 
   /*
 
   */
   responseFacebook(response) {
-    console.log(response);
+    // console.log(response);
     this.setState({authedIdFacebook: response});
+    if(response.accessToken !== undefined){
+      this.context.userSessionHandler.loginSet({
+        isLoggedIn: true,
+        authType: 'facebook',
+        response: response
+      });
+
+      if(this.props.modalVars !== undefined){
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+          this.props.modalVars.name);
+      }
+    }
   }
 
   /*

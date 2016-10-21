@@ -1,7 +1,7 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import DashboardContainer from '../dashboard-container/dashboard-container';
+import DashboardContainer from '../dashboard-container';
 
 require("./users-notifications.scss");
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import DashboardPagesHeader from '../dashboard-pages-header/dashboard-pages-header';
+import DashboardPagesHeader from '../dashboard-pages-header';
 
 require("./dashboard-container.scss");
 
