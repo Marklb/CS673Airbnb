@@ -37,12 +37,11 @@ DROP TABLE IF EXISTS `Users` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `Users` (
   `user_ID` INT NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
   `password` VARCHAR(45) NOT NULL,
   `Fname` VARCHAR(45) NOT NULL,
   `Lname` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) GENERATED ALWAYS AS (concat(Fname, Lname)) VIRTUAL,
-  `email` VARCHAR(45) NOT NULL,
   `addr_ID` INT NULL,
   `gender` VARCHAR(45) NOT NULL,
   `DOB` VARCHAR(45) NOT NULL,
@@ -231,8 +230,8 @@ SHOW WARNINGS;
 -- -----------------------------------------------------
 
 INSERT INTO Users (
-   username,password,Fname,
-   Lname,email,gender,DOB
+   email,password,Fname,
+   Lname,gender,DOB
 ) VALUES (
-   'JohnDoe', 'test', 'John', 'Doe', 'JohnDoe@VIP.com','M','03/26/90'
+   'JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','03/26/90'
 );
