@@ -5,8 +5,7 @@ var db = function(app){
 	var connection = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		// password : '9993kuo',
-		password : '',
+		 password : '9993kuo',
 		database : 'airbnb'
 	});
 
@@ -50,23 +49,42 @@ var db = function(app){
 
 	// Sign up information inserting
 	app.post("/api/signupinfo",function(req,res){
-		var username = req.body.username;
+		var username = 'NULL';
 		var password = req.body.password;
-		var fname = req.body.fname;
-		var lname = req.body.lname;
-		var name = req.body.name;
+		var fname = req.body.firstname;
+		var lname = req.body.lastname;
+		var name = fname + ' ' + lname;
 		var email = req.body.email;
-		var gender = req.body.gender;
-		var dob = req.body.dob;
+		var gender = 'NULL';
+		var bmonth = req.body.birthdaymonth;
+		var byear = req.body.birthdayyear;
+		var bday = req.body.birthdayday;
+		var dob = bday + '-' + bmonth + '-' + byear;
+		
+		var va = 1;
+		var st = 'Cash';
 		connection.query(
 		"INSERT INTO Users (username,password,Fname,Lname,email,gender,DOB) VALUES (" +
 		"'" + username + "'," + "'" + password + "'," + "'" + fname + "'," + "'" + lname +"'," +
-		"'" + name + "'," + "'" + email + "'," + "'" + gender + "'," + "'" + dob + "')");
-		if (!err) {
-			console.log('number of row : ' + rows.length);
-		} else {
-			console.log('Error while performing Query.');
-		}
+		"'" + email + "'," + "'" + gender + "'," + "'" + dob + "')", function(err, rows, fields){
+			if (!err) {
+				res.json({'insert_success': true});
+			} else {
+				console.log('Error while performing Query.');
+				console.log('Error while performing Query.');
+				res.json({'insert_success': false});
+			}
+		});
+		// connection.query(
+		// "INSERT INTO Users (username,password,Fname,Lname,email,gender,DOB) VALUES ('WillKuo', '007', 'Will', 'Kuo', 'uuu@VIP.com','M','08/26/90')", function(err, rows, fields){
+			// if (!err) {
+				// res.json({'insert_success': true});
+			// } else {
+				// console.log('Error while performing Query.');
+				// console.log(err);
+				// res.json({'insert_success': false});
+			// }
+		// });
 	});
 
 	// A get request api call
