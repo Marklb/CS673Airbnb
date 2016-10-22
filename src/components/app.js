@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+import Home from './home/home';
 import Container from './container/container';
 import Dashboard from './dashboard/dashboard';
 import Inbox from './inbox/inbox';
@@ -48,7 +49,7 @@ export default class App extends React.Component {
 };
 
 // Temporary mini placeholder components
-const Home = () => <h1>Home Page</h1>
+//const Home = () => <h1>Home Page</h1>
 const NotFound = () => <h1>404.. This page is not found!</h1>
 
 
