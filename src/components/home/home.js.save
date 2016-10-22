@@ -6,7 +6,7 @@ import TopHeader from '../top-header/top-header';
 import ModalsContainer from '../modals-container/modals-container';
 import LoginForm from '../login-form/login-form';
 import SignUpForm from '../signup-form/signup-form';
-import DateRangePicker from '../daterangepicker/jsx/DateRangePickerWrapper';
+import DateRangePicker from '../daterangepicker/jsx/DateRangePicker.jsx';
 
 require("./home.scss");
 require("../top-header/top-header.scss");
@@ -78,9 +78,16 @@ export default class Home extends React.Component {
                   className="location"
                   onKeyPress={this.onKeyPressSearchInput.bind(this)}
                 />
-
-              </div>
-
+      <div>
+        <	DateRangePicker
+          {...this.props}
+          	onDatesChange={this.onDatesChange}
+          	onFocusChange={this.onFocusChange}
+          	focusedInput={focusedInput}
+          	startDate={startDate}
+          	endDate={endDate}
+        	/>
+	      </div>
             </form>
           </div>
 

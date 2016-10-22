@@ -51,10 +51,7 @@ export default class App extends React.Component {
 
 
 // Temporary mini placeholder components
-//const Home = () => <h1>Home Page</h1>
 const NotFound = () => <h1>404.. This page is not found!</h1>
-
-
 
 // This should fix the issue with hot reloader saying that a component isn't sure how to update
 if (module.hot) {
