@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-<<<<<<< HEAD
+// HEAD
 import Home from './home/home';
 import Container from './container/container';
 import Dashboard from './dashboard/dashboard';
@@ -11,20 +11,8 @@ import UsersTrips from './users-trips/users-trips';
 import UsersEdit from './users-edit/users-edit';
 import UsersNotifications from './users-notifications/users-notifications';
 import FilterForm from './filter-form/filter-form';
-=======
 // Javascript Modules
 import _ from 'lodash';
-
-// React Components
-import Container from './container';
-import Dashboard from './dashboard';
-import Inbox from './inbox';
-import UsersRooms from './users-rooms';
-import UsersTrips from './users-trips';
-import UsersEdit from './users-edit';
-import UsersNotifications from './users-notifications';
-import FilterForm from './filter-form';
->>>>>>> 4cac84fad0128c12add8edc6c1d13bffbac031e9
 
 require("./app.scss");
 
