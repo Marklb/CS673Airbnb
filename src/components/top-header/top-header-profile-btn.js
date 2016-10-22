@@ -1,12 +1,11 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import TopHeaderDropdownButton from './top-header-dropdown-button';
+// Javascript Modules
+import UserSessionHandler from '../../user-session-handler';
 
-// TODO: Remove fake info
-let fakeInfo = {
-  username: 'Mark'
-};
+// React Components
+import TopHeaderDropdownButton from './top-header-dropdown-button';
 
 export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
 
@@ -17,7 +16,7 @@ export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
 
   renderButton() {
     // return (<div>{fakeInfo.username}</div>);
-    return (<Link to="/users/edit">{fakeInfo.username}</Link>);
+    return (<Link to="/dashboard">{this.context.userSessionHandler.getFirstName()}</Link>);
   }
 
   renderDropdownContent() {
@@ -27,4 +26,8 @@ export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
   }
 
 
+};
+
+TopHeaderProfileBtn.contextTypes = {
+  userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
 };

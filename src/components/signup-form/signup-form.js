@@ -7,7 +7,6 @@ import _ from 'lodash';
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import Modal from '../modal/modal';
 
 require("./signup-form.scss");
 
@@ -49,7 +48,7 @@ let getAge = (dateString) => {
 /*
 
 */
-export default class SignUpForm extends Modal {
+export default class SignUpForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -334,7 +333,7 @@ export default class SignUpForm extends Modal {
   /*
 
   */
-  renderContent() {
+  render() {
     return (
       <div className='signup-modal' onClick={this.onClickModal.bind(this)}>
         <div className='form-container'>

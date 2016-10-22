@@ -1,13 +1,28 @@
 // TODO: Add tooltip
-
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import Modal from '../modal/modal';
+// Javascript Modules
+import $ from 'jquery';
+import UserSessionHandler from '../../user-session-handler';
+import ModalsHandler from '../../modals-handler';
+
+// React Components
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
+
 
 require("./login-form.scss");
 
-export default class LoginForm extends Modal {
+
+export default class LoginForm extends React.Component {
+  static contextTypes = {
+    googleApiClientId: React.PropTypes.string.isRequired,
+    facebookApiAppId: React.PropTypes.string.isRequired,
+    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
+    modalsHandler: React.PropTypes.instanceOf(ModalsHandler).isRequired
+  };
+
   constructor(props) {
     super(props);
 
@@ -18,6 +33,8 @@ export default class LoginForm extends Modal {
     };
 
     this.state = {
+      // isVisible: true,
+
       formEmailClassesDefault: `user_email`,
       formEmailClasses: `user_email ${this.inputFieldClasses.default}`,
       formEmailRequiredLabelVisible: false,
@@ -29,7 +46,14 @@ export default class LoginForm extends Modal {
       formPasswordRequiredLabelVisible: false,
       isValidPasswordField: false,
       formValuesPassword: "",
+
+      authedIdGoogle: null,
+      authedIdFacebook: null
     };
+  }
+
+  componentDidMount() {
+
   }
 
   /*
@@ -55,16 +79,30 @@ export default class LoginForm extends Modal {
     );
   }
 
-  renderContent() {
-    console.log(this.props);
-    console.log(`${this.props.name}: ${this.props.isVisible}`);
-    // if(this.props.)
+  render() {
     return (
-      <div className="modal login-form" onClick={this.onClickLoginForm.bind(this)}>
+      <div className="login-form" onClick={this.onClickLoginForm.bind(this)}>
         <div className='form-container'>
           <div className="social-auth-buttons">
-            <Link to="#" className="btn auth-btn-facebook">Log in with Facebook</Link>
-            <Link to="#" className="btn auth-btn-google">Log in with Google</Link>
+            <FacebookLogin
+              appId={this.context.facebookApiAppId}
+              autoLoad={true}
+              textButton="Log in with Facebook"
+              fields="name,email,picture"
+              callback={this.responseFacebook.bind(this)}
+              cssClass="btn auth-btn-facebook"
+              icon="fa-facebook"
+            />
+            <GoogleLogin
+              clientId={this.context.googleApiClientId}
+              className="btn auth-btn-google"
+              buttonText="Login with google"
+              onSuccess={this.responseGoogle.bind(this)}
+              onFailure={this.responseGoogle.bind(this)}
+            >
+              <div className="icon-google" />
+              <span>Log in with Google</span>
+            </GoogleLogin>
           </div>
 
           <div className="or-separator">
@@ -123,6 +161,46 @@ export default class LoginForm extends Modal {
   /*
 
   */
+  responseGoogle(response) {
+    // console.log(response);
+    this.setState({authedIdGoogle: response});
+    if(response.accessToken !== undefined){
+      this.context.userSessionHandler.loginSet({
+        isLoggedIn: true,
+        authType: 'google',
+        response: response
+      });
+
+      if(this.props.modalVars !== undefined){
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+          this.props.modalVars.name);
+      }
+    }
+  }
+
+  /*
+
+  */
+  responseFacebook(response) {
+    // console.log(response);
+    this.setState({authedIdFacebook: response});
+    if(response.accessToken !== undefined){
+      this.context.userSessionHandler.loginSet({
+        isLoggedIn: true,
+        authType: 'facebook',
+        response: response
+      });
+
+      if(this.props.modalVars !== undefined){
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+          this.props.modalVars.name);
+      }
+    }
+  }
+
+  /*
+
+  */
   onClickLoginForm(event) {
     event.stopPropagation();
   }
@@ -137,10 +215,43 @@ export default class LoginForm extends Modal {
     // this.refs.createInput.value = '';
   }
 
+  /*
+  NOTE: Will be removed
+  */
+  // onClickLoginForm2(event) {
+  //   event.stopPropagation();
+  //   console.log(this.state.authedIdGoogle);
+  //   console.log(gapi.auth2.getAuthInstance());
+  //   var auth2 = gapi.auth2.getAuthInstance();
+  //   auth2.signOut().then(function () {
+  //       console.log('User signed out.');
+  //   });
+  //
+  // }
+
   onClickLoginButton(event) {
     event.preventDefault();
 
     let isValid = this.isFormValid();
+
+  	if(isValid === true){
+  		$.post('/api/verifyLogin', {
+  			'email': this.state.formValuesEmail,
+  			'password': this.state.formValuesPassword
+  		}, (data, status) => {
+  			//console.log(data);
+  			// console.log(status);
+  			if(data.veri_success == false) console.log('Login Not Successful');
+  			// If log In was successful then hide the modals which will hide the login model.
+  			// May switch this to be more specific instead of all is needed.
+  			this.props.hideAllModals();
+  			// this.props.isLoggedIn = true;
+  			this.props.loginSwitch();
+  		});
+  	}else{
+
+  	}
+
     this.setState({hasClickedSignUp: true});
   }
 

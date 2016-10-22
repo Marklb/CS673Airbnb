@@ -1,17 +1,27 @@
-import $ from 'jquery';
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+// Javascript Modules
+import $ from 'jquery';
+import UserSessionHandler from '../../user-session-handler';
+import ModalsHandler from '../../modals-handler';
+
+// React Components
 import TopHeaderBecomeAHostBtn from './top-header-become-a-host-btn';
 import TopHeaderTripsBtn from './top-header-trips-btn';
 import TopHeaderMessagesBtn from './top-header-messages-btn';
 import TopHeaderProfileBtn from './top-header-profile-btn';
+import LoginForm from '../login-form';
 
 require("./top-header.scss");
 
-// TODO: Fix login/signup modals
 
 export default class TopHeader extends React.Component {
+  static contextTypes = {
+    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
+    modalsHandler: React.PropTypes.instanceOf(ModalsHandler).isRequired
+  };
+  
   constructor(props) {
     super(props);
 
@@ -21,7 +31,7 @@ export default class TopHeader extends React.Component {
   }
 
   renderRightButtons() {
-    if(this.props.isLoggedIn === true){
+    if(this.context.userSessionHandler.isLoggedIn() === true){
       return (
         <div>
           <TopHeaderProfileBtn />
@@ -82,13 +92,12 @@ export default class TopHeader extends React.Component {
   }
 
 
-  // TODO: Fix these buttons
   onClickLoginBtn(event){
-    this.props.showModal('login_form');
+    this.context.modalsHandler.showModal('main_modal_container', 'login_form');
   }
 
   onClickSignUpBtn(event){
-    this.props.showModal('signup_form');
+    this.context.modalsHandler.showModal('main_modal_container', 'signup_form');
   }
 
   onKeyPressSearchInput(event){
@@ -109,6 +118,7 @@ export default class TopHeader extends React.Component {
 
       // Navigate to url (Page does not refresh)
       history.pushState(null, null, url);
+
 
       // Clearing the text manually since the page isn't refreshing
       event.target.value = '';

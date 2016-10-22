@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `DOB` VARCHAR(45) NOT NULL,
   `profile_pic` VARCHAR(45) NULL,
   `bio` VARCHAR(45) NULL,
-  `join_date` VARCHAR(45) NULL,
+  `join_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_ID`))
 ENGINE = InnoDB;
 
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `ListingType` (
 ENGINE = InnoDB;
 
 
-CREATE UNIQUE INDEX `listType_ID_UNIQUE` ON `ListType` (`listType_ID` ASC);
+CREATE UNIQUE INDEX `listType_ID_UNIQUE` ON `ListingType` (`listType_ID` ASC);
 SHOW WARNINGS;
 
 INSERT INTO `ListingType` (`listType_ID`, `listType_Name`) VALUES
@@ -230,7 +230,7 @@ SHOW WARNINGS;
 -- Still to Do --- Table `CreditCard, Paypal, Check, Reviews, Comments, Public Q&A`
 -- -----------------------------------------------------
 
-INSERT INTO airbnb.Users (
+INSERT INTO Users (
    username,password,Fname,
    Lname,email,gender,DOB
 ) VALUES (

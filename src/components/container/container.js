@@ -2,68 +2,45 @@ import _ from 'lodash';
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import TopHeader from '../top-header/top-header';
-import ModalsContainer from '../modals-container/modals-container';
-import LoginForm from '../login-form/login-form';
-import SignUpForm from '../signup-form/signup-form';
+// Javascript Modules
+import UserSessionHandler from '../../user-session-handler';
+
+// React Components
+import ContextWrapper from '../context-wrapper';
+import TopHeader from '../top-header';
+import ModalsContainer from '../modals-container';
+import Modal from '../modal';
+import LoginForm from '../login-form';
+import SignUpForm from '../signup-form';
 
 
 require("./container.scss");
 
 /*
-Root container component to the app
+
 */
 export default class Container extends React.Component {
   constructor(props) {
     super(props);
 
-    // Probably not the best was to organized props, but works fine for now.
     this.state = {
-      // TODO: Make a proper implementation for logged in status
-      isLoggedIn: false,
 
-      // Some states intended to be only used by the modal components
-      modalVars: {
-        isVisible: {
-          // Only put booleans in this object
-          login_form: false,
-          signup_form: false
-        },
-      },
-      showModal: (modal_name) => {
-        let newState = this.state;
-        newState.modalVars.isVisible[modal_name] = true;
-        this.setState(newState);
-      },
-      hideModal: (modal_name) => {
-        let newState = this.state;
-        newState.modalVars.isVisible[modal_name] = false;
-        this.setState(newState);
-      },
-      hideAllModals: () => {
-        let newState = this.state;
-        _.forEach(newState.modalVars.isVisible, function(value, key) {
-            newState.modalVars.isVisible[key] = false;
-          });
-        this.setState(newState);
-      }
     };
   }
 
 
-
   render() {
     return (
-      <div>
-        <TopHeader {...this.state} />
+      <ContextWrapper>
+        <TopHeader />
 
         {this.props.children}
 
-        <ModalsContainer {...this.state} >
-          <LoginForm name="login_form" isVisible={this.state.modalVars.isVisible.login_form} />
-          <SignUpForm name="signup_form" isVisible={this.state.modalVars.isVisible.signup_form} />
+        <ModalsContainer name="main_modal_container">
+          <Modal name="login_form"><LoginForm /></Modal>
+          <Modal name="signup_form"><SignUpForm /></Modal>
         </ModalsContainer>
-      </div>
+      </ContextWrapper>
     );
   }
 

@@ -2,7 +2,10 @@ var express = require('express');
 var path = require('path');
 var app = express();
 var db = require('./src/database/db');
+var bodyParser = require('body-parser');
 
+
+app.use(bodyParser());
 
 var webpack = require('webpack');
 var webpackDevMiddleware = require('webpack-dev-middleware');

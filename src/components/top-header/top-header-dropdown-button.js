@@ -40,14 +40,13 @@ export default class TopHeaderDropdownButton extends React.Component {
   }
 
   onMouseOver(event) {
-    console.log('Mouse Over');
+    // console.log('Mouse Over');
     this.setState({dropdownContainerVisibility: false});
   }
 
   onMouseOut(event) {
-    console.log('Mouse Out');
+    // console.log('Mouse Out');
     this.setState({dropdownContainerVisibility: true});
   }
 
 };
-// <div className="hover-check"></div>

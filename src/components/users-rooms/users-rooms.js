@@ -1,7 +1,7 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
-import DashboardContainer from '../dashboard-container/dashboard-container';
+import DashboardContainer from '../dashboard-container';
 
 require("./users-rooms.scss");
 
@@ -22,7 +22,7 @@ export default class UsersRooms extends React.Component {
   render() {
     return (
       <DashboardContainer headerTab='your-listings' >
-        <div>
+        <div className="dashboard-layout-left-nav-layout-container">
           Your Listings
         </div>
       </DashboardContainer>
