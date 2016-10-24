@@ -7,7 +7,10 @@ export default class userSessionHandler {
     this._reactComponent = reactComponent;
     this._isLoggedIn = false;
     this._authType = undefined;
+
     this._firstName = FIRST_NAME_PLACEHOLDER;
+    this._lastName = undefined;
+    this._email = undefined;
   }
 
   /*
@@ -31,10 +34,15 @@ export default class userSessionHandler {
     options._authType = (options.authType !== undefined) ? options.authType : undefined;
 
     if(options.response !== undefined){
+      console.log(options.response);
       switch(options.authType){
         case 'facebook':
+          this._email = (options.response.email !== undefined) ?
+            options.response.email : undefined;
           this._firstName = (options.response.name !== undefined) ?
             options.response.name.split(' ')[0] : FIRST_NAME_PLACEHOLDER;
+          this._lastName = (options.response.name !== undefined) ?
+            options.response.name.split(' ')[1] : undefined;
           break;
         case 'google':
           this._firstName = (options.response.profileObj.givenName !== undefined) ?

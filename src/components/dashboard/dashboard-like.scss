@@ -1,0 +1,187 @@
+@import "../common.scss";
+
+.dashboard-content-flex {
+  display: flex;
+  flex-direction: row;
+}
+
+.dashboard-left-panel {
+  display: block;
+  min-width: 264px;
+  // background-color: rgba(230,230,230,1);
+  padding-top: 10px;
+
+  .left-panel-btn {
+    margin-top: 24px;
+    outline-width: 0px;
+    text-decoration: none;
+    display: block;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    line-height: 1.43;
+    cursor: pointer;
+    @include box-sizing(border-box);
+    @include user-select;
+    border-color: #aaa;
+    color: #484848;
+    padding: 4px 0;
+
+    &:hover {
+
+    }
+  }
+}
+
+.sidenav {
+
+  .sidenav-list {
+    padding-left: 2px;
+    padding-right: 2px;
+    list-style: none;
+    @include box-sizing(border-box);
+    @include user-select;
+
+    li {
+      display: list-item;
+      text-align: -webkit-match-parent;
+      list-style: none;
+      @include box-sizing(border-box);
+      @include user-select;
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1.43;
+      color: #767676;
+      padding: 6px 0;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &.active {
+        color: #484848;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+.dashboard-main-panel {
+  display: block;
+  width: 100%;
+  padding: 24px 0 0 20px;
+
+  .dashboard-panel {
+    margin-bottom: 24px;
+    border: 1px solid #dce0e0;
+    @include box-sizing(border-box);
+    display: block;
+
+    .dashboard-panel-header {
+      background-color: #edefed;
+      color: #484848;
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1.43;
+      padding: 12px 20px 12px 20px;
+      border-bottom: 1px solid #dce0e0;
+      @include box-sizing(border-box);
+      display: block;
+    }
+
+    .dashboard-panel-body {
+      padding: 20px;
+      @include box-sizing(border-box);
+      display: block;
+      overflow: hidden;
+    }
+
+    .dashboard-panel-form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      overflow: hidden;
+
+      .form-row {
+        display: flex;
+        margin-bottom: 24px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .row-label {
+          min-width: 184.5px;
+          max-width: 184.5px;
+          text-align: right;
+          padding: 7px 10px 0 0;
+          display: block;
+        }
+
+        .row-content {
+          width: 100%;
+
+          .row {
+            width: 100%;
+          }
+        }
+
+        .row-content-text {
+          padding: 2px 5px 0 5px;
+          font-size: 12px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="search"],
+        input[type="url"],
+        input[type="email"],
+        input[type="number"],
+        input[type="tel"] {
+          display: block;
+          padding: 8px 10px;
+          width: 100%;
+          @include transition(border-color 0.2s);
+          border: 1px solid #aaa;
+          @include border-radius(2px);
+          background-color: #fff;
+          color: #484848;
+          @include box-sizing(border-box);
+          -webkit-appearance: textfield;
+          -webkit-rtl-ordering: logical;
+          -webkit-user-select: text;
+          text-transform: none;
+          text-align: start;
+          -webkit-writing-mode: horizontal-tb;
+        }
+
+        select {
+          display: block;
+          padding: 8px 10px;
+          @include transition(border-color 0.2s);
+          border: 1px solid #aaa;
+          @include border-radius(2px);
+          background-color: #fff;
+          color: #484848;
+          @include box-sizing(border-box);;
+          -webkit-rtl-ordering: logical;
+          -webkit-user-select: text;
+          text-transform: none;
+          text-align: start;
+          -webkit-writing-mode: horizontal-tb;
+          align-items: center;
+        }
+      }
+
+    }
+  }
+
+}

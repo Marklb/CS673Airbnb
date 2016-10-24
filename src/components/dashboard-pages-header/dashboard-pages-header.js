@@ -8,6 +8,14 @@ require("./dashboard-pages-header.scss");
 
 */
 export default class DashboardPagesHeader extends React.Component {
+  static propTypes = {
+
+  };
+
+  static defaultProps = {
+
+  };
+
   constructor(props) {
     super(props);
 
@@ -16,11 +24,13 @@ export default class DashboardPagesHeader extends React.Component {
     };
   }
 
+  componentDidMount() {
 
+  }
 
   render() {
-    console.log('DashboardPagesHeader');
-    console.log(this.props);
+    // console.log('DashboardPagesHeader');
+    // console.log(this.props);
     return (
       <div className="dashboard-pages-header">
         <div className="links-container">

@@ -8,6 +8,9 @@ import UserSessionHandler from '../../user-session-handler';
 import TopHeaderDropdownButton from './top-header-dropdown-button';
 
 export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
+  static contextTypes = {
+    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
+  };
 
   constructor(props) {
     super(props);
@@ -21,13 +24,17 @@ export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
 
   renderDropdownContent() {
     return (
-      <div></div>
+      <div className="drop-btns">
+        <div className="drop-btn">Edit Profile</div>
+        <div className="drop-btn">Travel Credit</div>
+        <div className="drop-btn">Gift Cards</div>
+        <div className="drop-btn">Account Settings</div>
+        <div className="drop-btn">Business Travel</div>
+        <div className="drop-btn">My Guidebook</div>
+        <div className="drop-btn">Logout</div>
+      </div>
     );
   }
 
 
-};
-
-TopHeaderProfileBtn.contextTypes = {
-  userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
 };
