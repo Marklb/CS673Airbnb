@@ -117,7 +117,7 @@ export default class TopHeader extends React.Component {
       // window.location.href = url;
 
       // Navigate to url (Page does not refresh)
-      history.pushState(null, null, url);
+      browserHistory.push(url);
 
 
       // Clearing the text manually since the page isn't refreshing

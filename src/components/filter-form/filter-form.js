@@ -29,6 +29,7 @@ export default class FilterForm extends React.Component {
 						<input className="slide" type="range" min="0" max="100"></input>
 					</form>
 				</div>
+				<div>{this.props.params.place}</div>
 			</div>
 
 		);

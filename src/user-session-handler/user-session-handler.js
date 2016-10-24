@@ -50,8 +50,8 @@ export default class userSessionHandler {
           break;
         case 'mokbnb':
           // TODO: Fix this implementation
-          this._firstName = (options.firstName !== undefined) ?
-            options.firstName : FIRST_NAME_PLACEHOLDER;
+          this._firstName = (options.response.firstName !== undefined) ?
+            options.response.firstName : FIRST_NAME_PLACEHOLDER;
           break;
       }
     }

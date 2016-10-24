@@ -2,9 +2,15 @@
 //           Add facebook and google sign up
 //           Link Login button to login form
 //           [Maybe] Add weak/strong display under password
-
+import $ from 'jquery';
 import _ from 'lodash';
 import React from 'react';
+import UserSessionHandler from '../../user-session-handler';
+import ModalsHandler from '../../modals-handler';
+
+// React Components
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
 
@@ -49,6 +55,13 @@ let getAge = (dateString) => {
 
 */
 export default class SignUpForm extends React.Component {
+  static contextTypes = {
+    googleApiClientId: React.PropTypes.string.isRequired,
+    facebookApiAppId: React.PropTypes.string.isRequired,
+    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
+    modalsHandler: React.PropTypes.instanceOf(ModalsHandler).isRequired
+  };
+	
   constructor(props) {
     super(props);
 
@@ -382,6 +395,26 @@ export default class SignUpForm extends React.Component {
     // this.setState({ activeForm: FORM_IDS.SIGNUP_WITH_EMAIL});
     let isValid = this.isFormValid();
     this.setState({hasClickedSignUp: true});
+
+	$.post('/api/signupinfo', {
+		'firstname': this.state.formValuesFirstName,
+		'lastname': this.state.formValuesLastName,
+  		'email': this.state.formValuesEmail,
+  		'password': this.state.formValuesPassword,
+		'birthdaymonth': this.state.formValuesBirthdayMonth,
+		'birthdayday': this.state.formValuesBirthdayDay,
+		'birthdayyear': this.state.formValuesBirthdayYear,
+  	}, (data, status) => {
+  		console.log(data);
+  		console.log(status);
+  		if(data.insert_success == false) {
+			console.log('Signin Not Successful');
+		} else if (data.insert_success == true) {
+			if (this.props.modalVars !== undefined) {
+				this.context.modalsHandler.hideModal(this.props.modalVars.containerName, this.props.modalVars.name);
+			}
+		}
+  	});
   }
 
   /*
