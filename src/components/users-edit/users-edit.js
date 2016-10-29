@@ -3,8 +3,15 @@ import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
 import DashboardContainer from '../dashboard-container';
+import EditProfile from './sections/edit-profile';
+import PhotosAndVideo from './sections/photos-and-video';
+import TrustAndVerifications from './sections/trust-and-verifications';
+import Reviews from './sections/reviews';
+import References from './sections/references';
+
 
 require("./users-edit.scss");
+
 
 const tempUserId = 345897;
 
@@ -19,7 +26,7 @@ export default class UsersEdit extends React.Component {
   };
 
   static defaultProps = {
-
+    
   };
 
   constructor(props) {
@@ -86,298 +93,23 @@ export default class UsersEdit extends React.Component {
   }
 
   renderMainPanelEditProfile() {
-    return (
-      <div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Required</div>
-          <div className="dashboard-panel-body">
-            <div className="dashboard-panel-form">
-
-              <div className="form-row">
-                <div className="row-label">First Name</div>
-                <div className="row-content"><input type="text"></input></div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Last Name</div>
-                <div className="row-content">
-                  <input type="text"></input>
-                  <div className="row-content-text">This is only shared once you have a confirmed booking with another Airbnb user.</div>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">I am</div>
-                <div className="row-content">
-                  <div className="row">
-                    <select>
-                      <option value="gender">Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div className="row-content-text">This is only shared once you have a confirmed booking with another Airbnb user.</div>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Birth Date</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Email Address</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Phone Number</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Preferred Language</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Preffered Currency</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Where You Live</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Describe Yourself</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Optional</div>
-          <div className="dashboard-panel-body">
-
-            <div className="dashboard-panel-form">
-
-              <div className="form-row">
-                <div className="row-label">School</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Work</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Time Zone</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Languages</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Emergency contact</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Shipping Address</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-      </div>
-    );
+    return <EditProfile />
   }
 
   renderMainPanelPhotosSymbolsAndVideo() {
-    return (
-      <div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Profile Photo</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-      </div>
-    );
+    return <PhotosAndVideo />
   }
 
   renderMainPanelTrustAndVerification() {
-    return (
-      <div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Your verified info</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Not yet verified</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-      </div>
-    );
+    return <TrustAndVerifications />
   }
 
   renderMainPanelReviews() {
-    return (
-      <div>
-        {/* Add tabs */}
-
-        {/* Tab 1 */}
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Past Reviews</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        {/* Tab 2 */}
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Reviews to Write</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Past Reviews You've Written</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-      </div>
-    );
+    return <Reviews />
   }
 
   renderMainPanelReferences() {
-    return (
-      <div>
-        {/* Add tabs */}
-
-        {/* Tab 1 */}
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Email your friends</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Airbnb Friends</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        {/* Tab 2 */}
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Pending Approval</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Past References Written About You</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        {/* Tab 3 */}
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Reference Requests</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Past References You've Written</div>
-          <div className="dashboard-panel-body">
-
-
-          </div>
-        </div>
-
-      </div>
-    );
+    return <References />
   }
 
   renderMainPanel() {

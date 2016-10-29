@@ -2,8 +2,36 @@
 @import "../dashboard/dashboard-like.scss";
 
 
-.dashboard-panels {
+.dashboard-panel {
 
+  .birth-date-select {
+    float: left;
+    margin-right: 5px;
 
+    &:last-child {
+      margin-right: 0;
+    }
+  }
 
+}
+
+.save-profile-btn {
+  width: 91px;
+  border-color: #ff5a5f;
+  background-color: #ff5a5f;
+  color: #fff;
+  padding: 9px 27px 9px 27px;
+  font-size: 16px;
+  border-radius: 4px;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  line-height: 1.43;
+  @include user-select;
+  white-space: nowrap;
+  cursor: pointer;
+  text-transform: none;
+  @include box-sizing(border-box);
+  -webkit-writing-mode: horizontal-tb;
+  margin-bottom: 20px;
 }

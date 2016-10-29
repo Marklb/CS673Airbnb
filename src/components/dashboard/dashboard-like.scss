@@ -129,6 +129,7 @@
           width: 100%;
 
           .row {
+            @extend %clearfix;
             width: 100%;
           }
         }
@@ -138,6 +139,7 @@
           font-size: 12px;
         }
 
+        textarea,
         input[type="text"],
         input[type="email"],
         input[type="password"],
@@ -182,6 +184,33 @@
       }
 
     }
+
+
   }
+
+  .dashboard-panel-tabs-bar {
+    @extend %clearfix;
+    margin-bottom: 20px;
+
+    .dashboard-panel-tabs-bar-tab {
+      color: #484848;
+      padding: 10px 0;
+      float: left;
+      margin-right: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      @include user-select;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &.selected {
+        border-bottom: 4px solid #aaa;
+      }
+    }
+
+  }
+
 
 }

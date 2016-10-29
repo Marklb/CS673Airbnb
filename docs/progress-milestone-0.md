@@ -2,7 +2,7 @@
 
 - User
   * Sign Up
-  * Login
+  * Log In
   * Verifications
   * Dashboard Landing Page
   * Profile
@@ -26,3 +26,40 @@
     + Title
     + Room type
   * Links to room description pages will not work yet.
+
+
+---
+> **_User > Sign Up_**
+```
+Working: Using the Sign Up Form as a modal view works on most browsers.
+Todo: Implement api calls.
+```
+
+---
+> **_User > Log In_**
+```
+Working: Using the Sign Up Form as a modal view works on most browsers.
+Todo: Implement api calls.
+```
+
+---
+> **_User > Verifications_**
+```
+...
+```
+
+---
+> **_User > Dashboard Landing Page_**
+```
+...
+```
+---
+> **_User > Profile_**
+```
+...
+```
+---
+> **_User > Account_**
+```
+...
+```
