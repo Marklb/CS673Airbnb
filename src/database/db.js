@@ -60,7 +60,7 @@ var db = function(app){
 		var byear = req.body.birthdayyear;
 		var bday = req.body.birthdayday;
 		var dob = bday + '-' + bmonth + '-' + byear;
-		
+
 		var va = 1;
 		var st = 'Cash';
 		connection.query(
@@ -90,7 +90,7 @@ var db = function(app){
 			}
 		});
 	});
-	
+
 
 	// A get request api call
 	app.get('/api/names', function(req, res){
