@@ -5,7 +5,7 @@ var db = function(app){
 	var connection = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		 password : '9993kuo',
+		password : '9993kuo',
 		database : 'airbnb'
 	});
 
@@ -71,21 +71,26 @@ var db = function(app){
 				res.json({'insert_success': true});
 			} else {
 				console.log('Error while performing Query.');
-				console.log('Error while performing Query.');
 				res.json({'insert_success': false});
 			}
 		});
-		// connection.query(
-		// "INSERT INTO Users (username,password,Fname,Lname,email,gender,DOB) VALUES ('WillKuo', '007', 'Will', 'Kuo', 'uuu@VIP.com','M','08/26/90')", function(err, rows, fields){
-			// if (!err) {
-				// res.json({'insert_success': true});
-			// } else {
-				// console.log('Error while performing Query.');
-				// console.log(err);
-				// res.json({'insert_success': false});
-			// }
-		// });
 	});
+
+	// Get neighborhoods information
+	app.post("/api/showneighbor",function(req,res){
+		var city = req.body.city;
+		connection.query("SELECT street from Address WHERE city=" + "'" + city + "'", function(err, rows, fields){
+		//connection.end();
+			if (!err) {
+				console.log(rows);
+				res.json({'query_success': true, 'neighborhoods': rows});
+			} else {
+				console.log('Error while performing Query.');
+				res.json({'query_success': false});
+			}
+		});
+	});
+	
 
 	// A get request api call
 	app.get('/api/names', function(req, res){
