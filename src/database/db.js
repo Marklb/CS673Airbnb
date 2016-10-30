@@ -5,7 +5,8 @@ var db = function(app){
 	var connection = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		 password : '9993kuo',
+		// password : '9993kuo',
+		password : '',
 		database : 'airbnb'
 	});
 
@@ -60,7 +61,7 @@ var db = function(app){
 		var byear = req.body.birthdayyear;
 		var bday = req.body.birthdayday;
 		var dob = bday + '-' + bmonth + '-' + byear;
-		
+
 		var va = 1;
 		var st = 'Cash';
 		connection.query(
