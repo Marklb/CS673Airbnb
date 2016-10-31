@@ -21,7 +21,7 @@ export default class TopHeader extends React.Component {
     userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
     modalsHandler: React.PropTypes.instanceOf(ModalsHandler).isRequired
   };
-  
+
   constructor(props) {
     super(props);
 
@@ -34,7 +34,7 @@ export default class TopHeader extends React.Component {
     if(this.context.userSessionHandler.isLoggedIn() === true){
       return (
         <div>
-          <TopHeaderProfileBtn />
+          <TopHeaderProfileBtn className="profile-btn" />
           <TopHeaderMessagesBtn />
           <TopHeaderTripsBtn />
           <TopHeaderBecomeAHostBtn className="become-a-host" />

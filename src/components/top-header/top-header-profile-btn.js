@@ -15,10 +15,10 @@ export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
   constructor(props) {
     super(props);
 
+    this.onClickLogoutBtn = this.onClickLogoutBtn.bind(this);
   }
 
   renderButton() {
-    // return (<div>{fakeInfo.username}</div>);
     return (<Link to="/dashboard">{this.context.userSessionHandler.getFirstName()}</Link>);
   }
 
@@ -31,9 +31,15 @@ export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
         <div className="drop-btn">Account Settings</div>
         <div className="drop-btn">Business Travel</div>
         <div className="drop-btn">My Guidebook</div>
-        <div className="drop-btn">Logout</div>
+        <div className="drop-btn" onClick={this.onClickLogoutBtn}>Logout</div>
       </div>
     );
+  }
+
+
+
+  onClickLogoutBtn() {
+    this.context.userSessionHandler.logout();
   }
 
 

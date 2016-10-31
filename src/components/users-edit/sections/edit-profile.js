@@ -1,7 +1,13 @@
-import _ from 'lodash';
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+// Javascript Modules
+import _ from 'lodash';
+import $ from 'jquery';
+import UserSessionHandler from '../../../user-session-handler';
+import ModalsHandler from '../../../modals-handler';
+
+// React Components
 import DashboardContainer from '../../dashboard-container';
 
 require("../users-edit.scss");
@@ -23,21 +29,48 @@ const YEARS_RANGE = {
 
 */
 export default class EditProfile extends React.Component {
+  static contextTypes = {
+    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
+    modalsHandler: React.PropTypes.instanceOf(ModalsHandler).isRequired
+  };
+
   static propTypes = {
 
   };
 
   static defaultProps = {
-    
+
   };
 
   constructor(props) {
     super(props);
 
+    this.state = {
+      formValues: {
+        firstName: '',
+        lastName: ''
+      }
+    };
+
+    this.onChangeFirstName = this.onChangeFirstName.bind(this);
+    this.onChangeLastName = this.onChangeLastName.bind(this);
+
+
   }
 
   componentDidMount() {
-
+    $.get('/api/getUserInfo', {
+        authType: this.context.userSessionHandler.getAuthType(),
+        authToken: this.context.userSessionHandler.getAuthToken()
+    	}, (data, status) => {
+        console.log(data);
+        // this._firstName = data.first_name;
+        // this._isLoggedIn = true;
+        //
+        // let newState = this._reactComponent.state;
+        // newState.userSessionHandler = this;
+        // this._reactComponent.setState(newState);
+    	});
   }
 
   render() {
@@ -52,17 +85,21 @@ export default class EditProfile extends React.Component {
               <div className="form-row">
                 <div className="row-label">First Name</div>
                 <div className="row-content">
-                  <input type="text"></input>
+                  <input type="text"
+                    value={this.state.formValues.firstName}
+                    onChange={this.onChangeFirstName}></input>
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="row-label">Last Name</div>
                 <div className="row-content">
-                  <input type="text"></input>
+                  <input type="text"
+                    value={this.state.formValues.lastName}
+                    onChange={this.onChangeLastName}></input>
                   <div className="row-content-text">
                     This is only shared once you have a confirmed booking with
-                    another Airbnb user.
+                    another Mokbnb user.
                   </div>
                 </div>
               </div>
@@ -80,7 +117,7 @@ export default class EditProfile extends React.Component {
                   </div>
                   <div className="row-content-text">
                     This is only shared once you have a confirmed booking with
-                    another Airbnb user.
+                    another Mokbnb user.
                   </div>
                 </div>
               </div>
@@ -120,7 +157,7 @@ export default class EditProfile extends React.Component {
                 <div className="row-content">
                   <input type="text"></input>
                   <div className="row-content-text">
-                    We won’t share your private email address with other Airbnb
+                    We won’t share your private email address with other Mokbnb
                     users. Learn more.
                   </div>
                 </div>
@@ -132,7 +169,7 @@ export default class EditProfile extends React.Component {
                   <input type="tel"></input>
                   <div className="row-content-text">
                     This is only shared once you have a confirmed booking with
-                    another Airbnb user. This is how we can all get in touch.
+                    another Mokbnb user. This is how we can all get in touch.
                   </div>
                 </div>
               </div>
@@ -171,7 +208,7 @@ export default class EditProfile extends React.Component {
                 <div className="row-content">
                   <textarea cols="40" rows="5"></textarea>
                   <div className="row-content-text">
-                    Airbnb is built on relationships. Help other people get to
+                    Mokbnb is built on relationships. Help other people get to
                     know you.
                     <br/><br/>
                     Tell them about the things you like: What are 5 things you
@@ -179,7 +216,7 @@ export default class EditProfile extends React.Component {
                     books, movies, shows, music, food.
                     <br/><br/>
                     Tell them what it’s like to have you as a guest or host:
-                    What’s your style of traveling? Of Airbnb hosting?
+                    What’s your style of traveling? Of Mokbnb hosting?
                     <br/><br/>
                     Tell them about you: Do you have a life motto?
                   </div>
@@ -225,7 +262,7 @@ export default class EditProfile extends React.Component {
                 <div className="row-content">
                   <div className="row-content-text">
                     Add any languages that others can use to speak with you on
-                    Airbnb
+                    Mokbnb
                   </div>
                 </div>
               </div>
@@ -267,6 +304,17 @@ export default class EditProfile extends React.Component {
 
   */
 
+  onChangeFirstName(evt) {
+    let newState = this.state;
+    newState.formValues.firstName = evt.target.value;
+    this.setState(newState);
+  }
+
+  onChangeLastName(evt) {
+    let newState = this.state;
+    newState.formValues.lastName = evt.target.value;
+    this.setState(newState);
+  }
 
 
 

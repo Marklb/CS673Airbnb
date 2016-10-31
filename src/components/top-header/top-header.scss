@@ -108,7 +108,7 @@ $topHeaderHeight: 61px;
           width: 280px;
           max-width: 280px;
           height: 94px;
-          max-height: 94px;
+          min-height: 94px;
           padding: 20px;
           border: 1px solid $borderColor;
 
@@ -122,7 +122,12 @@ $topHeaderHeight: 61px;
         .drop-btns {
 
           .drop-btn {
+            padding: 10px 0px 10px 0px;
 
+            &:hover {
+              background-color: white;
+              color: rgba(20,40,100,1);
+            }
           }
         }
       }
@@ -150,7 +155,13 @@ $topHeaderHeight: 61px;
 
     }
 
-
+    .profile-btn {
+      .dropdown-container {
+        &.visible {
+          min-height: 300px;
+        }
+      }
+    }
 
     .search-bar-wrapper {
       padding-top: 0;

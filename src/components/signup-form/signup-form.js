@@ -61,7 +61,7 @@ export default class SignUpForm extends React.Component {
     userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
     modalsHandler: React.PropTypes.instanceOf(ModalsHandler).isRequired
   };
-	
+
   constructor(props) {
     super(props);
 
@@ -396,25 +396,34 @@ export default class SignUpForm extends React.Component {
     let isValid = this.isFormValid();
     this.setState({hasClickedSignUp: true});
 
-	$.post('/api/signupinfo', {
-		'firstname': this.state.formValuesFirstName,
-		'lastname': this.state.formValuesLastName,
+  	$.post('/api/signupinfo', {
+  		'firstname': this.state.formValuesFirstName,
+  		'lastname': this.state.formValuesLastName,
   		'email': this.state.formValuesEmail,
   		'password': this.state.formValuesPassword,
-		'birthdaymonth': this.state.formValuesBirthdayMonth,
-		'birthdayday': this.state.formValuesBirthdayDay,
-		'birthdayyear': this.state.formValuesBirthdayYear,
-  	}, (data, status) => {
-  		console.log(data);
-  		console.log(status);
-  		if(data.insert_success == false) {
-			console.log('Signin Not Successful');
-		} else if (data.insert_success == true) {
-			if (this.props.modalVars !== undefined) {
-				this.context.modalsHandler.hideModal(this.props.modalVars.containerName, this.props.modalVars.name);
-			}
-		}
-  	});
+  		'birthdaymonth': this.state.formValuesBirthdayMonth,
+  		'birthdayday': this.state.formValuesBirthdayDay,
+  		'birthdayyear': this.state.formValuesBirthdayYear,
+    	}, (data, status) => {
+    		console.log(data);
+    		console.log(status);
+    		if(data.insert_success == false) {
+    			console.log('Signin Not Successful');
+    		} else if (data.insert_success == true) {
+          this.context.userSessionHandler.loginSet({
+            isLoggedIn: true,
+            authType: data.auth_type,
+            response: {
+              firstName: data.first_name,
+              authToken: data.auth_token
+            }
+          });
+    			if (this.props.modalVars !== undefined) {
+    				this.context.modalsHandler.hideModal(
+              this.props.modalVars.containerName, this.props.modalVars.name);
+    			}
+    		}
+    	});
   }
 
   /*
