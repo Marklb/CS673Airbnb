@@ -37,10 +37,16 @@ var db = function(app){
 	    if(err){
 	      res.json({'veri_success': false});
 	    }else{
-				res.json({
-					'veri_success': true,
-					'first_name': rows[0].first_name
-				});
+				console.log('yoyo');
+				console.log(rows[0]);
+				if(rows.length > 0){
+					res.json({
+						'veri_success': true,
+						'first_name': rows[0].first_name
+					});
+				}else{
+					res.json({'veri_success': false});
+				}
 	    }
 	  });
 
@@ -100,16 +106,15 @@ var db = function(app){
 		var fname = req.body.firstname;
 		var lname = req.body.lastname;
 		var email = req.body.email;
-		var gender = 'NULL';
 		var bmonth = req.body.birthdaymonth;
 		var byear = req.body.birthdayyear;
 		var bday = req.body.birthdayday;
 		var dob = bday + '-' + bmonth + '-' + byear;
 
 		conn.query(
-			'INSERT INTO Users (password,first_name,last_name,email,gender,'+
-					'birth_date) VALUES (?, ?, ?, ?, ?, ?)',
-			[password, fname, lname, email, gender, dob], function(err, result){
+			'INSERT INTO Users (password,first_name,last_name,email,'+
+					'birth_date) VALUES (?, ?, ?, ?, ?)',
+			[password, fname, lname, email, dob], function(err, result){
 			if (!err) {
 				// console.log('Signup was a success');
 				var user_id = result.insertId;
@@ -177,24 +182,31 @@ var db = function(app){
 	// params:
 	// 	authToken: (Required) Needed to protect who is accessing user info
 	//
-	// TODO: Extend customization of into to be returned
-	// TODO: Fix query
+	// TODO: Extend customization of info to be returned
 	/////////////////////////////////////////////////////////////////////////////
 	app.get("/api/getUserInfo",function(req,res){
-		console.log('/api/getUserInfo');
-		console.log(req.query);
+		// console.log('/api/getUserInfo');
+		// console.log(req.query);
 
-		var query_str = 'SELECT U.user_id, U.email, U.first_name, U.last_name, ' +
-													'U.addr_id, U.gender, U.birth_date, U.profile_pic ' +
-													'U.bio, U.join_date' +
+		// var query_str = 'SELECT U.user_id, U.email, U.first_name, U.last_name, ' +
+		// 											'U.addr_id, U.gender, U.birth_date, U.profile_pic ' +
+		// 											'U.bio, U.join_date ' +
+	  //                 'FROM UserSession AS S, Users AS U ' +
+	  //                 'WHERE S.auth_type = ? AND S.session_auth_id = ? ' +
+	  //                   'AND S.user_id = U.user_id';
+		var query_str = 'SELECT * ' +
 	                  'FROM UserSession AS S, Users AS U ' +
-	                  'WHERE S.auth_type = ? AND S.session_auth_id = ? ' +
-	                    'AND S.user_id = U.user_id';
+	                  'WHERE S.auth_type = ? AND S.session_auth_id = ? AND S.user_id = U.user_id';
+		// console.log(query_str);
 	  conn.query(query_str, [req.query.authType, req.query.authToken],
 			function(err, rows, fields) {
 	    if(err){
 	      res.json({'success': false});
 	    }else{
+				// res.json({
+				// 	'success': true
+				// });
+				// console.log(rows);
 				res.json({
 					'success': true,
 					'user_id': rows[0].user_id,
@@ -210,20 +222,52 @@ var db = function(app){
 				});
 	    }
 	  });
+	});
 
-		// res.json({'query_success': false});
+	////////////////////////////////////////////////////////////////////////////
+	// Update user information
+	//
+	// params:
+	// 	authToken: (Required) Needed to protect who is changing user info
+	// 	(any attrs in attr array):
+	/////////////////////////////////////////////////////////////////////////////
+	app.get("/api/updateUserInfo",function(req,res){
+		// console.log('/api/updateUserInfo');
+		// console.log(req.query);
+		let attrs = ['email', 'first_name', 'last_name', 'gender',
+									'birth_date_year', 'birth_date_month', 'birth_date_day',
+									'profile_pic', 'bio'];
 
-		// var city = req.body.city;
-		// conn.query("SELECT street from Address WHERE city=" + "'" + city + "'",
-		// function(err, rows, fields){
-		// 	if (!err) {
-		// 		console.log(rows);
-		// 		res.json({'query_success': true, 'neighborhoods': rows});
-		// 	} else {
-		// 		console.log('Error while performing Query.');
-		// 		res.json({'query_success': false});
-		// 	}
-		// });
+		let vals = [];
+		for(var attr of attrs){
+			if(req.query[attr] !== undefined){
+				vals.push({'attr': attr, 'value': req.query[attr]});
+			}
+		}
+
+		var query_str = 'UPDATE Users ' +
+										'SET ';
+		for(var i = 0; i < vals.length; i++){
+			let val = vals[i];
+			query_str += val.attr + ' = \'' + val.value + '\' ';
+			if(i !== vals.length-1) query_str += ', ';
+		}
+		query_str += 'WHERE user_id = (SELECT user_id FROM UserSession ' +
+			'WHERE auth_type = \''+ req.query.auth_type + '\' AND ' +
+			'session_auth_id = \''+ req.query.auth_token +'\')';
+		// console.log(query_str);
+
+	  conn.query(query_str, function(err, rows, fields) {
+	    if(err){
+				// console.log(err);
+	      res.json({'success': false});
+	    }else{
+				res.json({
+					'success': true
+				});
+				// console.log(rows);
+	    }
+	  });
 	});
 
 	/////////////////////////////////////////////////////////////////////////////

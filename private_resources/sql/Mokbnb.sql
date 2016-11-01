@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `last_name` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) GENERATED ALWAYS AS (concat(first_name, ' ', last_name)) VIRTUAL,
   `addr_id` INT NULL,
-  `gender` VARCHAR(45) NOT NULL,
+  `gender` VARCHAR(45) NULL,
   `birth_date` VARCHAR(45) NOT NULL,
   `profile_pic` VARCHAR(45) NULL,
   `bio` VARCHAR(45) NULL,

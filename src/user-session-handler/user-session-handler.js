@@ -160,6 +160,9 @@ export default class userSessionHandler {
         authType: this._authType,
         authToken: this._authToken
     	}, (data, status) => {
+        // console.log(data);
+        // console.log(status);
+        if(data.veri_success === false) return;
         this._firstName = data.first_name;
         this._isLoggedIn = true;
 
@@ -167,6 +170,20 @@ export default class userSessionHandler {
         newState.userSessionHandler = this;
         this._reactComponent.setState(newState);
     	});
+  }
+
+  /*
+
+  */
+  getSessionAuthValues() {
+    return {
+      // TODO: Camel-case only for old compatability
+      'authType': this.getAuthType(),
+      'authToken': this.getAuthToken(),
+      // Use this syntax istead of the camel-case
+      'auth_type': this.getAuthType(),
+      'auth_token': this.getAuthToken()
+    };
   }
 
 
