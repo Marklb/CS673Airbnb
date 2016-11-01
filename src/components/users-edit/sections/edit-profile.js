@@ -55,7 +55,7 @@ export default class EditProfile extends React.Component {
     this.onChangeFirstName = this.onChangeFirstName.bind(this);
     this.onChangeLastName = this.onChangeLastName.bind(this);
 
-
+    this.onClickSaveBtn = this.onClickSaveBtn.bind(this);
   }
 
   componentDidMount() {
@@ -64,6 +64,11 @@ export default class EditProfile extends React.Component {
         authToken: this.context.userSessionHandler.getAuthToken()
     	}, (data, status) => {
         console.log(data);
+        let newState = this.state;
+        if(data.first_name) newState.formValues.firstName = data.first_name;
+        if(data.last_name) newState.formValues.lastName = data.last_name;
+        this.setState(newState);
+
         // this._firstName = data.first_name;
         // this._isLoggedIn = true;
         //
@@ -291,7 +296,7 @@ export default class EditProfile extends React.Component {
           </div>
         </div>
 
-        <div className="save-profile-btn">Save</div>
+        <div className="save-profile-btn" onClick={this.onClickSaveBtn}>Save</div>
 
       </div>
     );
@@ -314,6 +319,34 @@ export default class EditProfile extends React.Component {
     let newState = this.state;
     newState.formValues.lastName = evt.target.value;
     this.setState(newState);
+  }
+
+  onClickSaveBtn(evt) {
+    // console.log('onClickSaveBtn');
+    let formValues = this.state.formValues;
+
+    let toUpdate = this.context.userSessionHandler.getSessionAuthValues();
+    if(formValues.firstName.trim().length > 0){
+      toUpdate.first_name = formValues.firstName.trim();
+    }
+    if(formValues.lastName.trim().length > 0){
+      toUpdate.last_name = formValues.lastName.trim();
+    }
+    // console.log('toUpdate');
+    // console.log(toUpdate);
+
+    $.get('/api/updateUserInfo', toUpdate, (data, status) => {
+      if(data.success !== true) {
+        // console.log(data);
+        console.log('User Information Update Not Successful');
+        // $('html, body').animate({ scrollTop: 0 }, 'fast');
+      } else if(data.success === true) {
+        // console.log(data);
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
+      }
+    });
+
+
   }
 
 

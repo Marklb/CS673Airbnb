@@ -39,20 +39,27 @@ $topHeaderHeight: 61px;
       background-color: $bgColor;
 
       .icon-logo {
-        width: 98.73px;
+        // width: 98.73px;//=====
+        width: 30px;//-----
+        max-width: 30px;//-----
         border-left: 1px solid $borderColor;
         padding: 0 19px;
         padding-top: 14px;
+        // padd
 
         div {
-          width: 98.73px;
+          // width: 98.73px;//=====
+          width: 30px;//-----
+          // max-width: 98.73px;//=====
+          max-width: 30px;
           height: ($topHeaderHeight/2);
           line-height: ($topHeaderHeight/2);
           font-size: 24px;
           background-repeat: no-repeat;
-          background-image: url('./Airbnb_Logo.svg');
+          // background-image: url('./Airbnb_Logo.svg');//=====
+          background-image: url('../../../public/images/airbnb_edit.png');//-----
+          background-size: auto 30px;//-----
           max-height: ($topHeaderHeight/2);
-          max-width: 98.73px;
         }
       }
 
