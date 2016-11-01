@@ -48,12 +48,25 @@ export default class EditProfile extends React.Component {
     this.state = {
       formValues: {
         firstName: '',
-        lastName: ''
+        lastName: '',
+        gender: 'Gender',
+        birthDateYear: 'Year',
+        birthDateMonth: 'Month',
+        birthDateDay: 'Day',
+        email: '',
+        bio: ''
       }
     };
 
     this.onChangeFirstName = this.onChangeFirstName.bind(this);
     this.onChangeLastName = this.onChangeLastName.bind(this);
+    this.onChangeGender = this.onChangeGender.bind(this);
+    this.onChangeBirthDateYear = this.onChangeBirthDateYear.bind(this);
+    this.onChangeBirthDateMonth = this.onChangeBirthDateMonth.bind(this);
+    this.onChangeBirthDateDay = this.onChangeBirthDateDay.bind(this);
+    this.onChangeEmail = this.onChangeEmail.bind(this);
+    this.onChangeBio = this.onChangeBio.bind(this);
+
 
     this.onClickSaveBtn = this.onClickSaveBtn.bind(this);
   }
@@ -67,6 +80,15 @@ export default class EditProfile extends React.Component {
         let newState = this.state;
         if(data.first_name) newState.formValues.firstName = data.first_name;
         if(data.last_name) newState.formValues.lastName = data.last_name;
+        if(data.gender) newState.formValues.gender = data.gender;
+        if(data.birth_date) {
+          let a = data.birth_date.split('-');
+          newState.formValues.birthDateYear = a[2],
+          newState.formValues.birthDateMonth = a[1],
+          newState.formValues.birthDateDay = a[0]
+        };
+        if(data.email) newState.formValues.email = data.email;
+        if(data.bio) newState.formValues.bio = data.bio;
         this.setState(newState);
 
         // this._firstName = data.first_name;
@@ -113,7 +135,8 @@ export default class EditProfile extends React.Component {
                 <div className="row-label">I am</div>
                 <div className="row-content">
                   <div className="row">
-                    <select>
+                    <select value={this.state.formValues.gender}
+                      onChange={this.onChangeGender}>
                       <option value="gender">Gender</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
@@ -131,19 +154,25 @@ export default class EditProfile extends React.Component {
                 <div className="row-label">Birth Date</div>
                 <div className="row-content">
                   <div className="row">
-                    <select className="birth-date-select">
+                    <select className="birth-date-select"
+                      value={this.state.formValues.birthDateMonth}
+                      onChange={this.onChangeBirthDateMonth}>
                       <option>Month</option>
                       {MONTHS.map((val, i) => {
                         return <option key={i} value={val}>{val}</option>})}
                     </select>
 
-                    <select className="birth-date-select">
+                    <select className="birth-date-select"
+                      value={this.state.formValues.birthDateDay}
+                      onChange={this.onChangeBirthDateDay}>
                       <option value>Day</option>
                       {_.range(DAYS_RANGE.start, DAYS_RANGE.end+1).map((val, i) => {
                         return <option key={i} value={val}>{val}</option>})}
                     </select>
 
-                    <select className="birth-date-select">
+                    <select className="birth-date-select"
+                      value={this.state.formValues.birthDateYear}
+                      onChange={this.onChangeBirthDateYear}>
                       <option value>Year</option>
                       {_.range(YEARS_RANGE.start, YEARS_RANGE.end+1).map((val, i) => {
                         return <option key={i} value={val}>{val}</option>})}
@@ -160,7 +189,8 @@ export default class EditProfile extends React.Component {
               <div className="form-row">
                 <div className="row-label">Email Address</div>
                 <div className="row-content">
-                  <input type="text"></input>
+                  <input type="text" value={this.state.formValues.email}
+                    onChange={this.onChangeEmail}></input>
                   <div className="row-content-text">
                     We won’t share your private email address with other Mokbnb
                     users. Learn more.
@@ -211,7 +241,8 @@ export default class EditProfile extends React.Component {
               <div className="form-row">
                 <div className="row-label">Describe Yourself</div>
                 <div className="row-content">
-                  <textarea cols="40" rows="5"></textarea>
+                  <textarea cols="40" rows="5" value={this.state.formValues.bio}
+                    onChange={this.onChangeBio}></textarea>
                   <div className="row-content-text">
                     Mokbnb is built on relationships. Help other people get to
                     know you.
@@ -321,6 +352,44 @@ export default class EditProfile extends React.Component {
     this.setState(newState);
   }
 
+  onChangeGender(evt) {
+    console.log(evt);
+    let newState = this.state;
+    newState.formValues.gender = evt.target.value;
+    this.setState(newState);
+  }
+
+  onChangeBirthDateYear(evt) {
+    let newState = this.state;
+    newState.formValues.birthDateYear = evt.target.value;
+    this.setState(newState);
+  }
+
+  onChangeBirthDateMonth(evt) {
+    let newState = this.state;
+    newState.formValues.birthDateMonth = evt.target.value;
+    this.setState(newState);
+  }
+
+  onChangeBirthDateDay(evt) {
+    let newState = this.state;
+    newState.formValues.birthDateDay = evt.target.value;
+    this.setState(newState);
+  }
+
+  onChangeEmail(evt) {
+    let newState = this.state;
+    newState.formValues.email = evt.target.value;
+    this.setState(newState);
+  }
+
+  onChangeBio(evt) {
+    let newState = this.state;
+    newState.formValues.bio = evt.target.value;
+    this.setState(newState);
+  }
+
+
   onClickSaveBtn(evt) {
     // console.log('onClickSaveBtn');
     let formValues = this.state.formValues;
@@ -332,8 +401,25 @@ export default class EditProfile extends React.Component {
     if(formValues.lastName.trim().length > 0){
       toUpdate.last_name = formValues.lastName.trim();
     }
-    // console.log('toUpdate');
-    // console.log(toUpdate);
+    if(formValues.gender == 'male' ||
+      formValues.gender == 'female' ||
+      formValues.gender == 'other'){
+      toUpdate.gender = formValues.gender;
+    }
+    if(formValues.birthDateYear != 'Year'
+      && formValues.birthDateMonth != 'Month'
+      && formValues.birthDateDay != 'Day'){
+      toUpdate.birth_date = formValues.birthDateDay + '-' +
+        formValues.birthDateMonth.trim() + '-' + formValues.birthDateYear.trim();
+    }
+    if(formValues.email.trim().length > 0){
+      toUpdate.email = formValues.email;
+    }
+    if(formValues.bio.trim().length > 0){
+      toUpdate.bio = formValues.bio;
+    }
+    console.log('toUpdate');
+    console.log(toUpdate);
 
     $.get('/api/updateUserInfo', toUpdate, (data, status) => {
       if(data.success !== true) {

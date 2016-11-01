@@ -40,9 +40,9 @@ if (process.env.NODE_ENV !== 'production') {
   // Run dev development with command: npm run start-prod
   console.log('PRODUCTION ENVIRONMENT');
 
-  app.use(express.static(__dirname + '/public'));
+  // app.use(express.static(__dirname + '/public'));
 }
-
+app.use(express.static(__dirname + '/public'));
 //=============================================================
 // Routing
 // -------------------------------------------------------------------------------------------------------------
