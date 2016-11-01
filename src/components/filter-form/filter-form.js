@@ -10,11 +10,18 @@ export default class FilterForm extends React.Component {
 
 		this.state = {
 			inputLocation : this.props.params.place,
-			neighborhoods : null
+			neighborhoods : []
 		};
-		this.getNeighborQuery(this.state.inputLocation);
 	}
 	
+	componentWillReceiveProps(nextProps) {
+	// You don't have to do this check first, but it can help prevent an unneeded render
+		if (nextProps.params.place !== this.state.inputLocation) {
+			this.setState({inputLocation: nextProps.params.place});
+			this.getNeighborQuery(nextProps.params.place);
+		}
+	}
+
 	getNeighborQuery(location) {
 		$.post('/api/showneighbor', {
   			'city': location
@@ -28,17 +35,16 @@ export default class FilterForm extends React.Component {
   		});
 	}
 	
-	renderCheckBox(ob) {
-		var numrows = ob.numrows;
-		var names = ob.names;
+	renderCheckBox(neighbor) {
 		var rows = [];
-		for (var i=0; i < numrows; i++) {
-			rows.push(<MyCheckBox name={names[i]} />);
+		for (var i=0; i < neighbor.length; i++) {
+			rows.push(<MyCheckBox street={neighbor[i].street} />);
 		}
 		return (
 			<form className="f">
 				Neighborhoods
-				{rows}
+				<br></br>
+				{rows.length === 0 ? 'None' : rows}
 			</form>
 		);
 	}
@@ -124,14 +130,14 @@ export default class FilterForm extends React.Component {
 							<option>16+ beds</option>
 						</select>
 					</form>
-					{this.state.neighborhoods === null ?
-						this.renderCheckBox({'numrows': 1, 'names': ['hi']}) : this.renderCheckBox({'numrows': 1, 'names': [this.state.neighborhoods[0].street]})}
-					
+
+					{this.renderCheckBox(this.state.neighborhoods)}
+
 					<form className="f">
 						Instant Book
 						<input className="instantBook" type="checkbox"></input> on/off
 					</form>
-										
+
 					<form className="f">
 						Amenities
 						<input className="t2" type="checkbox"></input> Wireless Internet
