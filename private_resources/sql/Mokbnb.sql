@@ -104,9 +104,10 @@ CREATE TABLE IF NOT EXISTS `HostPlaceListing` (
   `host_id` INT NOT NULL,
   `list_type_id` INT NOT NULL,
   `ask_amount` VARCHAR(8) NOT NULL,
-  `initial_date_range` VARCHAR(30) NOT NULL,
-  `booked_dates` VARCHAR(200) NOT NULL,
-  `response_time` VARCHAR(30) NOT NULL,
+  `date_range_start` VARCHAR(30) NOT NULL,
+  `date_range_end` VARCHAR(30) NOT NULL,
+  `booked_dates` VARCHAR(200),
+  `response_time` VARCHAR(30),
   PRIMARY KEY (`place_id`, `host_id`))
 ENGINE = InnoDB;
 
@@ -124,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `Place` (
   `addr_id` INT NOT NULL,
   `name` VARCHAR(45) NULL,
   `description` VARCHAR(45) NULL,
-  `cost_per_night` VARCHAR(45) NULL,
+  `cost_per_night` NUMERIC(7,2) NULL,
   `max_people` INT NULL,
   `pictures` VARCHAR(45) NULL,
   PRIMARY KEY (`place_id`))
@@ -132,8 +133,6 @@ ENGINE = InnoDB;
 
 SHOW WARNINGS;
 CREATE UNIQUE INDEX `place_id_UNIQUE` ON `Place` (`place_id` ASC);
-
-CREATE UNIQUE INDEX `host_id_UNIQUE` ON `Place` (`host_id` ASC);
 
 CREATE UNIQUE INDEX `addr_id_UNIQUE` ON `Place` (`addr_id` ASC);
 SHOW WARNINGS;
@@ -149,7 +148,8 @@ CREATE TABLE IF NOT EXISTS `ClientPlaceRequest` (
   `client_id` INT NOT NULL,
   `place_id` INT NOT NULL,
   `resp_time` VARCHAR(45) NULL,
-  `date_range` VARCHAR(45) NULL,
+  `date_start` VARCHAR(45) NULL,
+  `date_end` VARCHAR(45) NULL,
   `date_req` VARCHAR(45) NULL,
   `date_resp` VARCHAR(45) NULL,
   `status` VARCHAR(45) NULL,
@@ -250,4 +250,40 @@ INSERT INTO Users (
    last_name,gender,birth_date
 ) VALUES (
    'JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','03/26/90'
+);
+
+INSERT INTO address (
+   street, city, state, zip, country
+) VALUES (
+   "86 Heaven Lane", "Houston", "Texas", "07294", "USA"
+);
+
+INSERT INTO address (
+   street, city, state, zip, country
+) VALUES (
+   "666 Haunted Terrace", "Newark", "New Jersey", "07032", "USA"
+);
+
+INSERT INTO place (
+   host_id, addr_id, name, description, cost_per_night, max_people
+) VALUES (
+   1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 3
+);
+
+INSERT INTO place (
+   host_id, addr_id, name, description, cost_per_night, max_people
+) VALUES (
+   1, 2, "My Second Housetel", "Welcome to hell.", 666.00, 2
+);
+
+INSERT INTO hostplacelisting (
+   place_id, host_id, list_type_id, ask_amount, date_range_start, date_range_end
+) VALUES (
+   1, 1, 1, "80.00", "2016-11-01", "2016-11-06"
+);
+
+INSERT INTO hostplacelisting (
+   place_id, host_id, list_type_id, ask_amount, date_range_start, date_range_end
+) VALUES (
+   2, 1, 2, "666.00", "2016-11-02", "2016-11-07"
 );

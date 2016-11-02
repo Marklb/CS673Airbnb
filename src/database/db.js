@@ -176,6 +176,30 @@ var db = function(app){
 		});
 	});
 
+	/////////////////////////////////////////////////////////////////////////////
+	// Get place information
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/showplace",function(req,res){
+		var state = req.body.state;
+		var date_start = req.body.date_start;
+		var date_end = req.body.date_end;
+		var numofguest = req.body.numofguest;
+		var min_cost = req.body.min_cost;
+		var max_cost = req.body.max_cost;
+		var placeQuerySQL = "SELECT * FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id) WHERE addr_id = (SELECT addr_id FROM address WHERE state='" + state + "') AND cost_per_night <= " + max_cost + " AND cost_per_night >= " + min_cost + " AND max_people >= " + numofguest + " AND (SELECT DATEDIFF('" + date_start + "', date_range_start)) >= 0 AND (SELECT DATEDIFF(date_range_end, '" + date_end + "')) >= 0";
+		console.log(placeQuerySQL);
+		conn.query(placeQuerySQL,
+		function(err, rows, fields){
+			if (!err) {
+				console.log(rows);
+				res.json({'query_success': true, 'result': rows});
+			} else {
+				console.log('Error while performing Query.');
+				res.json({'query_success': false});
+			}
+		});
+	});
+
 	////////////////////////////////////////////////////////////////////////////
 	// Get user information
 	//
@@ -234,11 +258,11 @@ var db = function(app){
 	app.get("/api/updateUserInfo",function(req,res){
 		// console.log('/api/updateUserInfo');
 		// console.log(req.query);
-		let attrs = ['email', 'first_name', 'last_name', 'gender',
+		var attrs = ['email', 'first_name', 'last_name', 'gender',
 									'birth_date_year', 'birth_date_month', 'birth_date_day',
 									'profile_pic', 'bio'];
 
-		let vals = [];
+		var vals = [];
 		for(var attr of attrs){
 			if(req.query[attr] !== undefined){
 				vals.push({'attr': attr, 'value': req.query[attr]});
@@ -248,7 +272,7 @@ var db = function(app){
 		var query_str = 'UPDATE Users ' +
 										'SET ';
 		for(var i = 0; i < vals.length; i++){
-			let val = vals[i];
+			var val = vals[i];
 			query_str += val.attr + ' = \'' + val.value + '\' ';
 			if(i !== vals.length-1) query_str += ', ';
 		}

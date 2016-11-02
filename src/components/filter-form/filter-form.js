@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from "react-router";
+
+import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
+import MyResult from './myresult';
 require("./filter-form.scss");
 export default class FilterForm extends React.Component {
 	
@@ -10,8 +13,41 @@ export default class FilterForm extends React.Component {
 
 		this.state = {
 			inputLocation : this.props.params.place,
-			neighborhoods : []
+			neighborhoods : [],
+			result : [],
+			date_start : null,
+			date_end : null,
+			numofguest: -1,
+			min_cost : -1,
+			max_cost : -1,
+			bedroomsize: null
 		};
+
+		this.numofpeople = [
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
+			10
+		];
+
+		this.bedroomsize = [
+			'1 bedrooms',
+			'2 bedrooms',
+			'3 bedrooms',
+			'4 bedrooms',
+			'5 bedrooms',
+			'6 bedrooms',
+			'7 bedrooms',
+			'8 bedrooms',
+			'9 bedrooms',
+			'10 bedrooms'
+		];
 	}
 	
 	componentWillReceiveProps(nextProps) {
@@ -35,6 +71,30 @@ export default class FilterForm extends React.Component {
   		});
 	}
 	
+	getPlaceQuery() {
+		console.log('state.state = ' + this.state.inputLocation);
+		console.log('state.date_start = ' + this.state.date_start);
+		console.log('state.date_end = ' + this.state.date_end);
+		console.log('state.numofguest = ' + this.state.numofguest);
+		console.log('state.min_cost = ' + this.state.min_cost);
+		console.log('state.max_cost = ' + this.state.max_cost);
+		$.post('/api/showplace', {
+  			'state': this.state.inputLocation,
+			'date_start': this.state.date_start,
+			'date_end': this.state.date_end,
+			'numofguest': this.state.numofguest,
+			'min_cost': this.state.min_cost,
+			'max_cost': this.state.max_cost
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('Show place Not Successful');
+			} else {
+				console.log('Show place is Successful');
+				this.setState({result: data.result});
+			}
+  		});
+	}
+	
 	renderCheckBox(neighbor) {
 		var rows = [];
 		for (var i=0; i < neighbor.length; i++) {
@@ -49,46 +109,58 @@ export default class FilterForm extends React.Component {
 		);
 	}
 
+	renderResult(result) {
+		var rows = [];
+		for (var i=0; i < result.length; i++) {
+			rows.push(<MyResult name={result[i].name} />);
+		}
+		return (
+			<form className="f">
+				-----Filter Result-----
+				<br></br>
+				{rows.length === 0 ? 'None' : rows}
+			</form>
+		);
+	}
+
 	render() {
 		return (
 			<div>
 				<div className="filter">
 					<form className="f">
 						Dates
-						<input className="t1" type="date"></input>
-						<input className="t" type="date"></input>
-						<input className="t" type="date"></input>
+						<input name='date_start' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
+						<input name='date_end' onChange={this.onChange.bind(this)} className="t" type="date"></input>
+						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
+							<option>Number of guest</option>
+							{this.numofpeople.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
+						</select>
 					</form>
-					
+
 					<form className="f">
 						Room type
 						<input className="t2" type="checkbox"></input> Entire home
 						<input className="t3" type="checkbox"></input> Private room
 						<input className="t3" type="checkbox"></input> Shared room
 					</form>
-					
+
 					<form className="f">
 						Price min
-						<input className="slide" type="range" min="0" max="100"></input>
+						<input name='min_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
 						<br></br>
 						Price max
-						<input className="slide" type="range" min="0" max="100"></input>
+						<input name='max_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
 					</form>
 
 					<form className="f">
 						Size
-						<select className="sizeBedRoom">
+						<select name='sizeofbedroom' onChange={this.onChange.bind(this)} className="sizeBedRoom">
 							<option>Bedrooms</option>
-							<option>1 bedrooms</option>
-							<option>2 bedrooms</option>
-							<option>3 bedrooms</option>
-							<option>4 bedrooms</option>
-							<option>5 bedrooms</option>
-							<option>6 bedrooms</option>
-							<option>7 bedrooms</option>
-							<option>8 bedrooms</option>
-							<option>9 bedrooms</option>
-							<option>10 bedrooms</option>
+							{this.bedroomsize.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
 						</select>
 						<select className="sizeBath">
 							<option>Bathrooms</option>
@@ -239,11 +311,35 @@ export default class FilterForm extends React.Component {
 						<input className="t3" type="checkbox"></input> 한국어
 					</form>
 
-					<button type="button">Apply Filter</button>
-					
+					<button name='apply_filter' type="button" onClick={this.onClickApplyFilter.bind(this)}>Apply Filter</button>
+
+					{this.renderResult(this.state.result)}
+
 				</div>
 			</div>
 
 		);
+	}
+	
+	onChange(e){
+		var name = e.target.name;
+		var val = e.target.value;
+		console.log(e.target.value);
+
+		if (name === "date_start") {
+			this.setState({date_start: val});
+		} else if (name === "date_end") {
+			this.setState({date_end: val});
+		} else if (name === "numofguest") {
+			this.setState({numofguest: val});
+		} else if (name === "min_cost") {
+			this.setState({min_cost: val});
+		} else if (name === "max_cost") {
+			this.setState({max_cost: val});
+		}
+	}
+
+	onClickApplyFilter() {
+		this.getPlaceQuery();
 	}
 }
