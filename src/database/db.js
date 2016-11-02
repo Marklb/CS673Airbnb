@@ -37,7 +37,6 @@ var db = function(app){
 	    if(err){
 	      res.json({'veri_success': false});
 	    }else{
-				console.log('yoyo');
 				console.log(rows[0]);
 				if(rows.length > 0){
 					res.json({
@@ -256,11 +255,9 @@ var db = function(app){
 	// 	(any attrs in attr array):
 	/////////////////////////////////////////////////////////////////////////////
 	app.get("/api/updateUserInfo",function(req,res){
-		// console.log('/api/updateUserInfo');
-		// console.log(req.query);
-		var attrs = ['email', 'first_name', 'last_name', 'gender',
-									'birth_date_year', 'birth_date_month', 'birth_date_day',
-									'profile_pic', 'bio'];
+		console.log('/api/updateUserInfo');
+		console.log(req.query);
+		let attrs = ['email', 'first_name', 'last_name', 'gender', 'birth_date', 'profile_pic', 'bio'];
 
 		var vals = [];
 		for(var attr of attrs){
@@ -279,13 +276,14 @@ var db = function(app){
 		query_str += 'WHERE user_id = (SELECT user_id FROM UserSession ' +
 			'WHERE auth_type = \''+ req.query.auth_type + '\' AND ' +
 			'session_auth_id = \''+ req.query.auth_token +'\')';
-		// console.log(query_str);
+		console.log(query_str);
 
 	  conn.query(query_str, function(err, rows, fields) {
 	    if(err){
-				// console.log(err);
+				console.log(err);
 	      res.json({'success': false});
 	    }else{
+        console.log(rows);
 				res.json({
 					'success': true
 				});
