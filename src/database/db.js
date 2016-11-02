@@ -185,6 +185,10 @@ var db = function(app){
 		var numofguest = req.body.numofguest;
 		var min_cost = req.body.min_cost;
 		var max_cost = req.body.max_cost;
+		var bedroomsize = req.body.bedroomsize;
+		var bathroomsize = req.body.bathroomsize;
+		var bedsize = req.body.bedsize;
+		var checkbox = req.body.checkbox;
 		var placeQuerySQL = "SELECT * FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id) WHERE addr_id = (SELECT addr_id FROM address WHERE state='" + state + "') AND cost_per_night <= " + max_cost + " AND cost_per_night >= " + min_cost + " AND max_people >= " + numofguest + " AND (SELECT DATEDIFF('" + date_start + "', date_range_start)) >= 0 AND (SELECT DATEDIFF(date_range_end, '" + date_end + "')) >= 0";
 		console.log(placeQuerySQL);
 		conn.query(placeQuerySQL,

@@ -20,7 +20,97 @@ export default class FilterForm extends React.Component {
 			numofguest: -1,
 			min_cost : -1,
 			max_cost : -1,
-			bedroomsize: null
+			bedroomsize: -1,
+			bathroomsize: -1,
+			bedsize: -1,
+
+			checkbox : {
+				roomtype : [
+					{name : 'Entire home', checked : false},
+					{name : 'Private room', checked : false},
+					{name : 'Shared room', checked : false}
+				],
+
+				instantbook : [
+					{name : 'on/off', checked : false}
+				],
+
+				amenity : [
+					{name : 'Wireless Internet', checked : false},
+					{name : 'Pool', checked : false},
+					{name : 'Kitchen', checked : false},
+					{name : '24-hour check-in', checked : false},
+					{name : 'Air conditioning', checked : false},
+					{name : 'Buzzer/wireless intercom', checked : false},
+					{name : 'Cable TV', checked : false},
+					{name : 'Carbon monoxide detector', checked : false},
+					{name : 'Doorman', checked : false},
+					{name : 'Doorman Entry', checked : false},
+					{name : 'Dryer', checked : false},
+					{name : 'Elevator in building', checked : false},
+					{name : 'Essentials', checked : false},
+					{name : 'Family/kid friendly', checked : false},
+					{name : 'Fire extinguisher', checked : false},
+					{name : 'First aid kit', checked : false},
+					{name : 'Free parking on premises', checked : false},
+					{name : 'Free parking on street', checked : false},
+					{name : 'Gym', checked : false},
+					{name : 'Hair dryer', checked : false},
+					{name : 'Hangers', checked : false},
+					{name : 'Heating', checked : false},
+					{name : 'Hot tub', checked : false},
+					{name : 'Indoor fireplace', checked : false},
+					{name : 'Internet', checked : false},
+					{name : 'Iron', checked : false},
+					{name : 'Keypad', checked : false},
+					{name : 'Laptop friendly workspace', checked : false},
+					{name : 'Lock on bedroom door', checked : false},
+					{name : 'Lockbox', checked : false},
+					{name : 'Pets allowed', checked : false},
+					{name : 'Safety card', checked : false},
+					{name : 'Shampoo', checked : false},
+					{name : 'Smartlock', checked : false},
+					{name : 'Smoke detector', checked : false},
+					{name : 'Smoking allowed', checked : false},
+					{name : 'Suitable for events', checked : false},
+					{name : 'TV', checked : false},
+					{name : 'Washer', checked : false},
+					{name : 'Wheelchair accessible', checked : false}
+				],
+
+				hostlanguage : [
+					{name : 'English', checked : false},
+					{name : 'Español', checked : false},
+					{name : 'Français', checked : false},
+					{name : 'Bahasa Indonesia', checked : false},
+					{name : 'Bahasa Malaysia', checked : false},
+					{name : 'Bengali', checked : false},
+					{name : 'Dansk', checked : false},
+					{name : 'Deutsch', checked : false},
+					{name : 'Hindi', checked : false},
+					{name : 'Italiano', checked : false},
+					{name : 'Magyar', checked : false},
+					{name : 'Nederlands', checked : false},
+					{name : 'Norsk', checked : false},
+					{name : 'Polski', checked : false},
+					{name : 'Português', checked : false},
+					{name : 'Punjabi', checked : false},
+					{name : 'Sign Language', checked : false},
+					{name : 'Suomi', checked : false},
+					{name : 'Svenska', checked : false},
+					{name : 'Tagalog', checked : false},
+					{name : 'Türkçe', checked : false},
+					{name : 'Čeština', checked : false},
+					{name : 'Ελληνικά', checked : false},
+					{name : 'Русский', checked : false},
+					{name : 'العربية', checked : false},
+					{name : 'עברית', checked : false},
+					{name : 'ภาษาไทย', checked : false},
+					{name : '中文', checked : false},
+					{name : '日本語', checked : false},
+					{name : '한국어', checked : false}
+				]
+			}
 		};
 
 		this.numofpeople = [
@@ -37,19 +127,58 @@ export default class FilterForm extends React.Component {
 		];
 
 		this.bedroomsize = [
-			'1 bedrooms',
-			'2 bedrooms',
-			'3 bedrooms',
-			'4 bedrooms',
-			'5 bedrooms',
-			'6 bedrooms',
-			'7 bedrooms',
-			'8 bedrooms',
-			'9 bedrooms',
-			'10 bedrooms'
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
+			10
 		];
+
+		this.bathroomsize = [
+			0,
+			0.5,
+			1,
+			1.5,
+			2,
+			2.5,
+			3,
+			3.5,
+			4,
+			4.5,
+			5,
+			5.5,
+			6,
+			6.5,
+			7,
+			7.5,
+			8
+		];
+
+		this.bedsize = [
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
+			10,
+			11,
+			12,
+			13,
+			14,
+			15,
+			16
+		]
 	}
-	
+
 	componentWillReceiveProps(nextProps) {
 	// You don't have to do this check first, but it can help prevent an unneeded render
 		if (nextProps.params.place !== this.state.inputLocation) {
@@ -71,15 +200,19 @@ export default class FilterForm extends React.Component {
 			}
   		});
 	}
-	
+
 	getPlaceQuery(location) {
 		$.post('/api/showplace', {
+			'checkbox': this.state.checkbox,
 			'state': location,
 			'date_start': this.state.date_start,
 			'date_end': this.state.date_end,
 			'numofguest': this.state.numofguest,
 			'min_cost': this.state.min_cost,
-			'max_cost': this.state.max_cost
+			'max_cost': this.state.max_cost,
+			'bedroomsize': this.state.bedroomsize,
+			'bathroomsize': this.state.bathroomsize,
+			'bedsize': this.state.bedsize
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('Show place Not Successful');
@@ -89,7 +222,7 @@ export default class FilterForm extends React.Component {
 			}
   		});
 	}
-	
+
 	renderCheckBox(neighbor) {
 		var rows = [];
 		for (var i=0; i < neighbor.length; i++) {
@@ -136,9 +269,9 @@ export default class FilterForm extends React.Component {
 
 					<form className="f">
 						Room type
-						<input className="t2" type="checkbox"></input> Entire home
-						<input className="t3" type="checkbox"></input> Private room
-						<input className="t3" type="checkbox"></input> Shared room
+						{this.state.checkbox.roomtype.map((val, i) => {
+							return <label><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						})}
 					</form>
 
 					<form className="f">
@@ -151,50 +284,23 @@ export default class FilterForm extends React.Component {
 
 					<form className="f">
 						Size
-						<select name='sizeofbedroom' onChange={this.onChange.bind(this)} className="sizeBedRoom">
+						<select name='bedroomsize' onChange={this.onChange.bind(this)} className="sizeBedRoom">
 							<option>Bedrooms</option>
 							{this.bedroomsize.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
-						<select className="sizeBath">
+						<select name='bathroomsize' onChange={this.onChange.bind(this)} className="sizeBath">
 							<option>Bathrooms</option>
-							<option>0 bathrooms</option>
-							<option>0.5 bathrooms</option>
-							<option>1 bathrooms</option>
-							<option>1.5 bathrooms</option>
-							<option>2 bathrooms</option>
-							<option>2.5 bathrooms</option>
-							<option>3 bathrooms</option>
-							<option>3.5 bathrooms</option>
-							<option>4 bathrooms</option>
-							<option>4.5 bathrooms</option>
-							<option>5 bathrooms</option>
-							<option>5.5 bathrooms</option>
-							<option>6 bathrooms</option>
-							<option>6.5 bathrooms</option>
-							<option>7 bathrooms</option>
-							<option>7.5 bathrooms</option>
-							<option>8+ bathrooms</option>
+							{this.bathroomsize.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
 						</select>
-						<select className="sizeBed">
+						<select name='bedsize' onChange={this.onChange.bind(this)} className="sizeBed">
 							<option>Beds</option>
-							<option>1 beds</option>
-							<option>2 beds</option>
-							<option>3 beds</option>
-							<option>4 beds</option>
-							<option>5 beds</option>
-							<option>6 beds</option>
-							<option>7 beds</option>
-							<option>8 beds</option>
-							<option>9 beds</option>
-							<option>10 beds</option>
-							<option>11 beds</option>
-							<option>12 beds</option>
-							<option>13 beds</option>
-							<option>14 beds</option>
-							<option>15 beds</option>
-							<option>16+ beds</option>
+							{this.bedsize.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
 						</select>
 					</form>
 
@@ -202,108 +308,23 @@ export default class FilterForm extends React.Component {
 
 					<form className="f">
 						Instant Book
-						<input className="instantBook" type="checkbox"></input> on/off
+						{this.state.checkbox.instantbook.map((val, i) => {
+							return <label><br></br><input name='instantbook' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						})}
 					</form>
 
 					<form className="f">
 						Amenities
-						<input className="t2" type="checkbox"></input> Wireless Internet
-						<input className="t3" type="checkbox"></input> Pool
-						<input className="t3" type="checkbox"></input> Kitchen
-						<br></br>
-						<input className="t4" type="checkbox"></input> 24-hour check-in
-						<input className="t3" type="checkbox"></input> Air conditioning
-						<input className="t3" type="checkbox"></input> Breakfast
-						<br></br>
-						<input className="t4" type="checkbox"></input> Buzzer/wireless intercom
-						<input className="t3" type="checkbox"></input> Cable TV
-						<input className="t3" type="checkbox"></input> Carbon monoxide detector
-						<br></br>
-						<input className="t4" type="checkbox"></input> Doorman
-						<input className="t3" type="checkbox"></input> Doorman Entry
-						<input className="t3" type="checkbox"></input> Dryer
-						<br></br>
-						<input className="t4" type="checkbox"></input> Elevator in building
-						<input className="t3" type="checkbox"></input> Essentials
-						<input className="t3" type="checkbox"></input> Family/kid friendly
-						<br></br>
-						<input className="t4" type="checkbox"></input> Fire extinguisher
-						<input className="t3" type="checkbox"></input> First aid kit
-						<input className="t3" type="checkbox"></input> Free parking on premises
-						<br></br>
-						<input className="t4" type="checkbox"></input> Free parking on street
-						<input className="t3" type="checkbox"></input> Gym
-						<input className="t3" type="checkbox"></input> Hair dryer
-						<br></br>
-						<input className="t4" type="checkbox"></input> Hangers
-						<input className="t3" type="checkbox"></input> Heating
-						<input className="t3" type="checkbox"></input> Hot tub
-						<br></br>
-						<input className="t4" type="checkbox"></input> Indoor fireplace
-						<input className="t3" type="checkbox"></input> Internet
-						<input className="t3" type="checkbox"></input> Iron
-						<br></br>
-						<input className="t4" type="checkbox"></input> Keypad
-						<input className="t3" type="checkbox"></input> Laptop friendly workspace
-						<input className="t3" type="checkbox"></input> Lock on bedroom door
-						<br></br>
-						<input className="t4" type="checkbox"></input> Lockbox
-						<input className="t3" type="checkbox"></input> Pets allowed
-						<input className="t3" type="checkbox"></input> Safety card
-						<br></br>
-						<input className="t4" type="checkbox"></input> Shampoo
-						<input className="t3" type="checkbox"></input> Smartlock
-						<input className="t3" type="checkbox"></input> Smoke detector
-						<br></br>
-						<input className="t4" type="checkbox"></input> Smoking allowed
-						<input className="t3" type="checkbox"></input> Suitable for events
-						<input className="t3" type="checkbox"></input> TV
-						<br></br>
-						<input className="t4" type="checkbox"></input> Washer
-						<input className="t3" type="checkbox"></input> Wheelchair accessible
+						{this.state.checkbox.amenity.map((val, i) => {
+							return <label><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						})}
 					</form>
 					
 					<form className="f">
 						Host Language
-						<input className="t2" type="checkbox"></input> English
-						<input className="t3" type="checkbox"></input> Español
-						<input className="t3" type="checkbox"></input> Français
-						<br></br>
-						<input className="t4" type="checkbox"></input> Bahasa Indonesia
-						<input className="t3" type="checkbox"></input> Bahasa Malaysia
-						<input className="t3" type="checkbox"></input> Bengali
-						<br></br>
-						<input className="t4" type="checkbox"></input> Dansk
-						<input className="t3" type="checkbox"></input> Deutsch
-						<input className="t3" type="checkbox"></input> Hindi
-						<br></br>
-						<input className="t4" type="checkbox"></input> Italiano
-						<input className="t3" type="checkbox"></input> Magyar
-						<input className="t3" type="checkbox"></input> Nederlands
-						<br></br>
-						<input className="t4" type="checkbox"></input> Norsk
-						<input className="t3" type="checkbox"></input> Polski
-						<input className="t3" type="checkbox"></input> Português
-						<br></br>
-						<input className="t4" type="checkbox"></input> Punjabi
-						<input className="t3" type="checkbox"></input> Sign Language
-						<input className="t3" type="checkbox"></input> Suomi
-						<br></br>
-						<input className="t4" type="checkbox"></input> Svenska
-						<input className="t3" type="checkbox"></input> Tagalog
-						<input className="t3" type="checkbox"></input> Türkçe
-						<br></br>
-						<input className="t4" type="checkbox"></input> Čeština
-						<input className="t3" type="checkbox"></input> Ελληνικά
-						<input className="t3" type="checkbox"></input> Русский
-						<br></br>
-						<input className="t4" type="checkbox"></input> עברית
-						<input className="t3" type="checkbox"></input> العربية
-						<input className="t3" type="checkbox"></input> ภาษาไทย
-						<br></br>
-						<input className="t4" type="checkbox"></input> 中文
-						<input className="t3" type="checkbox"></input> 日本語
-						<input className="t3" type="checkbox"></input> 한국어
+						{this.state.checkbox.hostlanguage.map((val, i) => {
+							return <label><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						})}
 					</form>
 
 					<button name='apply_filter' type="button" onClick={this.onClickApplyFilter.bind(this)}>Apply Filter</button>
@@ -315,26 +336,61 @@ export default class FilterForm extends React.Component {
 
 		);
 	}
-	
+
 	onChange(e){
 		var name = e.target.name;
 		var val = e.target.value;
+		var type = e.target.type;
 		console.log(e.target.value);
 
-		if (name === "date_start") {
-			this.setState({date_start: val});
-		} else if (name === "date_end") {
-			this.setState({date_end: val});
-		} else if (name === "numofguest") {
-			this.setState({numofguest: val});
-		} else if (name === "min_cost") {
-			this.setState({min_cost: val});
-		} else if (name === "max_cost") {
-			this.setState({max_cost: val});
+		if (type !== "checkbox") {
+			if (name === "date_start") {
+				this.setState({date_start: val});
+			} else if (name === "date_end") {
+				this.setState({date_end: val});
+			} else if (name === "numofguest") {
+				this.setState({numofguest: val});
+			} else if (name === "bedroomsize") {
+				this.setState({bedroomsize: val});
+			} else if (name === "bathroomsize") {
+				this.setState({bathroomsize: val});
+			} else if (name === "bedsize") {
+				this.setState({bedsize: val});
+			} else if (name === "min_cost") {
+				this.setState({min_cost: val});
+			} else if (name === "max_cost") {
+				this.setState({max_cost: val});
+			}
+		} else {
+			var indx = e.target.value;
+			var checked = e.target.checked;
+			var newState = this.state;
+			if (name === "roomtype") {
+				newState.checkbox.roomtype[indx].checked = checked;
+			} else if (name === "instantbook") {
+				newState.checkbox.instantbook[indx].checked = checked;
+			} else if (name === "amenity") {
+				newState.checkbox.amenity[indx].checked = checked;
+			} else if (name === "hostlanguage") {
+				newState.checkbox.hostlanguage[indx].checked = checked;
+			}
+			this.setState(newState);
 		}
 	}
 
 	onClickApplyFilter() {
 		this.getPlaceQuery(this.state.inputLocation);
+		console.log(this.state.checkbox.roomtype[0].checked);
+		console.log(this.state.checkbox.instantbook[0].checked);
+		console.log(this.state.checkbox.amenity[0].checked);
+		console.log(this.state.checkbox.hostlanguage[0].checked);
+		console.log(this.state.date_start);
+		console.log(this.state.date_end);
+		console.log(this.state.numofguest);
+		console.log(this.state.min_cost);
+		console.log(this.state.max_cost);
+		console.log(this.state.bedroomsize);
+		console.log(this.state.bathroomsize);
+		console.log(this.state.bedsize);
 	}
 }
