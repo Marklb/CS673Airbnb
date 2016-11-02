@@ -55,6 +55,7 @@ export default class FilterForm extends React.Component {
 		if (nextProps.params.place !== this.state.inputLocation) {
 			this.setState({inputLocation: nextProps.params.place});
 			this.getNeighborQuery(nextProps.params.place);
+			this.getPlaceQuery(nextProps.params.place);
 		}
 	}
 
@@ -71,15 +72,9 @@ export default class FilterForm extends React.Component {
   		});
 	}
 	
-	getPlaceQuery() {
-		console.log('state.state = ' + this.state.inputLocation);
-		console.log('state.date_start = ' + this.state.date_start);
-		console.log('state.date_end = ' + this.state.date_end);
-		console.log('state.numofguest = ' + this.state.numofguest);
-		console.log('state.min_cost = ' + this.state.min_cost);
-		console.log('state.max_cost = ' + this.state.max_cost);
+	getPlaceQuery(location) {
 		$.post('/api/showplace', {
-  			'state': this.state.inputLocation,
+			'state': location,
 			'date_start': this.state.date_start,
 			'date_end': this.state.date_end,
 			'numofguest': this.state.numofguest,
@@ -340,6 +335,6 @@ export default class FilterForm extends React.Component {
 	}
 
 	onClickApplyFilter() {
-		this.getPlaceQuery();
+		this.getPlaceQuery(this.state.inputLocation);
 	}
 }
