@@ -10,7 +10,7 @@ var db = function(app){
 		host     : 'localhost',
 		user     : 'root',
 		// password : '9993kuo',
-		password : '',
+		password : 'd927392316',
 		database : 'mokbnb'
 	});
 

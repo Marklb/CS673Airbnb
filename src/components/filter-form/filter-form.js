@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from "react-router";
-
 import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
@@ -10,7 +9,11 @@ export default class FilterForm extends React.Component {
 	
 	constructor(props) {
 		super(props);
-
+		
+		this.state = {
+			isFiltersVisible: false
+		};
+		
 		this.state = {
 			inputLocation : this.props.params.place,
 			neighborhoods : [],
@@ -176,7 +179,13 @@ export default class FilterForm extends React.Component {
 			14,
 			15,
 			16
-		]
+		];
+
+		this.rooms = [
+			{img: "/images/room1.jpg", title: "room1", price: "$100", roomType: "private"},
+			{img: "/images/room2.jpg", title: "room1", price: "$100", roomType: "private"},
+			{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
+		];
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -247,6 +256,7 @@ export default class FilterForm extends React.Component {
 				-----Filter Result-----
 				<br></br>
 				{rows.length === 0 ? 'None' : rows}
+				{this.renderPicture()}
 			</form>
 		);
 	}
@@ -330,11 +340,45 @@ export default class FilterForm extends React.Component {
 					<button name='apply_filter' type="button" onClick={this.onClickApplyFilter.bind(this)}>Apply Filter</button>
 
 					{this.renderResult(this.state.result)}
-
+					
+					
+					
 				</div>
 			</div>
 
 		);
+	}
+
+	renderPicture() {
+		return (
+			<div>
+				<div className="filterResult">
+					<div>
+						<div onClick={this.onClickShowFilters.bind(this)}>filters</div>
+					</div>
+					
+					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
+					
+					{this.rooms.map((val, i) => {
+						return (
+							<form className="f">
+								<img src={val.img}  />
+								<br></br>
+								Title<input className="r1" type="text" placeholder={val.title}></input> 
+								Price<input className="r2" type="text" placeholder={val.price}></input> 
+								RoomType<input className="r3" type="text" placeholder={val.roomType}></input> 
+							</form>
+						);
+					})}
+				</div>
+			</div>
+		);
+	}
+
+	onClickShowFilters(e){
+		let newState = this.state;
+		newState.isFiltersVisible = !newState.isFiltersVisible;
+		this.setState(newState);
 	}
 
 	onChange(e){

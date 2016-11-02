@@ -249,7 +249,7 @@ INSERT INTO Users (
    email,password,first_name,
    last_name,gender,birth_date
 ) VALUES (
-   'JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','03/26/90'
+   'JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','9-April-2016'
 );
 
 INSERT INTO address (
