@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `profile_pic` VARCHAR(45) NULL,
   `bio` VARCHAR(45) NULL,
   `join_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `disabled` BIT NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`))
 ENGINE = InnoDB;
 

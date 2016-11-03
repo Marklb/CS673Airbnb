@@ -5,3 +5,4 @@ npm-debug.log*
 private_notes/
 mb-proj-data.json
 mb-proj-data*
+.mb/

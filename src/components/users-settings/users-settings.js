@@ -3,12 +3,20 @@ import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 're
 
 import DashboardContainer from '../dashboard-container';
 
-require("./inbox.scss");
+require("./users-settings.scss");
+
+//
+//
+// Settings are in users-notifications right now
+//  They wil be moved to here soon.
+//
+//
+
 
 /*
 
 */
-export default class Inbox extends React.Component {
+export default class UsersSettings extends React.Component {
   constructor(props) {
     super(props);
 
@@ -21,9 +29,9 @@ export default class Inbox extends React.Component {
 
   render() {
     return (
-      <DashboardContainer headerTab='inbox' >
+      <DashboardContainer headerTab='account' >
         <div>
-          Inbox
+          Settings
         </div>
       </DashboardContainer>
     );
