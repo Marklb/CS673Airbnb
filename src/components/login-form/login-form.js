@@ -86,7 +86,7 @@ export default class LoginForm extends React.Component {
           <div className="social-auth-buttons">
             <FacebookLogin
               appId={this.context.facebookApiAppId}
-              autoLoad={true}
+              autoLoad={false}
               textButton="Log in with Facebook"
               fields="name,email,picture"
               callback={this.responseFacebook.bind(this)}
@@ -163,19 +163,41 @@ export default class LoginForm extends React.Component {
   */
   responseGoogle(response) {
     // console.log(response);
-    this.setState({authedIdGoogle: response});
-    if(response.accessToken !== undefined){
-      this.context.userSessionHandler.loginSet({
-        isLoggedIn: true,
-        authType: 'google',
-        response: response
-      });
-
-      if(this.props.modalVars !== undefined){
-        this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
-          this.props.modalVars.name);
+    $.post('/api/verifyLogin', {
+      'email': response.profileObj.email,
+      'password': '909GOOGLE909'
+    }, (data, status) => {
+      if(data.veri_success === false) {
+        console.log('Login Not Successful');
+      } else {
+        // If log In was successful then hide the modals which will hide the login model.
+        // May switch this to be more specific instead of all is needed.
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName, this.props.modalVars.name);
+        this.context.userSessionHandler.loginSet({
+          isLoggedIn: true,
+          authType: data.auth_type,
+          response: {
+            firstName: data.first_name,
+            authToken: data.auth_token
+          }
+        });
       }
-    }
+    });
+
+
+    // this.setState({authedIdGoogle: response});
+    // if(response.accessToken !== undefined){
+    //   this.context.userSessionHandler.loginSet({
+    //     isLoggedIn: true,
+    //     authType: 'google',
+    //     response: response
+    //   });
+    //
+    //   if(this.props.modalVars !== undefined){
+    //     this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+    //       this.props.modalVars.name);
+    //   }
+    // }
   }
 
   /*
@@ -183,19 +205,43 @@ export default class LoginForm extends React.Component {
   */
   responseFacebook(response) {
     // console.log(response);
-    this.setState({authedIdFacebook: response});
-    if(response.accessToken !== undefined){
-      this.context.userSessionHandler.loginSet({
-        isLoggedIn: true,
-        authType: 'facebook',
-        response: response
-      });
-
-      if(this.props.modalVars !== undefined){
-        this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
-          this.props.modalVars.name);
+    $.post('/api/verifyLogin', {
+      'email': response.email,
+      'password': '909FACEBOOK909'
+    }, (data, status) => {
+      if(data.veri_success === false) {
+        console.log('Login Not Successful');
+      } else {
+        // If log In was successful then hide the modals which will hide the login model.
+        // May switch this to be more specific instead of all is needed.
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName, this.props.modalVars.name);
+        this.context.userSessionHandler.loginSet({
+          isLoggedIn: true,
+          authType: data.auth_type,
+          response: {
+            firstName: data.first_name,
+            authToken: data.auth_token
+          }
+        });
       }
-    }
+    });
+
+
+
+
+    // this.setState({authedIdFacebook: response});
+    // if(response.accessToken !== undefined){
+    //   this.context.userSessionHandler.loginSet({
+    //     isLoggedIn: true,
+    //     authType: 'facebook',
+    //     response: response
+    //   });
+    //
+    //   if(this.props.modalVars !== undefined){
+    //     this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+    //       this.props.modalVars.name);
+    //   }
+    // }
   }
 
   /*

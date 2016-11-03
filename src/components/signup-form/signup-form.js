@@ -167,8 +167,27 @@ export default class SignUpForm extends React.Component {
     return (
       <div>
         <div className="social-auth-buttons">
-          <Link to="#" className="btn auth-btn-facebook">Sign Up with Facebook</Link>
-          <Link to="#" className="btn auth-btn-google">Sign Up with Google</Link>
+          {/*<Link to="#" className="btn auth-btn-facebook">Sign Up with Facebook</Link>
+          <Link to="#" className="btn auth-btn-google">Sign Up with Google</Link>*/}
+          <FacebookLogin
+            appId={this.context.facebookApiAppId}
+            autoLoad={false}
+            textButton="Sign Up with Facebook"
+            fields="name,email,picture"
+            callback={this.responseFacebook.bind(this)}
+            cssClass="btn auth-btn-facebook"
+            icon="fa-facebook"
+          />
+          <GoogleLogin
+            clientId={this.context.googleApiClientId}
+            className="btn auth-btn-google"
+            buttonText="Sign Up with google"
+            onSuccess={this.responseGoogle.bind(this)}
+            onFailure={this.responseGoogle.bind(this)}
+          >
+            <div className="icon-google" />
+            <span>Sign Up with Google</span>
+          </GoogleLogin>
         </div>
 
         <div className="or-separator">
@@ -361,6 +380,104 @@ export default class SignUpForm extends React.Component {
   Event Callbacks
 
   */
+
+  /*
+
+  */
+  responseGoogle(response) {
+    console.log('responseGoogle');
+    console.log(response);
+    let obj = {
+      'auth_type': 'google',
+      'response': {
+        'profileObj': {
+          givenName: response.profileObj.givenName,
+          familyName: response.profileObj.familyName,
+          email: response.profileObj.email
+        }
+      }
+    };
+    console.log(obj);
+    $.post('/api/signupinfo', obj, (data, status) => {
+      if(data.veri_success === false) {
+        console.log('Login Not Successful');
+      } else {
+        console.log('Login Successful');
+        // If log In was successful then hide the modals which will hide the login model.
+        // May switch this to be more specific instead of all is needed.
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName, this.props.modalVars.name);
+        this.context.userSessionHandler.loginSet({
+          isLoggedIn: true,
+          authType: data.auth_type,
+          response: {
+            firstName: data.first_name,
+            authToken: data.auth_token
+          }
+        });
+      }
+    });
+
+
+
+    // this.setState({authedIdGoogle: response});
+    // if(response.accessToken !== undefined){
+    //   this.context.userSessionHandler.loginSet({
+    //     isLoggedIn: true,
+    //     authType: 'google',
+    //     response: response
+    //   });
+    //
+    //   if(this.props.modalVars !== undefined){
+    //     this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+    //       this.props.modalVars.name);
+    //   }
+    // }
+  }
+
+  /*
+
+  */
+  responseFacebook(response) {
+    console.log(response);
+    $.post('/api/signupinfo', {
+      'auth_type': 'facebook',
+      'response': response
+    }, (data, status) => {
+      if(data.veri_success === false) {
+        console.log('Login Not Successful');
+      } else {
+        console.log('Login Successful');
+        console.log(data);
+        // If log In was successful then hide the modals which will hide the login model.
+        // May switch this to be more specific instead of all is needed.
+        this.context.modalsHandler.hideModal(this.props.modalVars.containerName, this.props.modalVars.name);
+        this.context.userSessionHandler.loginSet({
+          isLoggedIn: true,
+          authType: data.auth_type,
+          response: {
+            firstName: data.first_name,
+            authToken: data.auth_token
+          }
+        });
+      }
+    });
+
+
+
+    // this.setState({authedIdFacebook: response});
+    // if(response.accessToken !== undefined){
+    //   this.context.userSessionHandler.loginSet({
+    //     isLoggedIn: true,
+    //     authType: 'facebook',
+    //     response: response
+    //   });
+    //
+    //   if(this.props.modalVars !== undefined){
+    //     this.context.modalsHandler.hideModal(this.props.modalVars.containerName,
+    //       this.props.modalVars.name);
+    //   }
+    // }
+  }
 
   /*
 

@@ -45,16 +45,18 @@ export default class userSessionHandler {
       console.log(options.response);
       switch(options.authType){
         case 'facebook':
-          this._email = (options.response.email !== undefined) ?
-            options.response.email : undefined;
-          this._firstName = (options.response.name !== undefined) ?
-            options.response.name.split(' ')[0] : FIRST_NAME_PLACEHOLDER;
-          this._lastName = (options.response.name !== undefined) ?
-            options.response.name.split(' ')[1] : undefined;
+          // this._email = (options.response.email !== undefined) ?
+          //   options.response.email : undefined;
+          this._firstName = (options.response.firstName !== undefined) ?
+            options.response.firstName : FIRST_NAME_PLACEHOLDER;
+          this._authToken = options.response.authToken;
+          this.storeDataToLocal();
           break;
         case 'google':
-          this._firstName = (options.response.profileObj.givenName !== undefined) ?
-            options.response.profileObj.givenName : FIRST_NAME_PLACEHOLDER;
+          this._firstName = (options.response.firstName !== undefined) ?
+            options.response.firstName : FIRST_NAME_PLACEHOLDER;
+          this._authToken = options.response.authToken;
+          this.storeDataToLocal();
           break;
         case 'mokbnb':
           // TODO: Fix this implementation

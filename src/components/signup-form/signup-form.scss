@@ -79,18 +79,41 @@ $fontFamily: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
       border-color: rgba(59,89,152,1);
       background-color: rgba(59,89,152,1);
       color: #fff;
+      display: block;
+      width: 100%;
 
       &:hover {
         border-color: rgba(59,89,172,1);
         background-color: rgba(59,89,172,1);
         // @include opacity(0.95);
       }
+
+      .fa {
+        float: left;
+        margin-top: 4px;
+        margin-left: 5px;
+      }
+
     }
 
     .auth-btn-google {
       border-color: #c4c4c4;
       background: white;
       color: #484848;
+      display: block;
+      width: 100%;
+
+      .icon-google {
+        float: left;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        background-repeat: no-repeat;
+        background-image: url('../../../public/images/Google_-G-_Logo.svg');
+        max-height: 20px;
+        max-width: 20px;
+      }
+
     }
   }
 

@@ -9,7 +9,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '9993kuo',
+		password : '',
 		database : 'mokbnb'
 	});
 
@@ -101,61 +101,133 @@ var db = function(app){
 	// Sign up
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/signupinfo",function(req,res){
-		var password = req.body.password;
-		var fname = req.body.firstname;
-		var lname = req.body.lastname;
-		var email = req.body.email;
-		var bmonth = req.body.birthdaymonth;
-		var byear = req.body.birthdayyear;
-		var bday = req.body.birthdayday;
-		var dob = bday + '-' + bmonth + '-' + byear;
+    console.log('/api/signupinfo');
+    if(req.body.auth_type){
+      console.log('req.body.auth_type:  ' + req.body.auth_type);
+      var fname;
+      var lname;
+      var email;
+      var password;
+      if(req.body.auth_type == 'google'){
+        fname = req.body.response.profileObj.givenName;
+        lname = req.body.response.profileObj.familyName;
+        email = req.body.response.profileObj.email;
+        password = '909GOOGLE909';
+      }else if(req.body.auth_type == 'facebook'){
+        var arr = req.body.response.name.split(' ');
+        fname = arr[0];
+        lname = arr[1];
+        email = req.body.response.email;
+        password = '909FACEBOOK909';
+      }
+      console.log(fname);
+      console.log(lname);
+      console.log(email);
+      // TODO: Fix password and birth_date attributes
+      conn.query(
+  			'INSERT INTO Users (password,first_name,last_name,email,'+
+  					'birth_date) VALUES (?, ?, ?, ?, ?)',
+  			[password, fname, lname, email, '9-April-1910'], function(err, result){
+  			if (!err) {
+  				// console.log('Signup was a success');
+  				var user_id = result.insertId;
+  				var auth_type = req.body.auth_type;
+          // TODO: Fix this to use correct token
+  				var auth_token = jwt.sign({data: email}, TOKEN_SECRET, {
+  					expiresIn: '1h'
+  				});
+  				// console.log(`Token: ${auth_token}`);
 
-		conn.query(
-			'INSERT INTO Users (password,first_name,last_name,email,'+
-					'birth_date) VALUES (?, ?, ?, ?, ?)',
-			[password, fname, lname, email, dob], function(err, result){
-			if (!err) {
-				// console.log('Signup was a success');
-				var user_id = result.insertId;
-				var auth_type = 'mokbnb';
-				var auth_token = jwt.sign({data: email}, TOKEN_SECRET, {
-					expiresIn: '1h'
-				});
-				// console.log(`Token: ${auth_token}`);
+
+
+  				// Store the user session data
+  				var query_str ='INSERT INTO `UserSession` (`user_id`, `auth_type`, '+
+  													'`session_auth_id`) VALUES (?, ?, ?)';
+  				console.log(query_str);
+  				conn.query(query_str, [user_id, auth_type, auth_token],
+  					function(err, result) {
+  					if (err) console.log(err);
+
+  					conn.query('SELECT `user_id`, `first_name` '+
+  											'FROM Users '+
+  											'WHERE `user_id` = ?', [user_id],
+  						function(err, row, fields) {
+  							if(err) console.log(err);
+
+  							res.json({
+  								'insert_success': true,
+  								'first_name': row[0].first_name,
+  								'auth_type': req.body.auth_type,
+  								'auth_token': auth_token
+  							});
+
+  						});
+  					});
+
+  				// res.json({'insert_success': false});
+  			} else {
+  				console.log('Error while performing Query.');
+  				console.log(err);
+  				res.json({'insert_success': false});
+  			}
+  		});
+    }else{
+  		var password = req.body.password;
+  		var fname = req.body.firstname;
+  		var lname = req.body.lastname;
+  		var email = req.body.email;
+  		var bmonth = req.body.birthdaymonth;
+  		var byear = req.body.birthdayyear;
+  		var bday = req.body.birthdayday;
+  		var dob = bday + '-' + bmonth + '-' + byear;
+
+  		conn.query(
+  			'INSERT INTO Users (password,first_name,last_name,email,'+
+  					'birth_date) VALUES (?, ?, ?, ?, ?)',
+  			[password, fname, lname, email, dob], function(err, result){
+  			if (!err) {
+  				// console.log('Signup was a success');
+  				var user_id = result.insertId;
+  				var auth_type = 'mokbnb';
+  				var auth_token = jwt.sign({data: email}, TOKEN_SECRET, {
+  					expiresIn: '1h'
+  				});
+  				// console.log(`Token: ${auth_token}`);
 
 
 
-				// Store the user session data
-				var query_str ='INSERT INTO `UserSession` (`user_id`, `auth_type`, '+
-													'`session_auth_id`) VALUES (?, ?, ?)';
-				console.log(query_str);
-				conn.query(query_str, [user_id, auth_type, auth_token],
-					function(err, result) {
-					if (err) console.log(err);
+  				// Store the user session data
+  				var query_str ='INSERT INTO `UserSession` (`user_id`, `auth_type`, '+
+  													'`session_auth_id`) VALUES (?, ?, ?)';
+  				console.log(query_str);
+  				conn.query(query_str, [user_id, auth_type, auth_token],
+  					function(err, result) {
+  					if (err) console.log(err);
 
-					conn.query('SELECT `user_id`, `first_name` '+
-											'FROM Users '+
-											'WHERE `user_id` = ?', [user_id],
-						function(err, row, fields) {
-							if(err) console.log(err);
+  					conn.query('SELECT `user_id`, `first_name` '+
+  											'FROM Users '+
+  											'WHERE `user_id` = ?', [user_id],
+  						function(err, row, fields) {
+  							if(err) console.log(err);
 
-							res.json({
-								'insert_success': true,
-								'first_name': row[0].first_name,
-								'auth_type': 'mokbnb',
-								'auth_token': auth_token
-							});
+  							res.json({
+  								'insert_success': true,
+  								'first_name': row[0].first_name,
+  								'auth_type': 'mokbnb',
+  								'auth_token': auth_token
+  							});
 
-						});
-					});
+  						});
+  					});
 
-				// res.json({'insert_success': false});
-			} else {
-				console.log('Error while performing Query.');
-				console.log(err);
-				res.json({'insert_success': false});
-			}
-		});
+  				// res.json({'insert_success': false});
+  			} else {
+  				console.log('Error while performing Query.');
+  				console.log(err);
+  				res.json({'insert_success': false});
+  			}
+  		});
+    }
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
