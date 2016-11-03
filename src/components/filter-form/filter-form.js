@@ -351,14 +351,15 @@ export default class FilterForm extends React.Component {
 
 					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
 
-					{this.rooms.map((val, i) => {
+					{this.state.result.map((val, i) => {
 						return (
 							<form className="f">
-								<img src={val.img}  />
+								<img src={val.pictures}  />
 								<br></br>
-								Title<input className="r1" type="text" placeholder={val.title}></input>
-								Price<input className="r2" type="text" placeholder={val.price}></input>
-								RoomType<input className="r3" type="text" placeholder={val.roomType}></input>
+								Title<input className="r1" type="text" placeholder={val.name}></input>
+								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
+								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
+								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
 							</form>
 						);
 					})}

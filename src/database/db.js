@@ -8,8 +8,8 @@ var db = function(app){
 	var mysql      = require('mysql');
 	var conn = mysql.createConnection({
 		host     : 'localhost',
-		user     : 'Jeremy',
-		password : 'universe',
+		user     : 'root',
+		password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -382,7 +382,7 @@ var db = function(app){
 	app.get("/api/updateUserInfo",function(req,res){
 		console.log('/api/updateUserInfo');
 		console.log(req.query);
-		let attrs = ['email', 'first_name', 'last_name', 'gender', 'birth_date', 'profile_pic', 'bio'];
+		var attrs = ['email', 'first_name', 'last_name', 'gender', 'birth_date', 'profile_pic', 'bio'];
 
 		var vals = [];
 		for(var attr of attrs){
