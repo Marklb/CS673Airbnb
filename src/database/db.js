@@ -363,26 +363,66 @@ var db = function(app){
 		}
 		console.log(language_string);
 
-		var placeQuerySQL = "" +
-		"SELECT name, cost_per_night, ask_amount, roomtype_id, COUNT(*), bookingtype_id, pictures" +
-		" FROM (place" +
-			" join hostplacelisting on place.place_id = hostplacelisting.place_id" +
-			" join userlanguage on place.host_id = userlanguage.user_id" +
-			" join placeamenity on place.place_id = placeamenity.place_id)" +
-		" WHERE (addr_id = (SELECT addr_id FROM address WHERE state='" + state + "')" +
-			" AND cost_per_night <= " + max_cost +
-			" AND cost_per_night >= " + min_cost +
-			" AND max_people >= " + numofguest +
-			" AND bedroomsize >= " + bedroomsize +
-			" AND bathroomsize >= " + bathroomsize +
-			" AND numofbeds >= " + numofbeds +
-			" AND (SELECT DATEDIFF('" + date_start + "', date_range_start)) >= 0" +
-			" AND (SELECT DATEDIFF(date_range_end, '" + date_end + "')) >= 0" +
-			" AND (" + roomtype_string + ")" +
-			" AND (" + bookingtype_string + ")" +
-			" AND (" + language_string + "))" +
-		" AND amenity_id IN (SELECT amenity_id FROM placeamenity WHERE " + amenity_string + ")" +
-		" GROUP BY place.place_id HAVING COUNT(*) = (SELECT COUNT(*) FROM Amenity WHERE " + amenity_string + ")";
+		// var bookingtype_id = [];
+		// var roomtype_id = [];
+		// var amenity_id = [];
+		// var language_id = [];
+
+		console.log('bookingtype_id.length ' + bookingtype_id.length);
+		console.log('roomtype_id.length ' + roomtype_id.length);
+		console.log('amenity_id.length ' + amenity_id.length);
+		console.log('language_id.length ' + language_id.length);
+		console.log('max_cost ' + max_cost);
+		console.log('min_cost ' + min_cost);
+		console.log('numofguest ' + numofguest);
+		console.log('bedroomsize ' + bedroomsize);
+		console.log('bathroomsize ' + bathroomsize);
+		console.log(date_start);
+		console.log(date_end);
+		var placeQuerySQL;
+		if (bookingtype_id.length == 0 && roomtype_id.length == 0 && amenity_id.length == 0 && language_id.length == 0
+			&& max_cost == -1 && min_cost == -1 && numofguest == -1 && bedroomsize == -1 && bathroomsize == -1
+			&& date_start === 'N/A' && date_end === 'N/A') {
+				console.log('nothing!!!');
+				placeQuerySQL = "" +
+				    "SELECT place.name, place.cost_per_night, hostplacelisting.bookingtype_id, place.roomtype_id, place.pictures" +
+					" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id)";
+		}
+		else {
+			placeQuerySQL = "" +
+			"SELECT *" +
+			" FROM (SELECT placeamenity.place_id, placeamenity.amenity_id, A.name, A.pictures, A.bookingtype_id, A.roomtype_id, A.cost_per_night" +
+					" FROM (placeamenity join (SELECT place.place_id, place.name, amenity_id, place.pictures, hostplacelisting.bookingtype_id, place.roomtype_id, place.cost_per_night" +
+												" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id" +
+															" join userlanguage on place.host_id = userlanguage.user_id" +
+															" join placeamenity on place.place_id = placeamenity.place_id)" +
+												" WHERE (addr_id = (SELECT addr_id" +
+																	" FROM address" +
+																	" WHERE state='Texas')" +
+																		" AND cost_per_night <= " + max_cost +
+																		" AND cost_per_night >= " + min_cost +
+																		" AND max_people >= " + numofguest +
+																		" AND bedroomsize >= " + bedroomsize +
+																		" AND bathroomsize >= " + bathroomsize +
+																		" AND numofbeds >= " + numofbeds +
+																		" AND (SELECT DATEDIFF('" + date_start + "', date_range_start)) >= 0 AND (SELECT DATEDIFF(date_range_end, '" + date_end + "')) >= 0" +
+																		" AND (" + roomtype_string + ")" +
+																		" AND (" + bookingtype_string + ")" +
+																		" AND (" + language_string + "))" +
+																		" AND amenity_id IN (SELECT amenity_id" +
+																							" FROM Amenity" +
+																							" WHERE " + amenity_string + ")" +
+												" GROUP BY place.place_id) AS A" +
+							" on placeamenity.place_id = A.place_id)) AS B" +
+					" WHERE B.amenity_id IN (SELECT amenity_id" +
+											" FROM Amenity" +
+											" WHERE " + amenity_string + ")" +
+			" GROUP BY B.place_id" +
+			" HAVING COUNT(*) = (SELECT COUNT(*)" +
+			" FROM Amenity" +
+			" WHERE " + amenity_string + ")";
+		}
+
 		console.log(placeQuerySQL);
 		conn.query(placeQuerySQL,
 		function(err, rows, fields){
