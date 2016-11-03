@@ -8,9 +8,8 @@ var db = function(app){
 	var mysql      = require('mysql');
 	var conn = mysql.createConnection({
 		host     : 'localhost',
-		user     : 'root',
-		// password : '9993kuo',
-		password : 'd927392316',
+		user     : 'Jeremy',
+		password : 'universe',
 		database : 'mokbnb'
 	});
 
@@ -185,11 +184,103 @@ var db = function(app){
 		var numofguest = req.body.numofguest;
 		var min_cost = req.body.min_cost;
 		var max_cost = req.body.max_cost;
-		var bedroomsize = req.body.bedroomsize;
-		var bathroomsize = req.body.bathroomsize;
-		var bedsize = req.body.bedsize;
-		var checkbox = req.body.checkbox;
-		var placeQuerySQL = "SELECT * FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id) WHERE addr_id = (SELECT addr_id FROM address WHERE state='" + state + "') AND cost_per_night <= " + max_cost + " AND cost_per_night >= " + min_cost + " AND max_people >= " + numofguest + " AND (SELECT DATEDIFF('" + date_start + "', date_range_start)) >= 0 AND (SELECT DATEDIFF(date_range_end, '" + date_end + "')) >= 0";
+		var bedroomsize = req.body.bedroomsize; //add column to place
+		var bathroomsize = req.body.bathroomsize; //add column to place
+		var numofbeds = req.body.numofbeds; //add column to place
+		var roomtype = req.body.checkbox.roomtype; //add column to place
+		var bookingtype = req.body.checkbox.bookingtype; //bookingtype = --bookingtype_id in hostplacelisting
+		var amenity = req.body.checkbox.amenity; //add column to place
+		var hostlanguage = req.body.checkbox.hostlanguage; //add to users, project language from (join users.user_id with hostplacelisting.host_id)
+
+		var bookingtype_id = [];
+		var roomtype_id = [];
+		var amenity_id = [];
+		var language_id = [];
+
+		for (var i = 0 ; i < bookingtype.length ; i++) {
+			if (bookingtype[i].checked == "true") {
+				bookingtype_id.push( i + 1 );
+			}
+		}
+		console.log(bookingtype_id);
+
+		var bookingtype_string = "";
+		for (var i = 0; i < bookingtype_id.length ; i++) {
+		        bookingtype_string += ("bookingtype_id = " + bookingtype_id[i]);
+		        if ((i + 1) !== bookingtype_id.length) {
+		                bookingtype_string += " OR ";
+		        }
+		}
+		console.log(bookingtype_string);
+
+		for (var i = 0 ; i < roomtype.length ; i++) {
+			if (roomtype[i].checked == "true") {
+				roomtype_id.push( i + 1 );
+			}
+		}
+		console.log(roomtype_id);
+
+		var roomtype_string = "";
+		for (var i = 0; i < roomtype_id.length ; i++) {
+		        roomtype_string += ("roomtype_id = " + roomtype_id[i]);
+		        if ((i + 1) !== roomtype_id.length) {
+		                roomtype_string += " OR ";
+		        }
+		}
+		console.log(roomtype_string);
+
+		for (var i = 0 ; i < amenity.length ; i++) {
+			if (amenity[i].checked == "true") {
+				amenity_id.push( i + 1 );
+			}
+		}
+		console.log(amenity_id);
+
+		var amenity_string = "";
+		for (var i = 0; i < amenity_id.length ; i++) {
+			amenity_string += ("amenity_id = " + amenity_id[i]);
+			if ((i + 1) !== amenity_id.length) {
+				amenity_string += " OR ";
+			}
+		}
+		console.log(amenity_string);
+
+		for (var i = 0 ; i < hostlanguage.length ; i++) {
+			if (hostlanguage[i].checked == "true") {
+				language_id.push( i + 1 );
+			}
+		}
+		console.log(language_id);
+
+		var language_string = "";
+		for (var i = 0; i < language_id.length ; i++) {
+			language_string += ("language_id = " + language_id[i]);
+			if ((i + 1) !== language_id.length) {
+				language_string += " OR ";
+			}
+		}
+		console.log(language_string);
+
+		var placeQuerySQL = "" +
+		"SELECT name, cost_per_night, ask_amount, roomtype_id, COUNT(*), bookingtype_id, pictures" +
+		" FROM (place" +
+			" join hostplacelisting on place.place_id = hostplacelisting.place_id" +
+			" join userlanguage on place.host_id = userlanguage.user_id" +
+			" join placeamenity on place.place_id = placeamenity.place_id)" +
+		" WHERE (addr_id = (SELECT addr_id FROM address WHERE state='" + state + "')" +
+			" AND cost_per_night <= " + max_cost +
+			" AND cost_per_night >= " + min_cost +
+			" AND max_people >= " + numofguest +
+			" AND bedroomsize >= " + bedroomsize +
+			" AND bathroomsize >= " + bathroomsize +
+			" AND numofbeds >= " + numofbeds +
+			" AND (SELECT DATEDIFF('" + date_start + "', date_range_start)) >= 0" +
+			" AND (SELECT DATEDIFF(date_range_end, '" + date_end + "')) >= 0" +
+			" AND (" + roomtype_string + ")" +
+			" AND (" + bookingtype_string + ")" +
+			" AND (" + language_string + "))" +
+		" AND amenity_id IN (SELECT amenity_id FROM placeamenity WHERE " + amenity_string + ")" +
+		" GROUP BY place.place_id HAVING COUNT(*) = (SELECT COUNT(*) FROM Amenity WHERE " + amenity_string + ")";
 		console.log(placeQuerySQL);
 		conn.query(placeQuerySQL,
 		function(err, rows, fields){

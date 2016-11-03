@@ -6,14 +6,14 @@ import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
 require("./filter-form.scss");
 export default class FilterForm extends React.Component {
-	
+
 	constructor(props) {
 		super(props);
-		
+
 		this.state = {
 			isFiltersVisible: false
 		};
-		
+
 		this.state = {
 			inputLocation : this.props.params.place,
 			neighborhoods : [],
@@ -25,7 +25,7 @@ export default class FilterForm extends React.Component {
 			max_cost : -1,
 			bedroomsize: -1,
 			bathroomsize: -1,
-			bedsize: -1,
+			numofbeds: -1,
 
 			checkbox : {
 				roomtype : [
@@ -34,8 +34,11 @@ export default class FilterForm extends React.Component {
 					{name : 'Shared room', checked : false}
 				],
 
-				instantbook : [
-					{name : 'on/off', checked : false}
+				bookingtype : [
+					{name : 'Instant Book', checked : false},
+					{name : 'Auction', checked : false},
+					{name : 'User-set Time Frame', checked : false},
+					{name : 'Host-set Time Frame', checked : false}
 				],
 
 				amenity : [
@@ -100,18 +103,7 @@ export default class FilterForm extends React.Component {
 					{name : 'Punjabi', checked : false},
 					{name : 'Sign Language', checked : false},
 					{name : 'Suomi', checked : false},
-					{name : 'Svenska', checked : false},
-					{name : 'Tagalog', checked : false},
-					{name : 'Türkçe', checked : false},
-					{name : 'Čeština', checked : false},
-					{name : 'Ελληνικά', checked : false},
-					{name : 'Русский', checked : false},
-					{name : 'العربية', checked : false},
-					{name : 'עברית', checked : false},
-					{name : 'ภาษาไทย', checked : false},
-					{name : '中文', checked : false},
-					{name : '日本語', checked : false},
-					{name : '한국어', checked : false}
+					{name : 'Svenska', checked : false}
 				]
 			}
 		};
@@ -162,7 +154,7 @@ export default class FilterForm extends React.Component {
 			8
 		];
 
-		this.bedsize = [
+		this.numofbeds = [
 			1,
 			2,
 			3,
@@ -221,7 +213,7 @@ export default class FilterForm extends React.Component {
 			'max_cost': this.state.max_cost,
 			'bedroomsize': this.state.bedroomsize,
 			'bathroomsize': this.state.bathroomsize,
-			'bedsize': this.state.bedsize
+			'numofbeds': this.state.numofbeds
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('Show place Not Successful');
@@ -306,9 +298,9 @@ export default class FilterForm extends React.Component {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
-						<select name='bedsize' onChange={this.onChange.bind(this)} className="sizeBed">
+						<select name='numofbeds' onChange={this.onChange.bind(this)} className="sizeBed">
 							<option>Beds</option>
-							{this.bedsize.map((val, i) => {
+							{this.numofbeds.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
@@ -317,9 +309,9 @@ export default class FilterForm extends React.Component {
 					{this.renderCheckBox(this.state.neighborhoods)}
 
 					<form className="f">
-						Instant Book
-						{this.state.checkbox.instantbook.map((val, i) => {
-							return <label><br></br><input name='instantbook' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						Booking Type
+						{this.state.checkbox.bookingtype.map((val, i) => {
+							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
@@ -329,7 +321,7 @@ export default class FilterForm extends React.Component {
 							return <label><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
-					
+
 					<form className="f">
 						Host Language
 						{this.state.checkbox.hostlanguage.map((val, i) => {
@@ -340,9 +332,9 @@ export default class FilterForm extends React.Component {
 					<button name='apply_filter' type="button" onClick={this.onClickApplyFilter.bind(this)}>Apply Filter</button>
 
 					{this.renderResult(this.state.result)}
-					
-					
-					
+
+
+
 				</div>
 			</div>
 
@@ -356,17 +348,17 @@ export default class FilterForm extends React.Component {
 					<div>
 						<div onClick={this.onClickShowFilters.bind(this)}>filters</div>
 					</div>
-					
+
 					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
-					
+
 					{this.rooms.map((val, i) => {
 						return (
 							<form className="f">
 								<img src={val.img}  />
 								<br></br>
-								Title<input className="r1" type="text" placeholder={val.title}></input> 
-								Price<input className="r2" type="text" placeholder={val.price}></input> 
-								RoomType<input className="r3" type="text" placeholder={val.roomType}></input> 
+								Title<input className="r1" type="text" placeholder={val.title}></input>
+								Price<input className="r2" type="text" placeholder={val.price}></input>
+								RoomType<input className="r3" type="text" placeholder={val.roomType}></input>
 							</form>
 						);
 					})}
@@ -398,8 +390,8 @@ export default class FilterForm extends React.Component {
 				this.setState({bedroomsize: val});
 			} else if (name === "bathroomsize") {
 				this.setState({bathroomsize: val});
-			} else if (name === "bedsize") {
-				this.setState({bedsize: val});
+			} else if (name === "numofbeds") {
+				this.setState({numofbeds: val});
 			} else if (name === "min_cost") {
 				this.setState({min_cost: val});
 			} else if (name === "max_cost") {
@@ -411,8 +403,8 @@ export default class FilterForm extends React.Component {
 			var newState = this.state;
 			if (name === "roomtype") {
 				newState.checkbox.roomtype[indx].checked = checked;
-			} else if (name === "instantbook") {
-				newState.checkbox.instantbook[indx].checked = checked;
+			} else if (name === "bookingtype") {
+				newState.checkbox.bookingtype[indx].checked = checked;
 			} else if (name === "amenity") {
 				newState.checkbox.amenity[indx].checked = checked;
 			} else if (name === "hostlanguage") {
@@ -425,7 +417,7 @@ export default class FilterForm extends React.Component {
 	onClickApplyFilter() {
 		this.getPlaceQuery(this.state.inputLocation);
 		console.log(this.state.checkbox.roomtype[0].checked);
-		console.log(this.state.checkbox.instantbook[0].checked);
+		console.log(this.state.checkbox.bookingtype[0].checked);
 		console.log(this.state.checkbox.amenity[0].checked);
 		console.log(this.state.checkbox.hostlanguage[0].checked);
 		console.log(this.state.date_start);
@@ -435,6 +427,7 @@ export default class FilterForm extends React.Component {
 		console.log(this.state.max_cost);
 		console.log(this.state.bedroomsize);
 		console.log(this.state.bathroomsize);
-		console.log(this.state.bedsize);
+		console.log(this.state.numofbeds);
+		console.log(this.state.checkbox.bookingtype);
 	}
 }
