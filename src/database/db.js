@@ -10,7 +10,8 @@ var db = function(app){
 		host     : 'localhost',
 		user     : 'root',
 		// password : '9993kuo',
-		password : 'd927392316',
+		// password : 'd927392316',
+		password : '',
 		database : 'mokbnb'
 	});
 
@@ -31,7 +32,7 @@ var db = function(app){
 		var query_str = 'SELECT S.user_id, U.first_name ' +
 	                  'FROM UserSession AS S, Users AS U ' +
 	                  'WHERE S.auth_type = ? AND S.session_auth_id = ? ' +
-	                    'AND S.user_id = U.user_id';
+	                    'AND S.user_id = U.user_id AND disabled = 0';
 	  conn.query(query_str, [req.query.authType, req.query.authToken],
 			function(err, rows, fields) {
 	    if(err){
@@ -58,7 +59,8 @@ var db = function(app){
 		var email = req.body.email;
 		var password = req.body.password;
 
-		conn.query('SELECT * from Users WHERE email = ? AND password = ?',
+		conn.query('SELECT * from Users WHERE email = ? AND password = ? AND ' +
+									'disabled = 0',
 			[email, password], function(err, rows, fields){
 			if (!err) {
 				// console.log('number of row : ' + rows.length);
@@ -157,6 +159,35 @@ var db = function(app){
 			}
 		});
 	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Disable User Account
+	/////////////////////////////////////////////////////////////////////////////
+	app.get("/api/disableUserAccount",function(req,res){
+		console.log('/api/disableUserAccount');
+		console.log(req.query);
+
+		var query_str = 'UPDATE Users ' +
+										'SET disabled = true ' +
+										'WHERE user_id = (SELECT user_id FROM UserSession ' +
+										'WHERE auth_type = \''+ req.query.auth_type + '\' AND ' +
+										'session_auth_id = \''+ req.query.auth_token +'\')';
+		console.log(query_str);
+
+	  conn.query(query_str, function(err, rows, fields) {
+	    if(err){
+				console.log(err);
+	      res.json({'success': false});
+	    }else{
+        console.log(rows);
+				res.json({
+					'success': true
+				});
+				// console.log(rows);
+	    }
+	  });
+	});
+
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Get neighborhoods information
@@ -280,6 +311,40 @@ var db = function(app){
 		query_str += 'WHERE user_id = (SELECT user_id FROM UserSession ' +
 			'WHERE auth_type = \''+ req.query.auth_type + '\' AND ' +
 			'session_auth_id = \''+ req.query.auth_token +'\')';
+		console.log(query_str);
+
+	  conn.query(query_str, function(err, rows, fields) {
+	    if(err){
+				console.log(err);
+	      res.json({'success': false});
+	    }else{
+        console.log(rows);
+				res.json({
+					'success': true
+				});
+				// console.log(rows);
+	    }
+	  });
+	});
+
+	////////////////////////////////////////////////////////////////////////////
+	// Update user password
+	//
+	// params:
+	// 	authToken: (Required) Needed to protect who is changing user info
+	// 	old_password:
+	// 	new_password:
+	/////////////////////////////////////////////////////////////////////////////
+	app.get("/api/updateUserPassword",function(req,res){
+		console.log('/api/updateUserPassword');
+		console.log(req.query);
+
+		var query_str = 'UPDATE Users ' +
+										'SET password = \'' + req.query.new_password + '\' ';
+										'WHERE user_id = (SELECT user_id FROM UserSession ' +
+																			'WHERE auth_type = \''+ req.query.auth_type + '\' AND ' +
+																			'session_auth_id = \''+ req.query.auth_token +'\') ' +
+													'AND password = \'' + req.query.old_password + '\'';
 		console.log(query_str);
 
 	  conn.query(query_str, function(err, rows, fields) {
