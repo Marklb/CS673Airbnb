@@ -1,4 +1,4 @@
--- -----------------------------------------------------
+﻿-- -----------------------------------------------------
 -- Schema mokbnb
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `mokbnb` ;
@@ -414,13 +414,13 @@ INSERT INTO address (
 INSERT INTO place (
    host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
 ) VALUES (
-   1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "./../../../public/images/room1.jpg"
+   1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"
 );
 
 INSERT INTO place (
    host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
 ) VALUES (
-   1, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "./../../../public/images/room2.jpg"
+   1, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"
 );
 
 INSERT INTO hostplacelisting (
