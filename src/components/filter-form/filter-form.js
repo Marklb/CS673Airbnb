@@ -26,6 +26,11 @@ export default class FilterForm extends React.Component {
 			bedroomsize: -1,
 			bathroomsize: -1,
 			numofbeds: -1,
+			pictures : [],
+			titles : [],
+			costpernight : [],
+			bookingtypes : [],
+			roomtypes : [],
 
 			checkbox : {
 				roomtype : [
@@ -352,11 +357,17 @@ export default class FilterForm extends React.Component {
 					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
 
 					{this.state.result.map((val, i) => {
+						this.state.pictures.push(val.pictures);
+						this.state.titles.push(val.title);
+						this.state.costpernight.push(val.cost_per_night);
+						this.state.bookingtypes.push(this.state.checkbox.bookingtype[val.bookingtype_id - 1].name);
+						this.state.roomtypes.push(this.state.checkbox.roomtype[val.roomtype_id - 1].name);
+						
 						return (
 							<form className="f">
-								<img src={val.pictures}  />
+								<img key={i} src={val.pictures} onClick={this.onClickApplyFilter.bind(this)/>
 								<br></br>
-								Title<input className="r1" type="text" placeholder={val.name}></input>
+								Title<input className="r1" type="text" placeholder={val.title}></input>
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
@@ -430,5 +441,15 @@ export default class FilterForm extends React.Component {
 		console.log(this.state.bathroomsize);
 		console.log(this.state.numofbeds);
 		console.log(this.state.checkbox.bookingtype);
+	}
+
+	onClickPicLinker(e) {
+		var key = e.target.key;
+		var roominfo = this.state.date_start + "_" + this.state.date_end + "_" +
+						this.state.pictures[key] + "_" + this.state.titles[key] + "_" +
+						this.state.numofguest + "_" + this.state.costpernight[key] + "_" +
+						this.state.roomtypes[key] + "_" + this.state.bookingtypes[key];
+		let url = `/room/${roominfo}`;
+		browserHistory.push(url);
 	}
 }

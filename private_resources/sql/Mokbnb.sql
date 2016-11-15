@@ -102,14 +102,14 @@ CREATE TABLE IF NOT EXISTS `Place` (
   `host_id` INT NOT NULL,
   `addr_id` INT NOT NULL,
   `roomtype_id` INT NULL,
-  `name` VARCHAR(45) NULL,
+  `title` VARCHAR(45) NULL,
   `description` VARCHAR(45) NULL,
   `cost_per_night` NUMERIC(7,2) NULL,
   `max_people` INT NULL,
   `bedroomsize` INT NULL,
   `bathroomsize` NUMERIC(2,1) NULL,
   `numofbeds` INT NULL,
-  `pictures` VARCHAR(45) NULL,
+  `pictures` VARCHAR(90) NULL,
   PRIMARY KEY (`place_id`))
 ENGINE = InnoDB;
 

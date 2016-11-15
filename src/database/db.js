@@ -9,7 +9,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -382,10 +382,10 @@ var db = function(app){
 		var placeQuerySQL;
 		placeQuerySQL = "" +
 			"SELECT *" +
-			" FROM (SELECT placeamenity.place_id, placeamenity.amenity_id, A.name, A.pictures, A.bookingtype_id, A.roomtype_id, A.cost_per_night" +
+			" FROM (SELECT placeamenity.place_id, placeamenity.amenity_id, A.host_id, A.name, A.pictures, A.bookingtype_id, A.roomtype_id, A.cost_per_night" +
 					" FROM (placeamenity " +
 					(amenity_id.length == 0 ? "NATURAL JOIN " : "JOIN ") +
-					"(SELECT place.place_id, place.name, amenity_id, place.pictures, hostplacelisting.bookingtype_id, place.roomtype_id, place.cost_per_night" +
+					"(SELECT place.place_id, place.host_id, place.name, amenity_id, place.pictures, hostplacelisting.bookingtype_id, place.roomtype_id, place.cost_per_night" +
 												" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id" +
 															" join userlanguage on place.host_id = userlanguage.user_id" +
 															" join placeamenity on place.place_id = placeamenity.place_id)" +
