@@ -68,7 +68,29 @@ CREATE TABLE IF NOT EXISTS `UserSession` (
   PRIMARY KEY (`user_id`, `session_auth_id`))
 ENGINE = InnoDB;
 
-CREATE UNIQUE INDEX `session_id_UNIQUE` ON `UserSession` (`session_auth_id` ASC);
+CREATE UNIQUE INDEX `session_auth_id_UNIQUE` ON `UserSession` (`session_auth_id` ASC);
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `Message`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Message` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `Message` (
+  `message_id` INT NOT NULL AUTO_INCREMENT,
+  `sender_id` INT NOT NULL,
+  `receiver_id` INT NOT NULL,
+  `timestamp_sent` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `title` VARCHAR(200) NOT NULL,
+  `body` TEXT NOT NULL,
+  `is_read` BIT NOT NULL DEFAULT 0,
+  `is_stared` BIT NOT NULL DEFAULT 0,
+  `is_archived` BIT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`message_id`))
+ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX `message_id_UNIQUE` ON `Message` (`message_id` ASC);
 SHOW WARNINGS;
 
 -- -----------------------------------------------------

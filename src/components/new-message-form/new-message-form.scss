@@ -1,0 +1,43 @@
+@import "../common.scss";
+
+.new-message-form {
+  @extend %clearfix;
+  padding: 15px 15px 15px 15px;
+  background-color: rgba(50,50,50,1);
+
+  input[name="msg_recipient"].mokbnb-input {
+    height: auto;
+  }
+
+  input[name="msg_title"].mokbnb-input {
+    height: auto;
+  }
+
+  textarea.mokbnb-input {
+    height: 300px;
+    margin-bottom: 0;
+  }
+
+  .bottom-btns {
+    margin-top: 10px;
+    float: right;
+
+    .btn {
+      color: #484848;
+      background-color: rgba(250,250,250,1);
+      padding: 4px 12px 4px 12px;
+      border-radius: 2px;
+      min-width: 80px;
+      text-align: center;
+      @include user-select;
+      cursor: default;
+
+      &.send-message-btn {
+
+      }
+
+    }
+
+  }
+
+}
