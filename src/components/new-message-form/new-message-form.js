@@ -18,14 +18,14 @@ export default class NewMessageForm extends React.Component {
     super(props);
 
     this.state = {
-      vfMsgRecipient: 'JohnDoe@VIP.com',
-      // vfMsgRecipient: 'JamesBond@Agent.com',
+      vfMsgRecipientEmail: 'JohnDoe@VIP.com',
+      // vfMsgRecipientEmail: 'JamesBond@Agent.com',
       fvMsgTitle: '',
       fvMsgBody: ''
     };
 
-    this.handleMsgRecipientValueChange = this.handleMsgRecipientValueChange.bind(this);
-    this.handleMsgRecipientFocus = this.handleMsgRecipientFocus.bind(this);
+    this.handleMsgRecipientEmailValueChange = this.handleMsgRecipientEmailValueChange.bind(this);
+    this.handleMsgRecipientEmailFocus = this.handleMsgRecipientEmailFocus.bind(this);
     this.handleMsgTitleValueChange = this.handleMsgTitleValueChange.bind(this);
     this.handleMsgTitleFocus = this.handleMsgTitleFocus.bind(this);
     this.onChangeMsgBodyInput = this.onChangeMsgBodyInput.bind(this);
@@ -37,11 +37,11 @@ export default class NewMessageForm extends React.Component {
       <div className='new-message-form'>
         <input className='mokbnb-input'
           type="text"
-          placeholder="Recipient..."
+          placeholder="Recipient email..."
           name="msg_recipient"
-          value={this.state.vfMsgRecipient}
-          onChange={this.handleMsgRecipientValueChange.bind(this)}
-          onFocus={this.handleMsgRecipientFocus.bind(this)} />
+          value={this.state.vfMsgRecipientEmail}
+          onChange={this.handleMsgRecipientEmailValueChange.bind(this)}
+          onFocus={this.handleMsgRecipientEmailFocus.bind(this)} />
         <input className='mokbnb-input'
           type="text"
           placeholder="Message title..."
@@ -66,13 +66,14 @@ export default class NewMessageForm extends React.Component {
   Event Callbacks
 
   */
-  handleMsgRecipientValueChange(evt) {
-    this.setState({vfMsgRecipient: evt.target.value});
+  handleMsgRecipientEmailValueChange(evt) {
+    this.setState({vfMsgRecipientEmail: evt.target.value});
   }
 
-  handleMsgRecipientFocus(evt) {
+  handleMsgRecipientEmailFocus(evt) {
 
   }
+
   handleMsgTitleValueChange(evt) {
     this.setState({fvMsgTitle: evt.target.value});
   }
@@ -86,14 +87,14 @@ export default class NewMessageForm extends React.Component {
   }
 
   onClickSendMsg(evt) {
-    let recipient = this.state.vfMsgRecipient;
+    let recipientEmail = this.state.vfMsgRecipientEmail;
     let title = this.state.fvMsgTitle;
     let body = this.state.fvMsgBody;
-    if(recipient.trim().length === 0
+    if(recipientEmail.trim().length === 0
       || title.trim().length === 0
       || body.trim().length === 0) return;
     console.log('Send Message');
-    console.log(`recipient: ${recipient}`);
+    console.log(`recipientEmail: ${recipientEmail}`);
     console.log(`title: ${title}`);
     console.log(`body: ${body}`);
 
@@ -104,14 +105,16 @@ export default class NewMessageForm extends React.Component {
     let sendData = {};
     sendData.authToken = session.authToken;
     sendData.authType = session.authType;
-    sendData.msgRecipient = recipient;
+    sendData.msgRecipientEmail = recipientEmail;
     sendData.msgTitle = title;
     sendData.msgBody = body;
-    console.log(sendData);
+    // console.log(sendData);
 
     $.get('/api/add_new_message', sendData, (data, status) => {
       if(data.success === false) {
         console.log('Message Not Sent');
+        console.log(data);
+        console.log(status);
       } else {
         console.log('Message Sent');
       }

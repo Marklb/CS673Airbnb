@@ -593,36 +593,33 @@ var db = function(app){
 	// Add new message
 	/////////////////////////////////////////////////////////////////////////////
 	app.get("/api/add_new_message",function(req,res){
-    console.log('/api/add_new_message');
-		console.log(req.query);
+    // console.log('/api/add_new_message');
 		var authToken = req.query.authToken;
 		var authType = req.query.authType;
-		var msgRecipient = req.query.msgRecipient;
+		var msgRecipientEmail = req.query.msgRecipientEmail;
 		var msgTitle = req.query.msgTitle;
 		var msgBody = req.query.msgBody;
-		console.log('msgRecipient: ' + msgRecipient);
-		console.log('msgTitle: ' + msgTitle);
-		console.log('msgBody: ' + msgBody);
 
 		var query_str = 'INSERT INTO Message (sender_id, receiver_id, title, body)' +
 										'VALUES ((SELECT user_id ' +
 														 'FROM UserSession ' +
 														 'WHERE auth_type = ? AND session_auth_id = ?), ' +
-														 '?, ?, ?)';
+														 '(SELECT user_id ' +
+                              'FROM Users WHERE email = ?), ' +
+                            '?, ?)';
 
-		conn.query(query_str, [authType, authToken, 1, msgTitle, msgBody],
+		conn.query(query_str,
+      [authType, authToken, msgRecipientEmail, msgTitle, msgBody],
 			function(err, rows, fields) {
 				if(err){
 					console.log(err);
 					res.json({'success': false});
 				}else{
-					console.log(rows);
-					res.json({'success': true});
 					// console.log(rows);
+					res.json({'success': true});
 				}
 			});
 
-		// res.json({'success': true});
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
