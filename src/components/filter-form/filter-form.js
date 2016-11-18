@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from "react-router";
+import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
@@ -241,7 +241,7 @@ export default class FilterForm extends React.Component {
 	renderResult(result) {
 		var rows = [];
 		for (var i=0; i < result.length; i++) {
-			rows.push(<MyResult name={result[i].name} />);
+			rows.push(<MyResult key={i} name={result[i].name} />);
 		}
 		return (
 			<form className="f">
@@ -272,7 +272,7 @@ export default class FilterForm extends React.Component {
 					<form className="f">
 						Room type
 						{this.state.checkbox.roomtype.map((val, i) => {
-							return <label><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
@@ -311,21 +311,21 @@ export default class FilterForm extends React.Component {
 					<form className="f">
 						Booking Type
 						{this.state.checkbox.bookingtype.map((val, i) => {
-							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
 					<form className="f">
 						Amenities
 						{this.state.checkbox.amenity.map((val, i) => {
-							return <label><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
 					<form className="f">
 						Host Language
 						{this.state.checkbox.hostlanguage.map((val, i) => {
-							return <label><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
@@ -353,14 +353,14 @@ export default class FilterForm extends React.Component {
 
 					{this.state.result.map((val, i) => {
 						return (
-							<form className="f">
-								<img src={val.pictures}  />
+							<div key={i} className="f">
+								<img className="pic" src={val.pictures} onClick={this.onClickShowRoom.bind(this, i)} />
 								<br></br>
 								Title<input className="r1" type="text" placeholder={val.name}></input>
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-							</form>
+							</div>
 						);
 					})}
 				</div>
@@ -372,6 +372,13 @@ export default class FilterForm extends React.Component {
 		let newState = this.state;
 		newState.isFiltersVisible = !newState.isFiltersVisible;
 		this.setState(newState);
+	}
+
+	onClickShowRoom(indx, e){
+		var place_id = this.state.result[indx].place_id;
+		console.log("place_id = " + place_id);
+		let url = `/roomdetail/${place_id}`;
+		browserHistory.push(url);
 	}
 
 	onChange(e){
