@@ -276,8 +276,38 @@ var db = function(app){
 		});
 	});
 
+    /////////////////////////////////////////////////////////////////////////////
+    // Get information about one place
+    /////////////////////////////////////////////////////////////////////////////
+    app.post("/api/getRoomDetailsQuery",function(req,res){
+        var placeID = req.body.placeID;
+        //Returns place_id, hostID, host_name, gender, birth_date, profile_pic, bio, join_date, roomtype_id, roomtype_name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures, addr_id, street, city, state, zip, country, bookingtype_id, bookingtype_name, auction_id, g_price, current_price, sold_price, date_range_start, date_range_end, booked_dates, response_time, ask_amount, languages, amenities
+        var placeQuerySQL = "SELECT * FROM (place
+        NATURAL JOIN hostplacelisting
+        NATURAL JOIN address
+        NATURAL JOIN bookingtype
+        NATURAL JOIN roomtype
+        LEFT JOIN auction ON place.place_id=auction.place_id
+        JOIN (SELECT place.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A
+        JOIN (SELECT GROUP_CONCAT(DISTINCT language_name) AS languages FROM place, language
+                JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B
+        JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity
+                JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)
+    WHERE place.place_id = " + placeID + " GROUP BY place.place_id";
+        console.log(placeQuerySQL);
+        conn.query(placeQuerySQL,
+        function(err, rows, fields){
+            if (!err) {
+                console.log(rows);
+                res.json({'query_success': true, 'result': rows});
+            } else {
+                console.log('Error while performing Query.');
+                res.json({'query_success': false});
+            }
+        });
+    });
 	/////////////////////////////////////////////////////////////////////////////
-	// Get place information
+	// Get place search information
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/showplace",function(req,res){
 		var state = req.body.state;
@@ -286,13 +316,13 @@ var db = function(app){
 		var numofguest = req.body.numofguest;
 		var min_cost = req.body.min_cost;
 		var max_cost = req.body.max_cost;
-		var bedroomsize = req.body.bedroomsize; //add column to place
-		var bathroomsize = req.body.bathroomsize; //add column to place
-		var numofbeds = req.body.numofbeds; //add column to place
-		var roomtype = req.body.checkbox.roomtype; //add column to place
-		var bookingtype = req.body.checkbox.bookingtype; //bookingtype = --bookingtype_id in hostplacelisting
-		var amenity = req.body.checkbox.amenity; //add column to place
-		var hostlanguage = req.body.checkbox.hostlanguage; //add to users, project language from (join users.user_id with hostplacelisting.host_id)
+		var bedroomsize = req.body.bedroomsize;
+		var bathroomsize = req.body.bathroomsize;
+		var numofbeds = req.body.numofbeds;
+		var roomtype = req.body.checkbox.roomtype;
+		var bookingtype = req.body.checkbox.bookingtype;
+		var amenity = req.body.checkbox.amenity;
+		var hostlanguage = req.body.checkbox.hostlanguage;
 
 		var bookingtype_id = [];
 		var roomtype_id = [];
