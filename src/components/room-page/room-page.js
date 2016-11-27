@@ -9,7 +9,7 @@ export default class RoomPage extends React.Component {
 		super(props);
 
 		this.state = {
-			placeID : this.props.params.place_id,
+			placeID : this.props.params.placeid,
 			hostID: -1,
 			host_name: "N/A",
 			roomtype_id: -1,
@@ -43,14 +43,65 @@ export default class RoomPage extends React.Component {
 			auction_id: -1,//auction
 			starting_price: -1,//auction
 			current_price: -1,//auction
-			sold_price: -1//auction
+			sold_price: -1,//auction
+			
+			//result
+			result: [
+				{
+					roomtype_id: 'default',
+					bookingtype_id: 'default',
+					addr_id: 'default',
+					place_id: 'default',
+					host_id: 'default',
+					name: 'default',
+					description: 'default',
+					cost_per_night: 'default',
+					max_people: 'default',
+					bedroomsize: 'default',
+					bathroomsize: 'default',
+					numofbeds: 'default',
+					pictures: 'default',
+					ask_amount: 'default',
+					date_range_start: 'default',
+					date_range_end: 'default',
+					booked_dates: 'default',
+					response_time: 'default',
+					street: 'default',
+					city: 'default',
+					state: 'default',
+					zip: 'default',
+					country: 'default',
+					bookingtype_name: 'default',
+					roomtype_name: 'default',
+					auction_id: 'default',
+					starting_price: 'default',
+					current_price: 'default',
+					sold_price: 'default',
+					host_name: 'default',
+					gender: 'default',
+					birth_date: 'default',
+					profile_pic: 'default',
+					bio: 'default',
+					join_date: 'default',
+					languages: 'default',
+					amenities: 'default'
+				}
+			]
 		};
-		console.log("place_id = " + this.props.params.place_id); //This isn't working.
+		this.getRoomDetailsQuery(this.state.placeID);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.params.placeid !== this.state.placeID) {
+			this.setState({placeID: nextProps.params.placeid});
+			this.getRoomDetailsQuery(nextProps.params.placeid);
+		}
 	}
 
 	getRoomDetailsQuery(placeID) {
 		$.post('/api/getRoomDetailsQuery', {
 			//General place information
+			'placeID' : this.state.placeID,
 			'hostID': this.state.hostID,
 			'host_name': this.state.name,
 			'roomtype_id': this.state.roomtype_id,
@@ -169,9 +220,46 @@ export default class RoomPage extends React.Component {
 	}
 
 	render() {
-		this.getRoomDetailsQuery(this.state.placeID);
 		return (
-			<div>Room { this.state.placeID } display page</div>
+			<div>
+				<h1>Room { this.state.placeID } display page</h1>
+				<br></br>
+				<img src={this.state.result[0].pictures} />
+				<br></br>
+				Title : {this.state.result[0].name}
+				<br></br>
+				Description : {this.state.result[0].description}
+				<br></br>
+				Cost per night : {this.state.result[0].cost_per_night}
+				<br></br>
+				Max people : {this.state.result[0].max_people}
+				<br></br>
+				Number of bedroom : {this.state.result[0].bedroomsize}
+				<br></br>
+				Number of bathroom : {this.state.result[0].bathroomsize}
+				<br></br>
+				Number of bed : {this.state.result[0].numofbeds}
+				<br></br>
+				Number of bed : {this.state.result[0].numofbeds}
+				<br></br>
+				Start date : {this.state.result[0].date_range_start}
+				<br></br>
+				End date : {this.state.result[0].date_range_end}
+				<br></br>
+				Address : {this.state.result[0].street}, {this.state.result[0].city}, {this.state.result[0].state}, {this.state.result[0].zip}, {this.state.result[0].country}
+				<br></br>
+				Booking type : {this.state.result[0].bookingtype_name}
+				<br></br>
+				Room type : {this.state.result[0].roomtype_name}
+				<br></br>
+				Host name : {this.state.result[0].host_name}
+				<br></br>
+				Host name : {this.state.result[0].host_name}
+				<br></br>
+				Host languages : {this.state.result[0].languages}
+				<br></br>
+				Amenities : {this.state.result[0].amenities}
+			</div>
 		);
 	}
 }

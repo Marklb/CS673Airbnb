@@ -9,7 +9,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -282,18 +282,18 @@ var db = function(app){
     app.post("/api/getRoomDetailsQuery",function(req,res){
         var placeID = req.body.placeID;
         //Returns place_id, hostID, host_name, gender, birth_date, profile_pic, bio, join_date, roomtype_id, roomtype_name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures, addr_id, street, city, state, zip, country, bookingtype_id, bookingtype_name, auction_id, g_price, current_price, sold_price, date_range_start, date_range_end, booked_dates, response_time, ask_amount, languages, amenities
-        var placeQuerySQL = "SELECT * FROM (place
-        NATURAL JOIN hostplacelisting
-        NATURAL JOIN address
-        NATURAL JOIN bookingtype
-        NATURAL JOIN roomtype
-        LEFT JOIN auction ON place.place_id=auction.place_id
-        JOIN (SELECT place.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A
-        JOIN (SELECT GROUP_CONCAT(DISTINCT language_name) AS languages FROM place, language
-                JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B
-        JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity
-                JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)
-    WHERE place.place_id = " + placeID + " GROUP BY place.place_id";
+        var placeQuerySQL = "SELECT * FROM (place"+
+        " NATURAL JOIN hostplacelisting"+
+        " NATURAL JOIN address"+
+        " NATURAL JOIN bookingtype"+
+        " NATURAL JOIN roomtype"+
+        " LEFT JOIN auction ON place.place_id=auction.place_id"+
+        " JOIN (SELECT place.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A"+
+        " JOIN (SELECT GROUP_CONCAT(DISTINCT language_name) AS languages FROM place, language"+
+                " JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
+        " JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
+                " JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
+    " WHERE place.place_id = " + placeID + " GROUP BY place.place_id";
         console.log(placeQuerySQL);
         conn.query(placeQuerySQL,
         function(err, rows, fields){
