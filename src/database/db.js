@@ -9,7 +9,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '9993kuo',
+		password : '',
 		database : 'mokbnb'
 	});
 
@@ -288,7 +288,7 @@ var db = function(app){
         " NATURAL JOIN bookingtype"+
         " NATURAL JOIN roomtype"+
         " LEFT JOIN auction ON place.place_id=auction.place_id"+
-        " JOIN (SELECT place.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A"+
+        " JOIN (SELECT users.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A"+
         " JOIN (SELECT GROUP_CONCAT(DISTINCT language_name) AS languages FROM place, language"+
                 " JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
         " JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+

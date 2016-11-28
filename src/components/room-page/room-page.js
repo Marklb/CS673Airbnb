@@ -44,7 +44,7 @@ export default class RoomPage extends React.Component {
 			starting_price: -1,//auction
 			current_price: -1,//auction
 			sold_price: -1,//auction
-			
+
 			//result
 			result: [
 				{
@@ -53,7 +53,7 @@ export default class RoomPage extends React.Component {
 					addr_id: 'default',
 					place_id: 'default',
 					host_id: 'default',
-					name: 'default',
+					host_name: 'default',
 					description: 'default',
 					cost_per_night: 'default',
 					max_people: 'default',
@@ -77,7 +77,6 @@ export default class RoomPage extends React.Component {
 					starting_price: 'default',
 					current_price: 'default',
 					sold_price: 'default',
-					host_name: 'default',
 					gender: 'default',
 					birth_date: 'default',
 					profile_pic: 'default',
@@ -109,10 +108,10 @@ export default class RoomPage extends React.Component {
 			//General place information
 			'placeID' : this.state.placeID,
 			'hostID': this.state.hostID,
-			'host_name': this.state.name,
+			'host_name': this.state.host_name,
 			'roomtype_id': this.state.roomtype_id,
 			'roomtype_name': this.state.roomtype_name,
-			'room_title': this.state.title,
+			'room_title': this.state.name,
 			'description': this.state.description,
 			'cost_per_night': this.state.cost_per_night,//This is the same as ask_amount in hostplacelisting?
 			'max_people': this.state.max_people,
@@ -246,8 +245,6 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				Number of bed : {this.state.result[0].numofbeds}
 				<br></br>
-				Number of bed : {this.state.result[0].numofbeds}
-				<br></br>
 				Start date : {this.state.result[0].date_range_start}
 				<br></br>
 				End date : {this.state.result[0].date_range_end}
@@ -255,8 +252,6 @@ export default class RoomPage extends React.Component {
 				Address : {this.state.result[0].street}, {this.state.result[0].city}, {this.state.result[0].state}, {this.state.result[0].zip}, {this.state.result[0].country}
 				<br></br>
 				Room type : {this.state.result[0].roomtype_name}
-				<br></br>
-				Host name : {this.state.result[0].host_name}
 				<br></br>
 				Host name : {this.state.result[0].host_name}
 				<br></br>
