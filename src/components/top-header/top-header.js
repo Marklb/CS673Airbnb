@@ -16,8 +16,6 @@ import LoginForm from '../login-form';
 require("./top-header.scss");
 
 
-// const USE_GOOGLE_PLACES = false;
-
 export default class TopHeader extends React.Component {
   static contextTypes = {
     userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
@@ -76,15 +74,23 @@ export default class TopHeader extends React.Component {
           // Catch the event for when a place has been selected
           autocomplete.addListener('place_changed', function() {
             var place = autocomplete.getPlace();
-            // console.log(place);
+            console.log(place);
             
-            // Passing formatted_address since it seems closest to 
-            // our implementation format
-            let url = `/s/${place.formatted_address}`;
-            // Adding latitude and longitude
-            url += `?lat=${place.geometry.location.lat()}`;
-            url += `,lng=${place.geometry.location.lng()}`;
-            // console.log(`Going to ${url}`);
+            let url = '';
+            if(place.formatted_address){
+              // If a place option was picked
+              
+              // Passing formatted_address since it seems closest to 
+              // our implementation format
+              url = `/s/${place.formatted_address}`;
+              // Adding latitude and longitude
+              url += `?lat=${place.geometry.location.lat()}`;
+              url += `&lng=${place.geometry.location.lng()}`;
+              // console.log(`Going to ${url}`);
+            }else{
+              // If a place option wasn't picked 
+              url = `/s/${place.name}`;
+            }
 
             // Navigate to url (Makes page refresh)
             // window.location.href = url;

@@ -13,9 +13,13 @@ export default class FilterForm extends React.Component {
 		this.state = {
 			isFiltersVisible: false
 		};
-
+		console.log('this.props.params.place');
+		console.log(this.props.params.place);
+		console.log(this.props.location.query);
 		this.state = {
 			inputLocation : this.props.params.place,
+			latitude: this.props.location.query.lat || 0,
+			longitude: this.props.location.query.lng || 0,
 			neighborhoods : [],
 			result : [],
 			date_start : 'N/A',
@@ -180,19 +184,17 @@ export default class FilterForm extends React.Component {
 		];
 	}
 
-	componentWillReceiveProps(nextProps) {
-		console.log('componentWillReceiveProps');
-		
+	componentWillReceiveProps(nextProps) {		
 		let placeString =  nextProps.params.place;
+		let urlParams = this.props.location.query;
 
 		// You don't have to do this check first, but it can help prevent an unneeded render 
 		if (placeString !== this.state.inputLocation) {
-			let lat = this.props.location.query.lat;
-			let lng = this.props.location.query.lng;
-			if(lat || lng){
-
-			}
-			this.setState({inputLocation: placeString});
+			this.setState({
+				inputLocation: placeString,
+				latitude: urlParams.lat || 0,
+				longitude: urlParams.lng || 0,
+			});
 			this.getNeighborQuery(placeString);
 			this.getPlaceQuery(placeString);
 		}
