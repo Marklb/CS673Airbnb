@@ -1,4 +1,4 @@
-﻿-- -----------------------------------------------------
+-- -----------------------------------------------------
 -- Schema mokbnb
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `mokbnb` ;
@@ -68,29 +68,7 @@ CREATE TABLE IF NOT EXISTS `UserSession` (
   PRIMARY KEY (`user_id`, `session_auth_id`))
 ENGINE = InnoDB;
 
-CREATE UNIQUE INDEX `session_auth_id_UNIQUE` ON `UserSession` (`session_auth_id` ASC);
-SHOW WARNINGS;
-
--- -----------------------------------------------------
--- Table `Message`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `Message` ;
-
-SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `Message` (
-  `message_id` INT NOT NULL AUTO_INCREMENT,
-  `sender_id` INT NOT NULL,
-  `receiver_id` INT NOT NULL,
-  `timestamp_sent` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `title` VARCHAR(200) NOT NULL,
-  `body` TEXT NOT NULL,
-  `is_read` BIT NOT NULL DEFAULT 0,
-  `is_stared` BIT NOT NULL DEFAULT 0,
-  `is_archived` BIT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`message_id`))
-ENGINE = InnoDB;
-
-CREATE UNIQUE INDEX `message_id_UNIQUE` ON `Message` (`message_id` ASC);
+CREATE UNIQUE INDEX `session_id_UNIQUE` ON `UserSession` (`session_auth_id` ASC);
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
@@ -108,7 +86,6 @@ CREATE TABLE IF NOT EXISTS `HostPlaceListing` (
   `date_range_end` VARCHAR(30) NOT NULL,
   `booked_dates` VARCHAR(200),
   `response_time` VARCHAR(30),
-  `active` VARCHAR(3) NOT NULL,
   PRIMARY KEY (`place_id`, `host_id`))
 ENGINE = InnoDB;
 
@@ -342,7 +319,6 @@ CREATE TABLE IF NOT EXISTS `Auction` (
   `starting_price` VARCHAR(10) NOT NULL,
   `current_price` VARCHAR(10) NULL,
   `sold_price` VARCHAR(10) NULL,
-  `end_auction_time` TIMESTAMP NOT NULL,
   PRIMARY KEY (`auction_id`))
 ENGINE = InnoDB;
 
@@ -359,7 +335,6 @@ SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `ClientAuctionBids` (
   `bid_id` INT NOT NULL AUTO_INCREMENT,
   `auction_id` INT NOT NULL,
-  `client_id` INT NOT NULL,
   `bid_price` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`bid_id`))
 ENGINE = InnoDB;
@@ -380,9 +355,9 @@ CREATE TABLE IF NOT EXISTS `Reservation` (
   `host_id` INT NOT NULL,
   `client_id` INT NOT NULL,
   `payment_type_id` INT NOT NULL,
-  `date_range` VARCHAR(45) NOT NULL,
-  `amt_paid` VARCHAR(45) NOT NULL,
-  `paid_date` VARCHAR(45) NOT NULL,
+  `date_range` VARCHAR(45) NULL,
+  `amt_paid` VARCHAR(45) NULL,
+  `paid_date` VARCHAR(45) NULL,
   PRIMARY KEY (`reservation_id`))
 ENGINE = InnoDB;
 
@@ -421,44 +396,44 @@ INSERT INTO Users (
    email,password,first_name,last_name,gender,birth_date
 ) VALUES
    ('JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','1998-04-09'),
-   ('JamesBond@Agent.com', 'test', 'James', 'Bond', 'M','1992-08-16'),
-   ('JaneDoe@VIP.com', 'test', 'Jane', 'Doe', 'F','2000-08-14'),
-   ('JaclynBond@Agent.com', 'test', 'Jaclyn', 'Bond', 'F','1996-02-26')
+   ('JamesBond@Agent.com', 'test', 'James', 'Bond', 'M','1992-08-16')
 ;
 
 INSERT INTO address (
    street, city, state, zip, country
-) VALUES
-   ("86 Heaven Lane", "Houston", "Texas", "07294", "USA"),
-   ("666 Haunted Terrace", "Newark", "New Jersey", "07032", "USA"),
-   ("24 Thirdington Road", "Newark", "New Jersey", "07032", "USA"),
-   ("99 Fourthington Place", "Newark", "New Jersey", "07032", "USA")
-;
+) VALUES (
+   "86 Heaven Lane", "Houston", "Texas", "07294", "USA"
+);
+
+INSERT INTO address (
+   street, city, state, zip, country
+) VALUES (
+   "666 Haunted Terrace", "Newark", "New Jersey", "07032", "USA"
+);
 
 INSERT INTO place (
    host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
-) VALUES
-   (1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"),
-   (2, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"),
-   (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", 120.00, 3, 1, 1.5, 2, "/images/room3.jpg"),
-   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 69.99, 3, 1, 1.5, 2, "/images/room4.jpg")
-;
+) VALUES (
+   1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"
+);
+
+INSERT INTO place (
+   host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
+) VALUES (
+   1, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"
+);
 
 INSERT INTO hostplacelisting (
-   place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end, active
-) VALUE
-   (1, 1, 1, "80.00", "2016-12-30", "2017-01-02", "yes"),
-   (2, 2, 2, "666.00", "2016-11-02", "2016-12-16", "yes"),
-   (3, 3, 3, "89.99", "2016-11-01", "2016-12-16", "yes"),
-   (4, 4, 4, "64.95", "2016-11-01", "2016-12-16", "yes")
-;
+   place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end
+) VALUES (
+   1, 1, 1, "80.00", "2016-11-01", "2016-11-06"
+);
 
-INSERT INTO auction (
-   place_id, starting_price, current_price, sold_price, end_auction_time
-) VALUES
-   (1, "80.00", "278.00", "278.00", "2016-11-24"),
-   (2, "200.00", "243.00", NULL, "2016-12-04")
-;
+INSERT INTO hostplacelisting (
+   place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end
+) VALUES (
+   2, 1, 2, "666.00", "2016-11-02", "2016-11-07"
+);
 
 INSERT INTO PlaceAmenity (
    place_id, amenity_id
@@ -472,10 +447,4 @@ INSERT INTO UserLanguage (
 ) VALUES
    (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13),
    (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18), (2, 19)
-;
-
-INSERT INTO Reservation (
-   place_id, host_id, client_id, payment_type_id, date_range, amt_paid, paid_date
-) VALUES
-   (1, 1, 3, 3, "2016-12-02,2016-12-05", "278.00", "2016-11-26")
 ;
