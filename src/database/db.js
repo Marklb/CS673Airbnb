@@ -623,6 +623,74 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
+	// Get messages
+	/////////////////////////////////////////////////////////////////////////////
+	app.get("/api/get_user_messages",function(req,res){
+    // console.log('/api/get_user_messages');
+		var authToken = req.query.authToken;
+		var authType = req.query.authType;
+
+		var query_str = `
+		SELECT M.message_id,
+			M.sender_id, USENDER.first_name AS sender_fname,
+			USENDER.email AS sender_email,
+			M.receiver_id, URECEIVER.first_name AS receiver_fname,
+			URECEIVER.email AS receiver_email,
+			M.send_date, M.title, M.body, M.is_read, M.is_stared, M.is_archived,
+			S.user_id AS session_user_id
+
+		FROM Message AS M, Users AS USENDER, Users AS URECEIVER,
+			(SELECT S.user_id
+			 FROM UserSession As S
+			 WHERE S.auth_type = ? AND S.session_auth_id = ?) AS S
+
+		WHERE
+			(M.sender_id = S.user_id OR M.receiver_id = S.user_id)
+			AND
+			M.sender_id = USENDER.user_id
+			AND
+			M.receiver_id = URECEIVER.user_id
+
+		`;
+
+		conn.query(query_str,
+      [authType, authToken],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					let msgs = [];
+					for(let i = 0; i < rows.length; i++){
+						let row = rows[i];
+						msgs.push({
+							user_id: row.session_user_id,
+							message_id: row.message_id,
+							sender: {
+								user_id: row.sender_id,
+								fname: row.sender_fname,
+								email: row.sender_email,
+							},
+							receiver: {
+								user_id: row.receiver_id,
+								fname: row.receiver_fname,
+								email: row.receiver_email,
+							},
+							send_date: row.send_date,
+							title: row.title,
+							body: row.body,
+							is_read: row.is_read.lastIndexOf(1) !== -1,
+							is_stared: row.is_stared.lastIndexOf(1) !== -1,
+							is_archived: row.is_archived.lastIndexOf(1) !== -1
+						});
+					}
+					res.json({'success': true, msgs: msgs});
+				}
+			});
+
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
 	// A get request api call
 	/////////////////////////////////////////////////////////////////////////////
 	app.get('/api/names', function(req, res){

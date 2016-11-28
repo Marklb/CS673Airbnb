@@ -1,10 +1,13 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+import $ from 'jquery';
+import UserSessionHandler from '../../user-session-handler';
+
 import DashboardContainer from '../dashboard-container';
 import ReactModal from 'react-modal';
-import NewMessageForm from '../new-message-form'
-
+import NewMessageForm from '../new-message-form';
+import InputMessageTile from './inbox-message-tile';
 
 require("./inbox.scss");
 
@@ -13,6 +16,10 @@ require("./inbox.scss");
 
 */
 export default class Inbox extends React.Component {
+  static contextTypes = {
+    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
+  };
+
   static FILTERS = {
     ALL_MESSAGES: 'All Messages',
     STARRED: 'Starred',
@@ -27,12 +34,26 @@ export default class Inbox extends React.Component {
 
     this.state = {
       inboxFilter: Inbox.FILTERS.ALL_MESSAGES,
+      msgs: [],
       isNewMessageModalOpen: false
     };
+
+    // this.msgs = [];
 
     this.handleInboxFilterSelectValueChange = this.handleInboxFilterSelectValueChange.bind(this);
     this.onClickNewMsgBtn = this.onClickNewMsgBtn.bind(this);
     this.onCloseNewMessageModal = this.onCloseNewMessageModal.bind(this);
+  }
+
+  componentWillMount() {
+    // Get the users messages
+    let sendData = this.context.userSessionHandler.getSessionAuthValues();
+    $.get('/api/get_user_messages', sendData, (data, status) => {
+      // console.log('Mesages:');
+      // console.log(status);
+      // console.log(data);
+      this.setState({msgs: data.msgs});
+    });
   }
 
   renderNewMessageForm() {
@@ -48,6 +69,7 @@ export default class Inbox extends React.Component {
   }
 
   render() {
+    // console.log(this.state);
     return (
       <DashboardContainer headerTab='inbox' >
         <div className='inbox-container'>
@@ -67,7 +89,10 @@ export default class Inbox extends React.Component {
           </div>
           {/* */}
           <div className='inbox-messages-list'>
-
+            {this.state.msgs.map((val, i) => {
+              return (<InputMessageTile key={i}
+                msgData={val}></InputMessageTile>);
+            })}
           </div>
 
 

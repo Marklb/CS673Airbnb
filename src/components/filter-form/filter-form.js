@@ -181,11 +181,20 @@ export default class FilterForm extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-	// You don't have to do this check first, but it can help prevent an unneeded render
-		if (nextProps.params.place !== this.state.inputLocation) {
-			this.setState({inputLocation: nextProps.params.place});
-			this.getNeighborQuery(nextProps.params.place);
-			this.getPlaceQuery(nextProps.params.place);
+		console.log('componentWillReceiveProps');
+		
+		let placeString =  nextProps.params.place;
+
+		// You don't have to do this check first, but it can help prevent an unneeded render 
+		if (placeString !== this.state.inputLocation) {
+			let lat = this.props.location.query.lat;
+			let lng = this.props.location.query.lng;
+			if(lat || lng){
+
+			}
+			this.setState({inputLocation: placeString});
+			this.getNeighborQuery(placeString);
+			this.getPlaceQuery(placeString);
 		}
 	}
 

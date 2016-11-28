@@ -31,9 +31,20 @@
     border: 1px solid #aaa;
     @include border-radius(2px);
     min-height: 250px;
+    padding: 2px;
 
     .message-tile {
-      
+      // height: 50px;
+      display: block;
+      @include box-sizing(border-box);
+      border: 1px solid #aaa;
+      @include border-radius(2px);
+      margin-bottom: 2px;
+      padding: 2px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 

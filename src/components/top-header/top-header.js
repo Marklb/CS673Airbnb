@@ -16,6 +16,14 @@ import LoginForm from '../login-form';
 require("./top-header.scss");
 
 
+// include google maps api
+const USE_GOOGLE_PLACES = true;
+// const GOOGLE_API_KEY = 'AIzaSyCQfDokQ9kNbeF7udsP4Vzi9_9iz0FvZDk';
+// let googleScript = document.createElement('script');
+// googleScript.type = 'text/javascript';
+// googleScript.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+// document.getElementsByTagName('head')[0].appendChild(googleScript);
+
 export default class TopHeader extends React.Component {
   static contextTypes = {
     userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired,
@@ -56,6 +64,70 @@ export default class TopHeader extends React.Component {
     }
   }
 
+  renderSearchInputBox() {
+    if(USE_GOOGLE_PLACES){
+      // Since I am using regualr javascript dom manipulation 
+      // to make the input box autocomplete with google places
+      // I am using this javascript function
+      let initGooglePlacesInput = () => {
+        // Before getElementById can find the element it needs
+        // to be added to the dom, but since react is handling
+        // the dom element and when it will get added I am
+        // waiting on the next animation frame to set the event,
+        // so that the element will be added to the dom by then.
+        window.requestAnimationFrame(() => {
+          // Make the input autocomplete using google places
+          let autocomplete = new google.maps.places.Autocomplete(
+            document.getElementById('header-search-form'));
+          // Catch the event for when a place has been selected
+          autocomplete.addListener('place_changed', function() {
+            var place = autocomplete.getPlace();
+            console.log(place);
+            console.log(place.formatted_address);
+            console.log(place.geometry.location.lat());
+            console.log(place.geometry.location.lng());
+            // setMap(
+            //   place.geometry.location.lat(),
+            //   place.geometry.location.lng()
+            // );
+
+            // Passing formatted_address since it seems closest to 
+            // our implementation format
+            let url = `/s/${place.formatted_address}`;
+            // Adding latitude and longitude
+            url += `?lat=${place.geometry.location.lat()}`;
+            url += `,lng=${place.geometry.location.lng()}`;
+            // console.log(`Going to ${url}`);
+
+            // Navigate to url (Makes page refresh)
+            // window.location.href = url;
+
+            // Navigate to url (Page does not refresh)
+            browserHistory.push(url);
+          });
+        });
+      };
+      return (
+        <div>
+          <input type="text" id="header-search-form" className="location" 
+            name="location" placeholder="Where to?"
+            onKeyPress={this.onKeyPressSearchInputGooglePlaces.bind(this)}></input>
+          {initGooglePlacesInput()}
+        </div>  
+      );
+    }
+
+    return (
+      <input type="text" placeholder="Where to?"
+                  autoComplete="off"
+                  name="location"
+                  id="header-search-form"
+                  className="location"
+                  onKeyPress={this.onKeyPressSearchInput.bind(this)}
+                />
+    );
+  }
+
   render() {
     return (
       <div className="header-container">
@@ -74,13 +146,7 @@ export default class TopHeader extends React.Component {
             <form className="search-form">
               <div className="search-bar">
                 <div className="search-bar-icon"></div>
-                <input type="text" placeholder="Where to?"
-                  autoComplete="off"
-                  name="location"
-                  id="header-search-form"
-                  className="location"
-                  onKeyPress={this.onKeyPressSearchInput.bind(this)}
-                />
+                {this.renderSearchInputBox()}
               </div>
             </form>
           </div>
@@ -98,6 +164,15 @@ export default class TopHeader extends React.Component {
 
   onClickSignUpBtn(event){
     this.context.modalsHandler.showModal('main_modal_container', 'signup_form');
+  }
+
+  onKeyPressSearchInputGooglePlaces(event){
+    if(event.charCode === 13){
+      event.preventDefault();
+
+      // Clearing the text manually since the page isn't refreshing
+      // event.target.value = '';
+    }
   }
 
   onKeyPressSearchInput(event){
