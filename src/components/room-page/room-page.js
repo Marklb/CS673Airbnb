@@ -86,7 +86,13 @@ export default class RoomPage extends React.Component {
 					languages: 'default',
 					amenities: 'default'
 				}
-			]
+			],
+			
+			instantBookCheckinRangeOK : false,
+			instantBookCheckinTime : '1980-12-12',
+			instantBookCheckoutRangeOK : false,
+			instantBookCheckoutTime : '1980-12-12',
+			instantBookButtonOK : false
 		};
 		this.getRoomDetailsQuery(this.state.placeID);
 	}
@@ -221,7 +227,7 @@ export default class RoomPage extends React.Component {
 
 	render() {
 		return (
-			<div>
+			<div className="roompage">
 				<h1>Room { this.state.placeID } display page</h1>
 				<br></br>
 				<img src={this.state.result[0].pictures} />
@@ -248,8 +254,6 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				Address : {this.state.result[0].street}, {this.state.result[0].city}, {this.state.result[0].state}, {this.state.result[0].zip}, {this.state.result[0].country}
 				<br></br>
-				Booking type : {this.state.result[0].bookingtype_name}
-				<br></br>
 				Room type : {this.state.result[0].roomtype_name}
 				<br></br>
 				Host name : {this.state.result[0].host_name}
@@ -259,7 +263,88 @@ export default class RoomPage extends React.Component {
 				Host languages : {this.state.result[0].languages}
 				<br></br>
 				Amenities : {this.state.result[0].amenities}
+				<br></br>
+				<br></br>
+				Booking({this.state.result[0].bookingtype_name})
+				{this.renderBooking()}
 			</div>
 		);
+	}
+	
+	renderBooking() {
+		if (this.state.result[0].bookingtype_id == "1") {
+			return (this.instantBooking());
+		}
+	}
+
+	instantBooking() {
+		return (
+			<div>
+				Check in<input name='instant_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
+				Check out<input name='instant_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
+				<br></br>
+				{(this.state.instantBookButtonOK)? this.renderingInstantBookingButton() : "please select dates in correct range!"}
+			</div>
+		);
+	}
+
+	renderingInstantBookingButton() {
+		return (
+			<div>
+				<button type="button">Instant book!!</button>
+			</div>
+		);
+	}
+	
+	onChange(e){
+		var name = e.target.name;
+		var val = e.target.value;
+		var type = e.target.type;
+		if (this.state.result[0].bookingtype_id == "1" && type == "date") {
+			var date = new Date(val);
+			this.checkInstantBookDate(date, name, val);
+		}
+	}
+
+	checkInstantBookDate(date, name, val){
+		var start = new Date(this.state.result[0].date_range_start);
+		var end = new Date(this.state.result[0].date_range_end);
+		var timeDiffStart = date.getTime() - start.getTime();
+		var timeDiffEnd = date.getTime() - end.getTime();
+		var timeInHostRange = false;
+		if (timeDiffStart >= 0 && timeDiffEnd <= 0) {
+			timeInHostRange = true;
+		}
+		if (name == "instant_book_check_in") {
+			console.log("check date in check in");
+			var outTime = new Date(this.state.instantBookCheckoutTime);
+			var timeDiffOut	= date.getTime() - outTime.getTime();
+			this.setState({instantBookCheckinTime: val});
+			if (timeInHostRange) {
+				this.setState({instantBookCheckinRangeOK: true});
+			} else {
+				this.setState({instantBookCheckinRangeOK: false});
+			}
+			if (timeInHostRange && this.state.instantBookCheckoutRangeOK && timeDiffOut <= 0) {
+				this.setState({instantBookButtonOK: true});
+			} else {
+				this.setState({instantBookButtonOK: false});
+			}
+		} else if (name == "instant_book_check_out") {
+			console.log("check date in check out");
+			var inTime = new Date(this.state.instantBookCheckinTime);
+			var timeDiffIn	= date.getTime() - inTime.getTime();
+			this.setState({instantBookCheckoutTime: val});
+			if (timeInHostRange) {
+				this.setState({instantBookCheckoutRangeOK: true});
+			} else {
+				this.setState({instantBookCheckoutRangeOK: false});
+			}
+			if (timeInHostRange && this.state.instantBookCheckinRangeOK && timeDiffIn >= 0) {
+				this.setState({instantBookButtonOK: true});
+			} else {
+				this.setState({instantBookButtonOK: false});
+			}
+		}
 	}
 }
