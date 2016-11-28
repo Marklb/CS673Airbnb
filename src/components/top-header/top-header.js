@@ -16,13 +16,7 @@ import LoginForm from '../login-form';
 require("./top-header.scss");
 
 
-// include google maps api
-const USE_GOOGLE_PLACES = true;
-// const GOOGLE_API_KEY = 'AIzaSyCQfDokQ9kNbeF7udsP4Vzi9_9iz0FvZDk';
-// let googleScript = document.createElement('script');
-// googleScript.type = 'text/javascript';
-// googleScript.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
-// document.getElementsByTagName('head')[0].appendChild(googleScript);
+// const USE_GOOGLE_PLACES = false;
 
 export default class TopHeader extends React.Component {
   static contextTypes = {
@@ -65,7 +59,7 @@ export default class TopHeader extends React.Component {
   }
 
   renderSearchInputBox() {
-    if(USE_GOOGLE_PLACES){
+    if(APP_CONSTANTS.USE_GOOGLE_PLACES_INPUT){
       // Since I am using regualr javascript dom manipulation 
       // to make the input box autocomplete with google places
       // I am using this javascript function
@@ -82,15 +76,8 @@ export default class TopHeader extends React.Component {
           // Catch the event for when a place has been selected
           autocomplete.addListener('place_changed', function() {
             var place = autocomplete.getPlace();
-            console.log(place);
-            console.log(place.formatted_address);
-            console.log(place.geometry.location.lat());
-            console.log(place.geometry.location.lng());
-            // setMap(
-            //   place.geometry.location.lat(),
-            //   place.geometry.location.lng()
-            // );
-
+            // console.log(place);
+            
             // Passing formatted_address since it seems closest to 
             // our implementation format
             let url = `/s/${place.formatted_address}`;
@@ -109,9 +96,13 @@ export default class TopHeader extends React.Component {
       };
       return (
         <div>
-          <input type="text" id="header-search-form" className="location" 
-            name="location" placeholder="Where to?"
-            onKeyPress={this.onKeyPressSearchInputGooglePlaces.bind(this)}></input>
+          <input type="text" 
+            id="header-search-form" 
+            className="location" 
+            name="location" 
+            placeholder="Where to?"
+            onKeyPress={this.onKeyPressSearchInputGooglePlaces.bind(this)}>
+          </input>
           {initGooglePlacesInput()}
         </div>  
       );
@@ -133,7 +124,6 @@ export default class TopHeader extends React.Component {
       <div className="header-container">
         <div className="header-main">
 
-          {/* TODO: Add logged in logo version */}
           <Link to="/" className="icon-logo-container">
             <div className="icon-logo">
               <div></div>

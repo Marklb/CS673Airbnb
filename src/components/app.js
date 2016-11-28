@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+require('../constants');
+
 // HEAD
 import Home from './home/home';
 import Container from './container/container';
