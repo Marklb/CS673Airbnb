@@ -8,8 +8,8 @@ var db = function(app){
 	var mysql      = require('mysql');
 	var conn = mysql.createConnection({
 		host     : 'localhost',
-		user     : 'Jeremy',
-		password : 'tucker',
+		user     : 'root',
+		password : '',
 		database : 'mokbnb'
 	});
 
