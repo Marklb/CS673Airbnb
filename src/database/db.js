@@ -731,8 +731,7 @@ var db = function(app){
 		`;
 
 		var profilePicUrl = `/images/uploaded_images/user_profile_pictures/${fname}`;
-		console.log(profilePicUrl.length);
-		console.log(profilePicUrl);
+		
 		conn.query(query_str,
       [profilePicUrl, authType, authToken],
 			function(err, rows, fields) {
@@ -749,54 +748,27 @@ var db = function(app){
 	/////////////////////////////////////////////////////////////////////////////
 	// Get user profile image
 	/////////////////////////////////////////////////////////////////////////////
-	app.post('/api/get_user_profile_image', function(req, res){
-		// var authToken = req.body.authToken;
-		// var authType = req.body.authType;
-		// var imgData = req.body.imgData; 
+	app.get('/api/get_user_profile_image_url', function(req, res){
+		var userId = req.query.userId; 
 		
-		// var match = imgData.match(/^data:image\/(png|gif|jpeg);base64,(.+)$/);
-		// var fileExt = match[1];
-		// var base64Data = match[2];
+		var query_str = `
+		SELECT profile_pic
+		FROM Users
+		WHERE user_id = ?
+		`;
 
-		// var uploadedImgsDir = __dirname+'/../../public/images/uploaded_images';
-		// var userProfilePicsDir = uploadedImgsDir+'/user_profile_pictures';
-
-		// // Generate random string
-		// var crypto = require('crypto');
-		// var seed = crypto.randomBytes(20);
-		// var uniqueStr = crypto.createHash('sha1').update(seed).digest('hex');
-
-		// var fname = `profile_pic_${uniqueStr}.${fileExt}`;
-
-		// var buffer = new Buffer(base64Data, 'base64');
-
-		// var filePathFull = userProfilePicsDir+'/'+fname;
-		// fs.writeFile(filePathFull,buffer,(err) => {
-		// 	if(err) throw 'Error: Could not write user profile picture file';
-		// });
-
-
-		// var query_str = `
-		// UPDATE Users
-		// SET profile_pic = ?
-		// WHERE user_id = (SELECT user_id FROM UserSession
-		// 								 WHERE auth_type = ? AND session_auth_id = ?)
-
-		// `;
-
-		// var profilePicUrl = `/images/uploaded_images/user_profile_pictures/${fname}`;
-		// console.log(profilePicUrl.length);
-		// console.log(profilePicUrl);
-		// conn.query(query_str,
-    //   [profilePicUrl, authType, authToken],
-		// 	function(err, rows, fields) {
-		// 		if(err){
-		// 			console.log(err);
-		// 			res.json({'success': false});
-		// 		}else{
-		// 			res.json({'success': true});
-		// 		}
-		// 	});
+		conn.query(query_str,
+      [userId],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					res.json({'success': true, data: {
+						profile_pic: rows[0].profile_pic
+					}});
+				}
+			});
 
 	});
 

@@ -32,6 +32,7 @@ export default class PhotosAndVideo extends React.Component {
     super(props);
 
     this.state = {
+      userId: null,
       profilePhotoFile: '',
       profilePhotoPreviewUrl: '/images/user_pic-225x225.png'
     };
@@ -40,7 +41,19 @@ export default class PhotosAndVideo extends React.Component {
   }
 
   componentDidMount() {
-
+    $.get('/api/getUserInfo', {
+      authType: this.context.userSessionHandler.getAuthType(),
+      authToken: this.context.userSessionHandler.getAuthToken()
+    }, (data, status) => {
+      $.get('/api/get_user_profile_image_url', {
+        userId: data.user_id
+      }, (data2, status2) => {
+        this.setState({
+          userId: data.user_id, 
+          profilePhotoPreviewUrl: data2.data.profile_pic
+        });
+      });
+    });
   }
 
   render() {
