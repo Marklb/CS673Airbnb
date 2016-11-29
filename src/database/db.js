@@ -1,4 +1,5 @@
 var jwt = require('jsonwebtoken');
+var fs = require('fs');
 
 const TOKEN_SECRET = 'mkokbnbteam2project';
 
@@ -276,36 +277,36 @@ var db = function(app){
 		});
 	});
 
-    /////////////////////////////////////////////////////////////////////////////
-    // Get information about one place
-    /////////////////////////////////////////////////////////////////////////////
-    app.post("/api/getRoomDetailsQuery",function(req,res){
-        var placeID = req.body.placeID;
-        //Returns place_id, hostID, host_name, gender, birth_date, profile_pic, bio, join_date, roomtype_id, roomtype_name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures, addr_id, street, city, state, zip, country, bookingtype_id, bookingtype_name, auction_id, g_price, current_price, sold_price, date_range_start, date_range_end, booked_dates, response_time, ask_amount, languages, amenities
-        var placeQuerySQL = "SELECT * FROM (place"+
-        " NATURAL JOIN hostplacelisting"+
-        " NATURAL JOIN address"+
-        " NATURAL JOIN bookingtype"+
-        " NATURAL JOIN roomtype"+
-        " LEFT JOIN auction ON place.place_id=auction.place_id"+
-        " JOIN (SELECT users.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A"+
-        " JOIN (SELECT GROUP_CONCAT(DISTINCT language_name) AS languages FROM place, language"+
-                " JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
-        " JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
-                " JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
-    " WHERE place.place_id = " + placeID + " GROUP BY place.place_id";
-        console.log(placeQuerySQL);
-        conn.query(placeQuerySQL,
-        function(err, rows, fields){
-            if (!err) {
-                console.log(rows);
-                res.json({'query_success': true, 'result': rows});
-            } else {
-                console.log('Error while performing Query.');
-                res.json({'query_success': false});
-            }
-        });
-    });
+	/////////////////////////////////////////////////////////////////////////////
+	// Get information about one place
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getRoomDetailsQuery",function(req,res){
+			var placeID = req.body.placeID;
+			//Returns place_id, hostID, host_name, gender, birth_date, profile_pic, bio, join_date, roomtype_id, roomtype_name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures, addr_id, street, city, state, zip, country, bookingtype_id, bookingtype_name, auction_id, g_price, current_price, sold_price, date_range_start, date_range_end, booked_dates, response_time, ask_amount, languages, amenities
+			var placeQuerySQL = "SELECT * FROM (place"+
+			" NATURAL JOIN hostplacelisting"+
+			" NATURAL JOIN address"+
+			" NATURAL JOIN bookingtype"+
+			" NATURAL JOIN roomtype"+
+			" LEFT JOIN auction ON place.place_id=auction.place_id"+
+			" JOIN (SELECT users.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A"+
+			" JOIN (SELECT GROUP_CONCAT(DISTINCT language_name) AS languages FROM place, language"+
+							" JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
+			" JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
+							" JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
+			" WHERE place.place_id = " + placeID + " GROUP BY place.place_id";
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
 	/////////////////////////////////////////////////////////////////////////////
 	// Get place search information
 	/////////////////////////////////////////////////////////////////////////////
@@ -691,11 +692,84 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
-	// A get request api call
+	// Upload user profile image
+	// TODO: delete old profile picture when setting new
 	/////////////////////////////////////////////////////////////////////////////
-	app.get('/api/names', function(req, res){
-		// Temporary string response until implemented
-		res.send('/api/names is not implemented.');
+	app.post('/api/upload_user_profile_image', function(req, res){
+		var authToken = req.body.authToken;
+		var authType = req.body.authType;
+		var imgData = req.body.imgData; 
+		
+		var match = imgData.match(/^data:image\/(png|gif|jpeg);base64,(.+)$/);
+		var fileExt = match[1];
+		var base64Data = match[2];
+
+		var uploadedImgsDir = __dirname+'/../../public/images/uploaded_images';
+		var userProfilePicsDir = uploadedImgsDir+'/user_profile_pictures';
+
+		// Generate random string
+		var crypto = require('crypto');
+		var seed = crypto.randomBytes(20);
+		var uniqueStr = crypto.createHash('sha1').update(seed).digest('hex');
+
+		var fname = `profile_pic_${uniqueStr}.${fileExt}`;
+
+		var buffer = new Buffer(base64Data, 'base64');
+
+		var filePathFull = userProfilePicsDir+'/'+fname;
+		fs.writeFile(filePathFull,buffer,(err) => {
+			if(err) throw 'Error: Could not write user profile picture file';
+		});
+
+
+		var query_str = `
+		UPDATE Users
+		SET profile_pic = ?
+		WHERE user_id = (SELECT user_id FROM UserSession
+										 WHERE auth_type = ? AND session_auth_id = ?)
+
+		`;
+
+		var profilePicUrl = `/images/uploaded_images/user_profile_pictures/${fname}`;
+		
+		conn.query(query_str,
+      [profilePicUrl, authType, authToken],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					res.json({'success': true});
+				}
+			});
+
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Get user profile image
+	/////////////////////////////////////////////////////////////////////////////
+	app.get('/api/get_user_profile_image_url', function(req, res){
+		var userId = req.query.userId; 
+		
+		var query_str = `
+		SELECT profile_pic
+		FROM Users
+		WHERE user_id = ?
+		`;
+
+		conn.query(query_str,
+      [userId],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					res.json({'success': true, data: {
+						profile_pic: rows[0].profile_pic
+					}});
+				}
+			});
+
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
