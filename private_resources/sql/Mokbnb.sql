@@ -343,6 +343,7 @@ CREATE TABLE IF NOT EXISTS `Auction` (
   `current_price` VARCHAR(10) NULL,
   `sold_price` VARCHAR(10) NULL,
   `end_auction_time` TIMESTAMP NOT NULL,
+  `active` VARCHAR(3) NOT NULL,
   PRIMARY KEY (`auction_id`))
 ENGINE = InnoDB;
 
@@ -432,7 +433,8 @@ INSERT INTO address (
    ("86 Heaven Lane", "Houston", "Texas", "07294", "USA"),
    ("666 Haunted Terrace", "Newark", "New Jersey", "07032", "USA"),
    ("24 Thirdington Road", "Newark", "New Jersey", "07032", "USA"),
-   ("99 Fourthington Place", "Newark", "New Jersey", "07032", "USA")
+   ("99 Fourthington Place", "Newark", "New Jersey", "07032", "USA"),
+   ("68 Heaven Place", "Houston", "Texas", "07294", "USA")
 ;
 
 INSERT INTO place (
@@ -441,7 +443,8 @@ INSERT INTO place (
    (1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"),
    (2, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"),
    (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", 120.00, 3, 1, 1.5, 2, "/images/room3.jpg"),
-   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 69.99, 3, 1, 1.5, 2, "/images/room4.jpg")
+   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 69.99, 3, 1, 1.5, 2, "/images/room4.jpg"),
+   (1, 5, 1, "The Fifth Scene", "Five is the lucky number.", 200.00, 3, 1, 1.5, 2, "/images/room5.jpg")
 ;
 
 INSERT INTO hostplacelisting (
@@ -450,14 +453,15 @@ INSERT INTO hostplacelisting (
    (1, 1, 1, "80.00", "2016-12-30", "2017-01-02", "yes"),
    (2, 2, 2, "666.00", "2016-11-02", "2016-12-16", "yes"),
    (3, 3, 3, "89.99", "2016-11-01", "2016-12-16", "yes"),
-   (4, 4, 4, "64.95", "2016-11-01", "2016-12-16", "yes")
+   (4, 4, 4, "64.95", "2016-11-01", "2016-12-16", "yes"),
+   (5, 1, 1, "200.00", "2016-12-30", "2017-01-02", "yes")
 ;
 
 INSERT INTO auction (
-   place_id, starting_price, current_price, sold_price, end_auction_time
+   place_id, starting_price, current_price, sold_price, end_auction_time, active
 ) VALUES
-   (1, "80.00", "278.00", "278.00", "2016-11-24"),
-   (2, "200.00", "243.00", NULL, "2016-12-04")
+   (1, "80.00", "278.00", "278.00", "2016-11-24", "no"),
+   (5, "200.00", "243.00", NULL, "2016-12-06", "yes")
 ;
 
 INSERT INTO PlaceAmenity (
