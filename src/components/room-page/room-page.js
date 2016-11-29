@@ -1,7 +1,13 @@
 import React from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
+
+// Javascript modules
 import _ from 'lodash';
 import $ from 'jquery';
+
+// React Components
+import ReactDisqusThread from 'react-disqus-thread';
+
 require("./room-page.scss");
 export default class RoomPage extends React.Component {
 
@@ -9,6 +15,12 @@ export default class RoomPage extends React.Component {
 		super(props);
 
 		this.state = {
+			shortname: null,
+			identifier: null,
+			title: null,
+			url: null,
+			category_id: null,
+			onNewComment: null,
 			placeID : this.props.params.placeid,
 			hostID: -1,
 			host_name: "N/A",
@@ -86,7 +98,7 @@ export default class RoomPage extends React.Component {
 					amenities: 'default'
 				}
 			],
-			
+
 			instantBookCheckinRangeOK : false,
 			instantBookCheckinTime : '1980-12-12',
 			instantBookCheckoutRangeOK : false,
@@ -262,10 +274,20 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				Booking({this.state.result[0].bookingtype_name})
 				{this.renderBooking()}
+
+			<ReactDisqusThread
+			//shortname="mokbnb"
+			shortname="example"
+			identifier="something-unique-12345"
+			//identifier={`mokbnb-room-${this.state.placeID}`}
+			title={`Reviews for ${this.state.result[0].name}`}
+			url="//www.jeremyhoc.com/mokbnb"
+			category_id={`${this.state.placeID}`}
+			onNewComment={console.log(this.text)}/>
 			</div>
 		);
 	}
-	
+
 	renderBooking() {
 		if (this.state.result[0].bookingtype_id == "1") {
 			return (this.instantBooking());
@@ -290,7 +312,7 @@ export default class RoomPage extends React.Component {
 			</div>
 		);
 	}
-	
+
 	onChange(e){
 		var name = e.target.name;
 		var val = e.target.value;
