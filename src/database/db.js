@@ -422,7 +422,7 @@ var db = function(app){
 															" join placeamenity on place.place_id = placeamenity.place_id)" +
 												" WHERE (addr_id = (SELECT addr_id" +
 																	" FROM address" +
-																	" WHERE state='Texas')" +
+																	" WHERE state='" + state + "')" +
 																		" AND cost_per_night BETWEEN " + (min_cost == -1 ? "0" : min_cost) + " AND " + (max_cost == -1 ? "1000" : max_cost) +
 																		" AND max_people >= " + (numofguest == -1 ? "0" : numofguest) +
 																		" AND bedroomsize >= " + (bedroomsize == -1 ? "0" : bedroomsize) +
@@ -698,8 +698,8 @@ var db = function(app){
 	app.post('/api/upload_user_profile_image', function(req, res){
 		var authToken = req.body.authToken;
 		var authType = req.body.authType;
-		var imgData = req.body.imgData; 
-		
+		var imgData = req.body.imgData;
+
 		var match = imgData.match(/^data:image\/(png|gif|jpeg);base64,(.+)$/);
 		var fileExt = match[1];
 		var base64Data = match[2];
@@ -731,7 +731,7 @@ var db = function(app){
 		`;
 
 		var profilePicUrl = `/images/uploaded_images/user_profile_pictures/${fname}`;
-		
+
 		conn.query(query_str,
       [profilePicUrl, authType, authToken],
 			function(err, rows, fields) {
@@ -749,8 +749,8 @@ var db = function(app){
 	// Get user profile image
 	/////////////////////////////////////////////////////////////////////////////
 	app.get('/api/get_user_profile_image_url', function(req, res){
-		var userId = req.query.userId; 
-		
+		var userId = req.query.userId;
+
 		var query_str = `
 		SELECT profile_pic
 		FROM Users
