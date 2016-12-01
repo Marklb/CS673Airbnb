@@ -214,7 +214,27 @@ export default class FilterForm extends React.Component {
 	}
 
 	getPlaceQuery(location) {
-		$.post('/api/showplace', {
+		// $.post('/api/showplace', {
+		// 	'checkbox': this.state.checkbox,
+		// 	'state': location,
+		// 	'date_start': this.state.date_start,
+		// 	'date_end': this.state.date_end,
+		// 	'numofguest': this.state.numofguest,
+		// 	'min_cost': this.state.min_cost,
+		// 	'max_cost': this.state.max_cost,
+		// 	'bedroomsize': this.state.bedroomsize,
+		// 	'bathroomsize': this.state.bathroomsize,
+		// 	'numofbeds': this.state.numofbeds
+  	// 	}, (data, status) => {
+  	// 		if(data.query_success === false) {
+		// 		console.log('Show place Not Successful');
+		// 	} else {
+		// 		console.log('Show place is Successful');
+		// 		this.setState({result: data.result});
+		// 	}
+  	// 	});
+
+		$.post('/api/get_places', {
 			'checkbox': this.state.checkbox,
 			'state': location,
 			'date_start': this.state.date_start,
@@ -232,7 +252,7 @@ export default class FilterForm extends React.Component {
 				console.log('Show place is Successful');
 				this.setState({result: data.result});
 			}
-  		});
+		});
 	}
 
 	renderCheckBox(neighbor) {

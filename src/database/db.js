@@ -1,6 +1,13 @@
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
 
+/* For testing script start */ 
+Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
+	delete require.cache[require.resolve('./db-no-require-cache')];
+	return require('./db-no-require-cache');
+}});
+/* For testing script end */
+
 const TOKEN_SECRET = 'mkokbnbteam2project';
 
 var db = function(app){
@@ -310,6 +317,9 @@ var db = function(app){
 	/////////////////////////////////////////////////////////////////////////////
 	// Get place search information
 	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/get_places",function(req,res){
+		dbNoRequireCache.api_get_places(req,res,conn);
+	});
 	app.post("/api/showplace",function(req,res){
 		var state = req.body.state;
 		var date_start = req.body.date_start;
