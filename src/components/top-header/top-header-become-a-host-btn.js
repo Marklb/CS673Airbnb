@@ -11,14 +11,27 @@ export default class TopHeaderBecomeAHostBtn extends TopHeaderDropdownButton {
   }
 
   renderButton() {
-    return (<div><div className="btn-rect">Become a Host</div></div>);
-  }
+    return (<div><div className="btn-rect">Become a Host</div></div>);   
+	}
 
   renderDropdownContent() {
     return (
       <div>You could earn $324 sharing your home in Newark in a week. Become a host.</div>
     );
   }
+	// render() {
+    // return (
+      // <div className="header-container">
+        // <div className="header-main">
 
-
+          // {/* TODO: Add logged in logo version */}
+          // <Link to="/" className="icon-logo-container">
+            // <div className="icon-logo">
+              // <div></div>
+            // </div>
+          // </Link>
+		// </div>
+	// </div>
+	// );
+// }
 };
