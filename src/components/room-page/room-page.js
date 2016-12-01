@@ -291,6 +291,10 @@ export default class RoomPage extends React.Component {
 	renderBooking() {
 		if (this.state.result[0].bookingtype_id == "1") {
 			return (this.instantBooking());
+		} else if (this.state.result[0].bookingtype_id == "2") {
+			return (this.auctionBooking());
+		} else if (this.state.result[0].bookingtype_id == "3") {
+			return (this.userSetTimeFrameBooking());
 		}
 	}
 
@@ -313,11 +317,47 @@ export default class RoomPage extends React.Component {
 		);
 	}
 
+	renderingUserSetTimeFrameBookingButton() {
+		return (
+			<div>
+				<button type="button">Set!!</button>
+			</div>
+		);
+	}
+
+	auctionBooking() {
+		return (
+			<div>
+				Starting price<input type="text" placeholder='none'></input>
+				<br></br>
+				Current bid<input type="text" placeholder='none'></input>
+				<br></br>
+				Bid end date<input type="text" placeholder={this.state.result[0].date_range_end}></input>
+				<br></br>
+				Your Bid<input type="text"></input>
+				<br></br>
+				<button type="button">Submit</button>
+			</div>
+		);
+	}
+
+	userSetTimeFrameBooking() {
+		<div>
+			Check in<input name='user_set_time_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
+			Check out<input name='user_set_time_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
+			<br></br>
+			{(this.state.instantBookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
+		</div>
+	}
+
 	onChange(e){
 		var name = e.target.name;
 		var val = e.target.value;
 		var type = e.target.type;
 		if (this.state.result[0].bookingtype_id == "1" && type == "date") {
+			var date = new Date(val);
+			this.checkInstantBookDate(date, name, val);
+		} else if (this.state.result[0].bookingtype_id == "3" && type == "date") {
 			var date = new Date(val);
 			this.checkInstantBookDate(date, name, val);
 		}

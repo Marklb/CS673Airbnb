@@ -420,7 +420,7 @@ var db = function(app){
 												" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id" +
 															" join userlanguage on place.host_id = userlanguage.user_id" +
 															" join placeamenity on place.place_id = placeamenity.place_id)" +
-												" WHERE (addr_id = (SELECT addr_id" +
+												" WHERE (addr_id IN (SELECT addr_id" +
 																	" FROM address" +
 																	" WHERE state='" + state + "')" +
 																		" AND cost_per_night BETWEEN " + (min_cost == -1 ? "0" : min_cost) + " AND " + (max_cost == -1 ? "1000" : max_cost) +
@@ -661,9 +661,9 @@ var db = function(app){
 					console.log(err);
 					res.json({'success': false});
 				}else{
-					let msgs = [];
-					for(let i = 0; i < rows.length; i++){
-						let row = rows[i];
+					var msgs = [];
+					for(var i = 0; i < rows.length; i++){
+						var row = rows[i];
 						msgs.push({
 							user_id: row.session_user_id,
 							message_id: row.message_id,
