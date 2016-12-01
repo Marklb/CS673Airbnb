@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 
+require('../constants');
+
 // HEAD
 import Home from './home/home';
 import Container from './container/container';
@@ -12,7 +14,7 @@ import UsersEdit from './users-edit/users-edit';
 import UsersNotifications from './users-notifications/users-notifications';
 import FilterForm from './filter-form/filter-form';
 import BecomeHostMainPage from './become-host/become-host-page-header';
-
+import RoomPage from './room-page/room-page';
 // Javascript Modules
 import _ from 'lodash';
 
@@ -44,7 +46,7 @@ export default class App extends React.Component {
           <Route path='/users/notifications' component={UsersNotifications} />
           <Route path='/s/:place' component={FilterForm} />
 		  <Route path='/become-host' component={BecomeHostMainPage} />
-		  
+		  <Route path='/roomdetail/:placeid' component={RoomPage} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

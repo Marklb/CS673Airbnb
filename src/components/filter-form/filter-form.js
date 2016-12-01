@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from "react-router";
+import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
@@ -13,9 +13,13 @@ export default class FilterForm extends React.Component {
 		this.state = {
 			isFiltersVisible: false
 		};
-
+		console.log('this.props.params.place');
+		console.log(this.props.params.place);
+		console.log(this.props.location.query);
 		this.state = {
 			inputLocation : this.props.params.place,
+			latitude: this.props.location.query.lat || 0,
+			longitude: this.props.location.query.lng || 0,
 			neighborhoods : [],
 			result : [],
 			date_start : 'N/A',
@@ -180,12 +184,19 @@ export default class FilterForm extends React.Component {
 		];
 	}
 
-	componentWillReceiveProps(nextProps) {
-	// You don't have to do this check first, but it can help prevent an unneeded render
-		if (nextProps.params.place !== this.state.inputLocation) {
-			this.setState({inputLocation: nextProps.params.place});
-			this.getNeighborQuery(nextProps.params.place);
-			this.getPlaceQuery(nextProps.params.place);
+	componentWillReceiveProps(nextProps) {		
+		let placeString =  nextProps.params.place;
+		let urlParams = this.props.location.query;
+
+		// You don't have to do this check first, but it can help prevent an unneeded render 
+		if (placeString !== this.state.inputLocation) {
+			this.setState({
+				inputLocation: placeString,
+				latitude: urlParams.lat || 0,
+				longitude: urlParams.lng || 0,
+			});
+			this.getNeighborQuery(placeString);
+			this.getPlaceQuery(placeString);
 		}
 	}
 
@@ -203,7 +214,27 @@ export default class FilterForm extends React.Component {
 	}
 
 	getPlaceQuery(location) {
-		$.post('/api/showplace', {
+		// $.post('/api/showplace', {
+		// 	'checkbox': this.state.checkbox,
+		// 	'state': location,
+		// 	'date_start': this.state.date_start,
+		// 	'date_end': this.state.date_end,
+		// 	'numofguest': this.state.numofguest,
+		// 	'min_cost': this.state.min_cost,
+		// 	'max_cost': this.state.max_cost,
+		// 	'bedroomsize': this.state.bedroomsize,
+		// 	'bathroomsize': this.state.bathroomsize,
+		// 	'numofbeds': this.state.numofbeds
+  	// 	}, (data, status) => {
+  	// 		if(data.query_success === false) {
+		// 		console.log('Show place Not Successful');
+		// 	} else {
+		// 		console.log('Show place is Successful');
+		// 		this.setState({result: data.result});
+		// 	}
+  	// 	});
+
+		$.post('/api/get_places', {
 			'checkbox': this.state.checkbox,
 			'state': location,
 			'date_start': this.state.date_start,
@@ -221,7 +252,7 @@ export default class FilterForm extends React.Component {
 				console.log('Show place is Successful');
 				this.setState({result: data.result});
 			}
-  		});
+		});
 	}
 
 	renderCheckBox(neighbor) {
@@ -241,7 +272,7 @@ export default class FilterForm extends React.Component {
 	renderResult(result) {
 		var rows = [];
 		for (var i=0; i < result.length; i++) {
-			rows.push(<MyResult name={result[i].name} />);
+			rows.push(<MyResult key={i} name={result[i].name} />);
 		}
 		return (
 			<form className="f">
@@ -272,7 +303,7 @@ export default class FilterForm extends React.Component {
 					<form className="f">
 						Room type
 						{this.state.checkbox.roomtype.map((val, i) => {
-							return <label><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
@@ -311,21 +342,21 @@ export default class FilterForm extends React.Component {
 					<form className="f">
 						Booking Type
 						{this.state.checkbox.bookingtype.map((val, i) => {
-							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
 					<form className="f">
 						Amenities
 						{this.state.checkbox.amenity.map((val, i) => {
-							return <label><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
 					<form className="f">
 						Host Language
 						{this.state.checkbox.hostlanguage.map((val, i) => {
-							return <label><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label key={i}><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
@@ -353,14 +384,14 @@ export default class FilterForm extends React.Component {
 
 					{this.state.result.map((val, i) => {
 						return (
-							<form className="f">
-								<img src={val.pictures}  />
+							<div key={i} className="f">
+								<img className="pic" src={val.pictures} onClick={this.onClickShowRoom.bind(this, i)} />
 								<br></br>
 								Title<input className="r1" type="text" placeholder={val.name}></input>
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-							</form>
+							</div>
 						);
 					})}
 				</div>
@@ -372,6 +403,13 @@ export default class FilterForm extends React.Component {
 		let newState = this.state;
 		newState.isFiltersVisible = !newState.isFiltersVisible;
 		this.setState(newState);
+	}
+
+	onClickShowRoom(indx, e){
+		var place_id = this.state.result[indx].place_id;
+		console.log("place_id = " + place_id);
+		let url = `/roomdetail/${place_id}`;
+		browserHistory.push(url);
 	}
 
 	onChange(e){

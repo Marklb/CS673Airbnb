@@ -1,4 +1,12 @@
 var jwt = require('jsonwebtoken');
+var fs = require('fs');
+
+/* For testing script start */ 
+Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
+	delete require.cache[require.resolve('./db-no-require-cache')];
+	return require('./db-no-require-cache');
+}});
+/* For testing script end */
 
 const TOKEN_SECRET = 'mkokbnbteam2project';
 
@@ -277,8 +285,41 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
-	// Get place information
+	// Get information about one place
 	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getRoomDetailsQuery",function(req,res){
+			var placeID = req.body.placeID;
+			//Returns place_id, hostID, host_name, gender, birth_date, profile_pic, bio, join_date, roomtype_id, roomtype_name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures, addr_id, street, city, state, zip, country, bookingtype_id, bookingtype_name, auction_id, g_price, current_price, sold_price, date_range_start, date_range_end, booked_dates, response_time, ask_amount, languages, amenities
+			var placeQuerySQL = "SELECT * FROM (place"+
+			" NATURAL JOIN hostplacelisting"+
+			" NATURAL JOIN address"+
+			" NATURAL JOIN bookingtype"+
+			" NATURAL JOIN roomtype"+
+			" LEFT JOIN auction ON place.place_id=auction.place_id"+
+			" JOIN (SELECT users.name AS host_name, gender, birth_date, profile_pic, bio, join_date FROM place, users WHERE place.host_id=users.user_id) AS A"+
+			" JOIN (SELECT GROUP_CONCAT(DISTINCT language_name) AS languages FROM place, language"+
+							" JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
+			" JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
+							" JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
+			" WHERE place.place_id = " + placeID + " GROUP BY place.place_id";
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+	/////////////////////////////////////////////////////////////////////////////
+	// Get place search information
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/get_places",function(req,res){
+		dbNoRequireCache.api_get_places(req,res,conn);
+	});
 	app.post("/api/showplace",function(req,res){
 		var state = req.body.state;
 		var date_start = req.body.date_start;
@@ -286,13 +327,13 @@ var db = function(app){
 		var numofguest = req.body.numofguest;
 		var min_cost = req.body.min_cost;
 		var max_cost = req.body.max_cost;
-		var bedroomsize = req.body.bedroomsize; //add column to place
-		var bathroomsize = req.body.bathroomsize; //add column to place
-		var numofbeds = req.body.numofbeds; //add column to place
-		var roomtype = req.body.checkbox.roomtype; //add column to place
-		var bookingtype = req.body.checkbox.bookingtype; //bookingtype = --bookingtype_id in hostplacelisting
-		var amenity = req.body.checkbox.amenity; //add column to place
-		var hostlanguage = req.body.checkbox.hostlanguage; //add to users, project language from (join users.user_id with hostplacelisting.host_id)
+		var bedroomsize = req.body.bedroomsize;
+		var bathroomsize = req.body.bathroomsize;
+		var numofbeds = req.body.numofbeds;
+		var roomtype = req.body.checkbox.roomtype;
+		var bookingtype = req.body.checkbox.bookingtype;
+		var amenity = req.body.checkbox.amenity;
+		var hostlanguage = req.body.checkbox.hostlanguage;
 
 		var bookingtype_id = [];
 		var roomtype_id = [];
@@ -380,36 +421,29 @@ var db = function(app){
 		console.log(date_start);
 		console.log(date_end);
 		var placeQuerySQL;
-		if (bookingtype_id.length == 0 && roomtype_id.length == 0 && amenity_id.length == 0 && language_id.length == 0
-			&& max_cost == -1 && min_cost == -1 && numofguest == -1 && bedroomsize == -1 && bathroomsize == -1
-			&& date_start === 'N/A' && date_end === 'N/A') {
-				console.log('nothing!!!');
-				placeQuerySQL = "" +
-				    "SELECT place.name, place.cost_per_night, hostplacelisting.bookingtype_id, place.roomtype_id, place.pictures" +
-					" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id)";
-		}
-		else {
-			placeQuerySQL = "" +
+		placeQuerySQL = "" +
 			"SELECT *" +
 			" FROM (SELECT placeamenity.place_id, placeamenity.amenity_id, A.name, A.pictures, A.bookingtype_id, A.roomtype_id, A.cost_per_night" +
-					" FROM (placeamenity join (SELECT place.place_id, place.name, amenity_id, place.pictures, hostplacelisting.bookingtype_id, place.roomtype_id, place.cost_per_night" +
+					" FROM (placeamenity " +
+					(amenity_id.length == 0 ? "NATURAL JOIN " : "JOIN ") +
+					"(SELECT place.place_id, place.name, amenity_id, place.pictures, hostplacelisting.bookingtype_id, place.roomtype_id, place.cost_per_night" +
 												" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id" +
 															" join userlanguage on place.host_id = userlanguage.user_id" +
 															" join placeamenity on place.place_id = placeamenity.place_id)" +
-												" WHERE (addr_id = (SELECT addr_id" +
+												" WHERE (addr_id IN (SELECT addr_id" +
 																	" FROM address" +
-																	" WHERE state='Texas')" +
-																		" AND cost_per_night <= " + max_cost +
-																		" AND cost_per_night >= " + min_cost +
-																		" AND max_people >= " + numofguest +
-																		" AND bedroomsize >= " + bedroomsize +
-																		" AND bathroomsize >= " + bathroomsize +
-																		" AND numofbeds >= " + numofbeds +
+																	" WHERE state='" + state + "')" +
+																		" AND cost_per_night BETWEEN " + (min_cost == -1 ? "0" : min_cost) + " AND " + (max_cost == -1 ? "1000" : max_cost) +
+																		" AND max_people >= " + (numofguest == -1 ? "0" : numofguest) +
+																		" AND bedroomsize >= " + (bedroomsize == -1 ? "0" : bedroomsize) +
+																		" AND bathroomsize >= " + (bathroomsize == -1 ? "0" : bathroomsize) +
+																		" AND numofbeds >= " + (numofbeds == -1 ? "0" : numofbeds) +
 																		" AND (SELECT DATEDIFF('" + date_start + "', date_range_start)) >= 0 AND (SELECT DATEDIFF(date_range_end, '" + date_end + "')) >= 0" +
-																		" AND (" + roomtype_string + ")" +
-																		" AND (" + bookingtype_string + ")" +
-																		" AND (" + language_string + "))" +
-																		" AND amenity_id IN (SELECT amenity_id" +
+																		((roomtype_id.length != 0) ? " AND (" + roomtype_string + ")" : "") +
+																		((bookingtype_id.length != 0) ? " AND (" + bookingtype_string + ")" : "") +
+																		((language_id.length != 0) ? " AND (" + language_string + ")" : "") + ")";
+																		if (amenity_id.length != 0) {
+																			placeQuerySQL += " AND amenity_id IN (SELECT amenity_id" +
 																							" FROM Amenity" +
 																							" WHERE " + amenity_string + ")" +
 												" GROUP BY place.place_id) AS A" +
@@ -421,7 +455,10 @@ var db = function(app){
 			" HAVING COUNT(*) = (SELECT COUNT(*)" +
 			" FROM Amenity" +
 			" WHERE " + amenity_string + ")";
-		}
+																		} else {
+																			placeQuerySQL += ") AS A)) AS B" +
+																							" GROUP BY B.place_id";
+																		}
 
 		console.log(placeQuerySQL);
 		conn.query(placeQuerySQL,
@@ -564,11 +601,185 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
-	// A get request api call
+	// Add new message
 	/////////////////////////////////////////////////////////////////////////////
-	app.get('/api/names', function(req, res){
-		// Temporary string response until implemented
-		res.send('/api/names is not implemented.');
+	app.get("/api/add_new_message",function(req,res){
+    // console.log('/api/add_new_message');
+		var authToken = req.query.authToken;
+		var authType = req.query.authType;
+		var msgRecipientEmail = req.query.msgRecipientEmail;
+		var msgTitle = req.query.msgTitle;
+		var msgBody = req.query.msgBody;
+
+		var query_str = 'INSERT INTO Message (sender_id, receiver_id, title, body)' +
+										'VALUES ((SELECT user_id ' +
+														 'FROM UserSession ' +
+														 'WHERE auth_type = ? AND session_auth_id = ?), ' +
+														 '(SELECT user_id ' +
+                              'FROM Users WHERE email = ?), ' +
+                            '?, ?)';
+
+		conn.query(query_str,
+      [authType, authToken, msgRecipientEmail, msgTitle, msgBody],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					// console.log(rows);
+					res.json({'success': true});
+				}
+			});
+
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Get messages
+	/////////////////////////////////////////////////////////////////////////////
+	app.get("/api/get_user_messages",function(req,res){
+    // console.log('/api/get_user_messages');
+		var authToken = req.query.authToken;
+		var authType = req.query.authType;
+
+		var query_str = `
+		SELECT M.message_id,
+			M.sender_id, USENDER.first_name AS sender_fname,
+			USENDER.email AS sender_email,
+			M.receiver_id, URECEIVER.first_name AS receiver_fname,
+			URECEIVER.email AS receiver_email,
+			M.send_date, M.title, M.body, M.is_read, M.is_stared, M.is_archived,
+			S.user_id AS session_user_id
+
+		FROM Message AS M, Users AS USENDER, Users AS URECEIVER,
+			(SELECT S.user_id
+			 FROM UserSession As S
+			 WHERE S.auth_type = ? AND S.session_auth_id = ?) AS S
+
+		WHERE
+			(M.sender_id = S.user_id OR M.receiver_id = S.user_id)
+			AND
+			M.sender_id = USENDER.user_id
+			AND
+			M.receiver_id = URECEIVER.user_id
+
+		`;
+
+		conn.query(query_str,
+      [authType, authToken],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					var msgs = [];
+					for(var i = 0; i < rows.length; i++){
+						var row = rows[i];
+						msgs.push({
+							user_id: row.session_user_id,
+							message_id: row.message_id,
+							sender: {
+								user_id: row.sender_id,
+								fname: row.sender_fname,
+								email: row.sender_email,
+							},
+							receiver: {
+								user_id: row.receiver_id,
+								fname: row.receiver_fname,
+								email: row.receiver_email,
+							},
+							send_date: row.send_date,
+							title: row.title,
+							body: row.body,
+							is_read: row.is_read.lastIndexOf(1) !== -1,
+							is_stared: row.is_stared.lastIndexOf(1) !== -1,
+							is_archived: row.is_archived.lastIndexOf(1) !== -1
+						});
+					}
+					res.json({'success': true, msgs: msgs});
+				}
+			});
+
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Upload user profile image
+	// TODO: delete old profile picture when setting new
+	/////////////////////////////////////////////////////////////////////////////
+	app.post('/api/upload_user_profile_image', function(req, res){
+		var authToken = req.body.authToken;
+		var authType = req.body.authType;
+		var imgData = req.body.imgData;
+
+		var match = imgData.match(/^data:image\/(png|gif|jpeg);base64,(.+)$/);
+		var fileExt = match[1];
+		var base64Data = match[2];
+
+		var uploadedImgsDir = __dirname+'/../../public/images/uploaded_images';
+		var userProfilePicsDir = uploadedImgsDir+'/user_profile_pictures';
+
+		// Generate random string
+		var crypto = require('crypto');
+		var seed = crypto.randomBytes(20);
+		var uniqueStr = crypto.createHash('sha1').update(seed).digest('hex');
+
+		var fname = `profile_pic_${uniqueStr}.${fileExt}`;
+
+		var buffer = new Buffer(base64Data, 'base64');
+
+		var filePathFull = userProfilePicsDir+'/'+fname;
+		fs.writeFile(filePathFull,buffer,(err) => {
+			if(err) throw 'Error: Could not write user profile picture file';
+		});
+
+
+		var query_str = `
+		UPDATE Users
+		SET profile_pic = ?
+		WHERE user_id = (SELECT user_id FROM UserSession
+										 WHERE auth_type = ? AND session_auth_id = ?)
+
+		`;
+
+		var profilePicUrl = `/images/uploaded_images/user_profile_pictures/${fname}`;
+
+		conn.query(query_str,
+      [profilePicUrl, authType, authToken],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					res.json({'success': true});
+				}
+			});
+
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Get user profile image
+	/////////////////////////////////////////////////////////////////////////////
+	app.get('/api/get_user_profile_image_url', function(req, res){
+		var userId = req.query.userId;
+
+		var query_str = `
+		SELECT profile_pic
+		FROM Users
+		WHERE user_id = ?
+		`;
+
+		conn.query(query_str,
+      [userId],
+			function(err, rows, fields) {
+				if(err){
+					console.log(err);
+					res.json({'success': false});
+				}else{
+					res.json({'success': true, data: {
+						profile_pic: rows[0].profile_pic
+					}});
+				}
+			});
+
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
