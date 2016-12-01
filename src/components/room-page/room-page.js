@@ -295,6 +295,8 @@ export default class RoomPage extends React.Component {
 			return (this.auctionBooking());
 		} else if (this.state.result[0].bookingtype_id == "3") {
 			return (this.userSetTimeFrameBooking());
+		} else if (this.state.result[0].bookingtype_id == "4") {
+			return (this.hostSetTimeFrameBooking());
 		}
 	}
 
@@ -342,12 +344,27 @@ export default class RoomPage extends React.Component {
 	}
 
 	userSetTimeFrameBooking() {
-		<div>
-			Check in<input name='user_set_time_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
-			Check out<input name='user_set_time_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
-			<br></br>
-			{(this.state.instantBookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
-		</div>
+		return (
+			<div>
+				Check in<input name='user_set_time_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
+				Check out<input name='user_set_time_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
+				response time<input name='user_set_time_book_response' type="date"></input>
+				<br></br>
+				{(this.state.instantBookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
+			</div>
+		);
+	}
+
+	hostSetTimeFrameBooking() {
+		return (
+			<div>
+				Check in<input name='host_set_time_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
+				Check out<input name='host_set_time_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
+				response time<input name='host_set_time_book_response' type="date"></input>
+				<br></br>
+				{(this.state.instantBookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
+			</div>
+		);
 	}
 
 	onChange(e){
@@ -358,6 +375,9 @@ export default class RoomPage extends React.Component {
 			var date = new Date(val);
 			this.checkInstantBookDate(date, name, val);
 		} else if (this.state.result[0].bookingtype_id == "3" && type == "date") {
+			var date = new Date(val);
+			this.checkInstantBookDate(date, name, val);
+		} else if (this.state.result[0].bookingtype_id == "4" && type == "date") {
 			var date = new Date(val);
 			this.checkInstantBookDate(date, name, val);
 		}
