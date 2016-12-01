@@ -44,7 +44,7 @@ export default class App extends React.Component {
           <Route path='/users/edit' component={UsersEdit} />
           <Route path='/users/notifications' component={UsersNotifications} />
           <Route path='/s/:place' component={FilterForm} />
-		  <Route path='/roomdetail/:placeid' component={RoomPage} />
+		  <Route path='/roomdetail/:pidanddate' component={RoomPage} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

@@ -14,14 +14,19 @@ export default class RoomPage extends React.Component {
 	constructor(props) {
 		super(props);
 
+		var p_id = this.props.params.pidanddate.split("_")[0];
+		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
+		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
 		this.state = {
+			default_check_in_date: d_date_check_in,
+			default_check_out_date: d_date_check_out,
 			shortname: null,
 			identifier: null,
 			title: null,
 			url: null,
 			category_id: null,
 			onNewComment: null,
-			placeID : this.props.params.placeid,
+			placeID : p_id,
 			hostID: -1,
 			host_name: "N/A",
 			roomtype_id: -1,
@@ -99,19 +104,20 @@ export default class RoomPage extends React.Component {
 				}
 			],
 
-			instantBookCheckinRangeOK : false,
-			instantBookCheckinTime : '1980-12-12',
-			instantBookCheckoutRangeOK : false,
-			instantBookCheckoutTime : '1980-12-12',
-			instantBookButtonOK : false
+			bookCheckinRangeOK : false,
+			bookCheckinTime : '1980-12-12',
+			bookCheckoutRangeOK : false,
+			bookCheckoutTime : '1980-12-12',
+			bookButtonOK : false
 		};
 		this.getRoomDetailsQuery(this.state.placeID);
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.params.placeid !== this.state.placeID) {
-			this.setState({placeID: nextProps.params.placeid});
-			this.getRoomDetailsQuery(nextProps.params.placeid);
+		var new_p_id = nextProps.params.pidanddate.split("_")[0];
+		if (new_p_id !== this.state.placeID) {
+			this.setState({placeID: new_p_id});
+			this.getRoomDetailsQuery(new_p_id);
 		}
 	}
 
@@ -275,15 +281,15 @@ export default class RoomPage extends React.Component {
 				Booking({this.state.result[0].bookingtype_name})
 				{this.renderBooking()}
 
-			<ReactDisqusThread
-			//shortname="mokbnb"
-			shortname="example"
-			identifier="something-unique-12345"
-			//identifier={`mokbnb-room-${this.state.placeID}`}
-			title={`Reviews for ${this.state.result[0].name}`}
-			url="//www.jeremyhoc.com/mokbnb"
-			category_id={`${this.state.placeID}`}
-			onNewComment={console.log(this.text)}/>
+				<ReactDisqusThread
+					//shortname="mokbnb"
+					shortname="example"
+					identifier="something-unique-12345"
+					//identifier={`mokbnb-room-${this.state.placeID}`}
+					title={`Reviews for ${this.state.result[0].name}`}
+					url="//www.jeremyhoc.com/mokbnb"
+					category_id={`${this.state.placeID}`}
+					onNewComment={console.log(this.text)}/>
 			</div>
 		);
 	}
@@ -303,10 +309,10 @@ export default class RoomPage extends React.Component {
 	instantBooking() {
 		return (
 			<div>
-				Check in<input name='instant_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
-				Check out<input name='instant_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
+				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
-				{(this.state.instantBookButtonOK)? this.renderingInstantBookingButton() : "please select dates in correct range!"}
+				{(this.state.bookButtonOK)? this.renderingInstantBookingButton() : "please select dates in correct range!"}
 			</div>
 		);
 	}
@@ -346,11 +352,11 @@ export default class RoomPage extends React.Component {
 	userSetTimeFrameBooking() {
 		return (
 			<div>
-				Check in<input name='user_set_time_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
-				Check out<input name='user_set_time_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
-				response time<input name='user_set_time_book_response' type="date"></input>
+				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				response time<input name='book_check_response' type="date"></input>
 				<br></br>
-				{(this.state.instantBookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
+				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
 			</div>
 		);
 	}
@@ -358,11 +364,11 @@ export default class RoomPage extends React.Component {
 	hostSetTimeFrameBooking() {
 		return (
 			<div>
-				Check in<input name='host_set_time_book_check_in' type="date" onChange={this.onChange.bind(this)}></input>
-				Check out<input name='host_set_time_book_check_out' type="date" onChange={this.onChange.bind(this)}></input>
-				response time<input name='host_set_time_book_response' type="date"></input>
+				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				response time<input name='book_check_response' type="date"></input>
 				<br></br>
-				{(this.state.instantBookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
+				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
 			</div>
 		);
 	}
@@ -373,54 +379,55 @@ export default class RoomPage extends React.Component {
 		var type = e.target.type;
 		if (this.state.result[0].bookingtype_id == "1" && type == "date") {
 			var date = new Date(val);
-			this.checkInstantBookDate(date, name, val);
+			this.checkBookDate(date, name, val);
 		} else if (this.state.result[0].bookingtype_id == "3" && type == "date") {
 			var date = new Date(val);
-			this.checkInstantBookDate(date, name, val);
+			this.checkBookDate(date, name, val);
 		} else if (this.state.result[0].bookingtype_id == "4" && type == "date") {
 			var date = new Date(val);
-			this.checkInstantBookDate(date, name, val);
+			this.checkBookDate(date, name, val);
 		}
 	}
 
-	checkInstantBookDate(date, name, val){
+	checkBookDate(date, name, val){
 		var start = new Date(this.state.result[0].date_range_start);
 		var end = new Date(this.state.result[0].date_range_end);
 		var timeDiffStart = date.getTime() - start.getTime();
 		var timeDiffEnd = date.getTime() - end.getTime();
 		var timeInHostRange = false;
 		if (timeDiffStart >= 0 && timeDiffEnd <= 0) {
+			console.log("time in range");
 			timeInHostRange = true;
 		}
-		if (name == "instant_book_check_in") {
+		if (name == "book_check_in") {
 			console.log("check date in check in");
-			var outTime = new Date(this.state.instantBookCheckoutTime);
+			var outTime = new Date(this.state.bookCheckoutTime);
 			var timeDiffOut	= date.getTime() - outTime.getTime();
-			this.setState({instantBookCheckinTime: val});
+			this.setState({bookCheckinTime: val});
 			if (timeInHostRange) {
-				this.setState({instantBookCheckinRangeOK: true});
+				this.setState({bookCheckinRangeOK: true});
 			} else {
-				this.setState({instantBookCheckinRangeOK: false});
+				this.setState({bookCheckinRangeOK: false});
 			}
-			if (timeInHostRange && this.state.instantBookCheckoutRangeOK && timeDiffOut <= 0) {
-				this.setState({instantBookButtonOK: true});
+			if (timeInHostRange && this.state.bookCheckoutRangeOK && timeDiffOut <= 0) {
+				this.setState({bookButtonOK: true});
 			} else {
-				this.setState({instantBookButtonOK: false});
+				this.setState({bookButtonOK: false});
 			}
-		} else if (name == "instant_book_check_out") {
+		} else if (name == "book_check_out") {
 			console.log("check date in check out");
-			var inTime = new Date(this.state.instantBookCheckinTime);
+			var inTime = new Date(this.state.bookCheckinTime);
 			var timeDiffIn	= date.getTime() - inTime.getTime();
-			this.setState({instantBookCheckoutTime: val});
+			this.setState({bookCheckoutTime: val});
 			if (timeInHostRange) {
-				this.setState({instantBookCheckoutRangeOK: true});
+				this.setState({bookCheckoutRangeOK: true});
 			} else {
-				this.setState({instantBookCheckoutRangeOK: false});
+				this.setState({bookCheckoutRangeOK: false});
 			}
-			if (timeInHostRange && this.state.instantBookCheckinRangeOK && timeDiffIn >= 0) {
-				this.setState({instantBookButtonOK: true});
+			if (timeInHostRange && this.state.bookCheckinRangeOK && timeDiffIn >= 0) {
+				this.setState({bookButtonOK: true});
 			} else {
-				this.setState({instantBookButtonOK: false});
+				this.setState({bookButtonOK: false});
 			}
 		}
 	}

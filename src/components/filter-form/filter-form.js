@@ -408,7 +408,7 @@ export default class FilterForm extends React.Component {
 	onClickShowRoom(indx, e){
 		var place_id = this.state.result[indx].place_id;
 		console.log("place_id = " + place_id);
-		let url = `/roomdetail/${place_id}`;
+		let url = `/roomdetail/${place_id}_${this.state.date_start}_${this.state.date_end}`;
 		browserHistory.push(url);
 	}
 
