@@ -104,8 +104,8 @@ CREATE TABLE IF NOT EXISTS `HostPlaceListing` (
   `host_id` INT NOT NULL,
   `bookingtype_id` INT NOT NULL,
   `ask_amount` VARCHAR(8) NOT NULL,
-  `date_range_start` VARCHAR(30) NOT NULL,
-  `date_range_end` VARCHAR(30) NOT NULL,
+  `date_range_start` DATE NOT NULL,
+  `date_range_end` DATE NOT NULL,
   `booked_dates` VARCHAR(200),
   `response_time` VARCHAR(30),
   `active` VARCHAR(3) NOT NULL,
@@ -381,7 +381,8 @@ CREATE TABLE IF NOT EXISTS `Reservation` (
   `host_id` INT NOT NULL,
   `client_id` INT NOT NULL,
   `payment_type_id` INT NOT NULL,
-  `date_range` VARCHAR(45) NOT NULL,
+  `date_range_start` DATE NOT NULL,
+  `date_range_end` DATE NOT NULL,
   `amt_paid` VARCHAR(45) NOT NULL,
   `paid_date` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`reservation_id`))
@@ -450,7 +451,7 @@ INSERT INTO place (
 INSERT INTO hostplacelisting (
    place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end, active
 ) VALUE
-   (1, 1, 1, "80.00", "2016-12-30", "2017-01-02", "yes"),
+   (1, 1, 1, "80.00", "2016-12-30", "2017-01-25", "yes"),
    (2, 2, 2, "666.00", "2016-11-02", "2016-12-16", "yes"),
    (3, 3, 3, "89.99", "2016-11-01", "2016-12-16", "yes"),
    (4, 4, 4, "64.95", "2016-11-01", "2016-12-16", "yes"),
@@ -479,7 +480,7 @@ INSERT INTO UserLanguage (
 ;
 
 INSERT INTO Reservation (
-   place_id, host_id, client_id, payment_type_id, date_range, amt_paid, paid_date
+   place_id, host_id, client_id, payment_type_id, date_range_start, date_range_end, amt_paid, paid_date
 ) VALUES
-   (1, 1, 3, 3, "2016-12-02,2016-12-05", "278.00", "2016-11-26")
+   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26")
 ;
