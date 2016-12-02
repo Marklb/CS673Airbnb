@@ -34,6 +34,7 @@ export default class RoomPage extends React.Component {
 			room_title: "N/A",
 			description: "N/A",
 			cost_per_night: -1,//This is the same as ask_amount in hostplacelisting?
+			rating: -1,
 			max_people: -1,
 			bedroomsize: -1,
 			bathroomsize: -1,
@@ -73,6 +74,7 @@ export default class RoomPage extends React.Component {
 					host_name: 'default',
 					description: 'default',
 					cost_per_night: 'default',
+					rating: 'default',
 					max_people: 'default',
 					bedroomsize: 'default',
 					bathroomsize: 'default',
@@ -113,6 +115,29 @@ export default class RoomPage extends React.Component {
 		this.getRoomDetailsQuery(this.state.placeID);
 	}
 
+  componentDidMount() {
+    //----------------------------
+    // Disqus script start
+    //----------------------------
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+    var disqus_config = function () {
+    this.page.url = '//www.jeremyhoc.com/mokbnb';
+    this.page.identifier = 'mokbnb-room-${this.state.placeID}';
+    };
+
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = '//mokbnb-1.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    //----------------------------
+    // Disqus script end
+    //----------------------------
+  }
+
 	componentWillReceiveProps(nextProps) {
 		var new_p_id = nextProps.params.pidanddate.split("_")[0];
 		if (new_p_id !== this.state.placeID) {
@@ -132,6 +157,7 @@ export default class RoomPage extends React.Component {
 			'room_title': this.state.name,
 			'description': this.state.description,
 			'cost_per_night': this.state.cost_per_night,//This is the same as ask_amount in hostplacelisting?
+			'rating': this.state.rating,
 			'max_people': this.state.max_people,
 			'bedroomsize': this.state.bedroomsize,
 			'bathroomsize': this.state.bathroomsize,
@@ -256,6 +282,8 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				Cost per night : {this.state.result[0].cost_per_night}
 				<br></br>
+				Rating : {this.state.result[0].rating}/5
+				<br></br>
 				Max people : {this.state.result[0].max_people}
 				<br></br>
 				Number of bedroom : {this.state.result[0].bedroomsize}
@@ -282,15 +310,11 @@ export default class RoomPage extends React.Component {
 				Booking({this.state.result[0].bookingtype_name})
 				{this.renderBooking()}
 
-				{/*<ReactDisqusThread
-					//shortname="mokbnb"
-					shortname="example"
-					identifier="something-unique-12345"
-					//identifier={`mokbnb-room-${this.state.placeID}`}
-					title={`Reviews for ${this.state.result[0].name}`}
-					url="//www.jeremyhoc.com/mokbnb"
-					category_id={`${this.state.placeID}`}
-					onNewComment={console.log(this.text)}/>*/}
+
+				{/* Disqus example start */}
+				<div id="disqus_thread"></div>
+				<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+				{/* Disqus example end */}
 			</div>
 		);
 	}

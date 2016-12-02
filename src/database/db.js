@@ -289,6 +289,30 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
+	// Get User Trips
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getUserTrips",function(req,res){
+			var clientID = req.body.clientID;
+			//Returns place_id, room_name, pictures, booked_date_start, booked_date_end
+			var placeQuerySQL = "SELECT place_id, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
+			" NATURAL JOIN hostplacelisting"+
+			" NATURAL JOIN place"+
+			" WHERE client_id = " + clientID;
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+
+
+	/////////////////////////////////////////////////////////////////////////////
 	// Get information about one place
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/getRoomDetailsQuery",function(req,res){
@@ -427,17 +451,18 @@ var db = function(app){
 		var placeQuerySQL;
 		placeQuerySQL = "" +
 			"SELECT *" +
-			" FROM (SELECT placeamenity.place_id, placeamenity.amenity_id, A.name, A.pictures, A.bookingtype_id, A.roomtype_id, A.cost_per_night" +
-					" FROM (placeamenity " +
-					(amenity_id.length == 0 ? "NATURAL JOIN " : "JOIN ") +
-					"(SELECT place.place_id, place.name, amenity_id, place.pictures, hostplacelisting.bookingtype_id, place.roomtype_id, place.cost_per_night" +
-												" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id" +
-															" join userlanguage on place.host_id = userlanguage.user_id" +
-															" join placeamenity on place.place_id = placeamenity.place_id)" +
+			" FROM (SELECT placeamenity.amenity_id, A.place_id, A.name, A.pictures, A.bookingtype_id, A.rating, A.roomtype_id, A.cost_per_night" +
+					" FROM placeamenity " +
+					(amenity_id.length == 0 ? "RIGHT JOIN " : "JOIN ") +
+					"(SELECT place.place_id, place.name, amenity_id, pictures, hostplacelisting.bookingtype_id, hostplacelisting.rating, place.roomtype_id, place.cost_per_night" +
+												" FROM (place NATURAL JOIN hostplacelisting" +
+															" LEFT JOIN placeamenity on place.place_id = placeamenity.place_id" +
+                                                            " LEFT JOIN userlanguage on place.host_id = userlanguage.user_id)" +
 												" WHERE (addr_id IN (SELECT addr_id" +
 																	" FROM address" +
-																	" WHERE state='" + state + "')" +
-																		" AND cost_per_night BETWEEN " + (min_cost == -1 ? "0" : min_cost) + " AND " + (max_cost == -1 ? "1000" : max_cost) +
+																	" WHERE state = '" + state + "')" +
+																		" AND active = 'yes'" +
+                                                                        " AND cost_per_night BETWEEN " + (min_cost == -1 ? "0" : min_cost) + " AND " + (max_cost == -1 ? "1000" : max_cost) +
 																		" AND max_people >= " + (numofguest == -1 ? "0" : numofguest) +
 																		" AND bedroomsize >= " + (bedroomsize == -1 ? "0" : bedroomsize) +
 																		" AND bathroomsize >= " + (bathroomsize == -1 ? "0" : bathroomsize) +
@@ -450,8 +475,8 @@ var db = function(app){
 																			placeQuerySQL += " AND amenity_id IN (SELECT amenity_id" +
 																							" FROM Amenity" +
 																							" WHERE " + amenity_string + ")" +
-												" GROUP BY place.place_id) AS A" +
-							" on placeamenity.place_id = A.place_id)) AS B" +
+												" GROUP BY place.place_id) AS A " +
+							" on placeamenity.place_id = A.place_id) AS B" +
 					" WHERE B.amenity_id IN (SELECT amenity_id" +
 											" FROM Amenity" +
 											" WHERE " + amenity_string + ")" +
@@ -460,7 +485,7 @@ var db = function(app){
 			" FROM Amenity" +
 			" WHERE " + amenity_string + ")";
 																		} else {
-																			placeQuerySQL += ") AS A)) AS B" +
+																			placeQuerySQL += ") AS A ON placeamenity.place_id = A.place_id) AS B" +
 																							" GROUP BY B.place_id";
 																		}
 

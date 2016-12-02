@@ -25,6 +25,7 @@ export default class FilterForm extends React.Component {
 			date_start : 'N/A',
 			date_end : 'N/A',
 			numofguest: -1,
+			rating: -1,
 			min_cost : -1,
 			max_cost : -1,
 			bedroomsize: -1,
@@ -184,11 +185,11 @@ export default class FilterForm extends React.Component {
 		];
 	}
 
-	componentWillReceiveProps(nextProps) {		
+	componentWillReceiveProps(nextProps) {
 		let placeString =  nextProps.params.place;
 		let urlParams = this.props.location.query;
 
-		// You don't have to do this check first, but it can help prevent an unneeded render 
+		// You don't have to do this check first, but it can help prevent an unneeded render
 		if (placeString !== this.state.inputLocation) {
 			this.setState({
 				inputLocation: placeString,
@@ -391,6 +392,7 @@ export default class FilterForm extends React.Component {
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
+								Rating<input classname="r3" type="text" placeholder={`${val.rating}/5`}></input>
 							</div>
 						);
 					})}
@@ -462,6 +464,7 @@ export default class FilterForm extends React.Component {
 		console.log(this.state.date_start);
 		console.log(this.state.date_end);
 		console.log(this.state.numofguest);
+		console.log(this.state.rating);
 		console.log(this.state.min_cost);
 		console.log(this.state.max_cost);
 		console.log(this.state.bedroomsize);
