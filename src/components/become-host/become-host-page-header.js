@@ -4,28 +4,28 @@ import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
-require("./filter-form.scss");
-export default class FilterForm extends React.Component {
+import Dropzone from 'react-dropzone';
 
-	constructor(props) {
-		super(props);
+
+require("./become-host-page-header.scss");
+
+/*
+
+*/
+export default class BecomeHostMainPage extends React.Component {
+ constructor(props) {
+		 super(props)
+   
 
 		this.state = {
-			isFiltersVisible: false
-		};
-		console.log('this.props.params.place');
-		console.log(this.props.params.place);
-		console.log(this.props.location.query);
-		this.state = {
+			isFiltersVisible: false,
+			imageFiles: [],
 			inputLocation : this.props.params.place,
-			latitude: this.props.location.query.lat || 0,
-			longitude: this.props.location.query.lng || 0,
-			neighborhoods : [],
-			result : [],
+			//neighborhoods : [],
+			//result : [],
 			date_start : 'N/A',
 			date_end : 'N/A',
 			numofguest: -1,
-			rating: -1,
 			min_cost : -1,
 			max_cost : -1,
 			bedroomsize: -1,
@@ -178,30 +178,23 @@ export default class FilterForm extends React.Component {
 			16
 		];
 
-		this.rooms = [
+		/*this.rooms = [
 			{img: "/images/room1.jpg", title: "room1", price: "$100", roomType: "private"},
 			{img: "/images/room2.jpg", title: "room1", price: "$100", roomType: "private"},
 			{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
-		];
+		];*/
 	}
 
 	componentWillReceiveProps(nextProps) {
-		let placeString =  nextProps.params.place;
-		let urlParams = this.props.location.query;
-
-		// You don't have to do this check first, but it can help prevent an unneeded render
-		if (placeString !== this.state.inputLocation) {
-			this.setState({
-				inputLocation: placeString,
-				latitude: urlParams.lat || 0,
-				longitude: urlParams.lng || 0,
-			});
-			this.getNeighborQuery(placeString);
-			this.getPlaceQuery(placeString);
+	// You don't have to do this check first, but it can help prevent an unneeded render
+		if (nextProps.params.place !== this.state.inputLocation) {
+			this.setState({inputLocation: nextProps.params.place});
+			//this.getNeighborQuery(nextProps.params.place);
+			this.getPlaceQuery(nextProps.params.place);
 		}
 	}
 
-	getNeighborQuery(location) {
+	/*getNeighborQuery(location) {
 		$.post('/api/showneighbor', {
   			'city': location
   		}, (data, status) => {
@@ -212,30 +205,10 @@ export default class FilterForm extends React.Component {
 				this.setState({neighborhoods: data.neighborhoods});
 			}
   		});
-	}
+	}*/
 
-	getPlaceQuery(location) {
-		// $.post('/api/showplace', {
-		// 	'checkbox': this.state.checkbox,
-		// 	'state': location,
-		// 	'date_start': this.state.date_start,
-		// 	'date_end': this.state.date_end,
-		// 	'numofguest': this.state.numofguest,
-		// 	'min_cost': this.state.min_cost,
-		// 	'max_cost': this.state.max_cost,
-		// 	'bedroomsize': this.state.bedroomsize,
-		// 	'bathroomsize': this.state.bathroomsize,
-		// 	'numofbeds': this.state.numofbeds
-  	// 	}, (data, status) => {
-  	// 		if(data.query_success === false) {
-		// 		console.log('Show place Not Successful');
-		// 	} else {
-		// 		console.log('Show place is Successful');
-		// 		this.setState({result: data.result});
-		// 	}
-  	// 	});
-
-		$.post('/api/get_places', {
+	/*getPlaceQuery(location) {
+		$.post('/api/showplace', {
 			'checkbox': this.state.checkbox,
 			'state': location,
 			'date_start': this.state.date_start,
@@ -253,10 +226,10 @@ export default class FilterForm extends React.Component {
 				console.log('Show place is Successful');
 				this.setState({result: data.result});
 			}
-		});
-	}
+  		});
+	}*/
 
-	renderCheckBox(neighbor) {
+	/*renderCheckBox(neighbor) {
 		var rows = [];
 		for (var i=0; i < neighbor.length; i++) {
 			rows.push(<MyCheckBox street={neighbor[i].street} />);
@@ -268,12 +241,12 @@ export default class FilterForm extends React.Component {
 				{rows.length === 0 ? 'None' : rows}
 			</form>
 		);
-	}
+	}*/
 
-	renderResult(result) {
+	/*renderResult(result) {
 		var rows = [];
 		for (var i=0; i < result.length; i++) {
-			rows.push(<MyResult key={i} name={result[i].name} />);
+			rows.push(<MyResult name={result[i].name} />);
 		}
 		return (
 			<form className="f">
@@ -283,12 +256,16 @@ export default class FilterForm extends React.Component {
 				{this.renderPicture()}
 			</form>
 		);
-	}
+	}*/
 
 	render() {
+		let files = this.state.imageFiles;
+		console.log(files);
+		
 		return (
 			<div>
 				<div className="filter">
+
 					<form className="f">
 						Dates
 						<input name='date_start' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
@@ -304,7 +281,7 @@ export default class FilterForm extends React.Component {
 					<form className="f">
 						Room type
 						{this.state.checkbox.roomtype.map((val, i) => {
-							return <label key={i}><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
@@ -336,44 +313,70 @@ export default class FilterForm extends React.Component {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
+						
 					</form>
 
-					{this.renderCheckBox(this.state.neighborhoods)}
+					{/*{this.renderCheckBox(this.state.neighborhoods)}*/}
 
 					<form className="f">
 						Booking Type
 						{this.state.checkbox.bookingtype.map((val, i) => {
-							return <label key={i}><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
 					<form className="f">
 						Amenities
 						{this.state.checkbox.amenity.map((val, i) => {
-							return <label key={i}><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
 
 					<form className="f">
 						Host Language
 						{this.state.checkbox.hostlanguage.map((val, i) => {
-							return <label key={i}><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 					</form>
+					
+					 <form className='f' ref='joinForm' autoComplete='off'>
+						  <div>
+							<Dropzone onDrop={this.onDrop}>
+							  <div>Try dropping some files here, or click to select files to upload.</div>
+							</Dropzone>
+						  </div>
+					
+						{files.length > 0 ? <div>
+					<h2>Uploading {files.length} files...</h2>
+					<div>{files.map((file) => <img src={file.preview} /> )}</div>
+					</div> : null}
+					</form>
+					
+					<form className="f">
+						Discription:
+						<input type="text" name="discription"></input>
+					</form>
+					
+					<form className="f">
+						Name your place:
+						<input type="text" name="title"></input>
+					</form>
+					<button name='Save and exist' type="button" onClick={this.onClickApplyFilter.bind(this)}>Save and Exist</button>
 
-					<button name='apply_filter' type="button" onClick={this.onClickApplyFilter.bind(this)}>Apply Filter</button>
-
-					{this.renderResult(this.state.result)}
+					{/*{this.renderResult(this.state.result)}*/}
 
 
 
 				</div>
+				
+				
 			</div>
+			
 
 		);
 	}
 
-	renderPicture() {
+	/*renderPicture() {
 		return (
 			<div>
 				<div className="filterResult">
@@ -385,33 +388,25 @@ export default class FilterForm extends React.Component {
 
 					{this.state.result.map((val, i) => {
 						return (
-							<div key={i} className="f">
-								<img className="pic" src={val.pictures} onClick={this.onClickShowRoom.bind(this, i)} />
+							<form className="f">
+								<img src={val.pictures}  />
 								<br></br>
 								Title<input className="r1" type="text" placeholder={val.name}></input>
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-								Rating<input classname="r3" type="text" placeholder={`${val.rating}/5`}></input>
-							</div>
+							</form>
 						);
 					})}
 				</div>
 			</div>
 		);
-	}
+	}*/
 
 	onClickShowFilters(e){
 		let newState = this.state;
 		newState.isFiltersVisible = !newState.isFiltersVisible;
 		this.setState(newState);
-	}
-
-	onClickShowRoom(indx, e){
-		var place_id = this.state.result[indx].place_id;
-		console.log("place_id = " + place_id);
-		let url = `/roomdetail/${place_id}_${this.state.date_start}_${this.state.date_end}`;
-		browserHistory.push(url);
 	}
 
 	onChange(e){
@@ -421,11 +416,7 @@ export default class FilterForm extends React.Component {
 		console.log(e.target.value);
 
 		if (type !== "checkbox") {
-			if (name === "date_start") {
-				this.setState({date_start: val});
-			} else if (name === "date_end") {
-				this.setState({date_end: val});
-			} else if (name === "numofguest") {
+			if (name === "numofguest") {
 				this.setState({numofguest: val});
 			} else if (name === "bedroomsize") {
 				this.setState({bedroomsize: val});
@@ -433,10 +424,6 @@ export default class FilterForm extends React.Component {
 				this.setState({bathroomsize: val});
 			} else if (name === "numofbeds") {
 				this.setState({numofbeds: val});
-			} else if (name === "min_cost") {
-				this.setState({min_cost: val});
-			} else if (name === "max_cost") {
-				this.setState({max_cost: val});
 			}
 		} else {
 			var indx = e.target.value;
@@ -454,6 +441,10 @@ export default class FilterForm extends React.Component {
 			this.setState(newState);
 		}
 	}
+	onDrop(acceptedFiles, rejectedFiles) {
+      console.log('Accepted files: ', acceptedFiles);
+      console.log('Rejected files: ', rejectedFiles);
+    }
 
 	onClickApplyFilter() {
 		this.getPlaceQuery(this.state.inputLocation);
@@ -461,10 +452,7 @@ export default class FilterForm extends React.Component {
 		console.log(this.state.checkbox.bookingtype[0].checked);
 		console.log(this.state.checkbox.amenity[0].checked);
 		console.log(this.state.checkbox.hostlanguage[0].checked);
-		console.log(this.state.date_start);
-		console.log(this.state.date_end);
 		console.log(this.state.numofguest);
-		console.log(this.state.rating);
 		console.log(this.state.min_cost);
 		console.log(this.state.max_cost);
 		console.log(this.state.bedroomsize);
@@ -472,4 +460,6 @@ export default class FilterForm extends React.Component {
 		console.log(this.state.numofbeds);
 		console.log(this.state.checkbox.bookingtype);
 	}
-}
+
+
+};

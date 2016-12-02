@@ -1,4 +1,4 @@
--- -----------------------------------------------------
+﻿-- -----------------------------------------------------
 -- Schema mokbnb
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `mokbnb` ;
@@ -373,7 +373,7 @@ DROP TABLE IF EXISTS `PaymentType` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `PaymentType` (
   `payment_type_id` int(5) NOT NULL,
-  `payment_type_name` enum('Cash','Check','Credit Card','PayPal', 'Other') DEFAULT NULL,
+  `payment_type_name` enum('Cash','Check','Credit Card','PayPal','Other') DEFAULT NULL,
   PRIMARY KEY (`payment_type_id`))
 ENGINE=InnoDB;
 
@@ -396,7 +396,8 @@ INSERT INTO Users (
    email,password,first_name,last_name,gender,birth_date
 ) VALUES
    ('JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','1998-04-09'),
-   ('JamesBond@Agent.com', 'test', 'James', 'Bond', 'M','1992-08-16')
+   ('JamesBond@Agent.com', 'test', 'James', 'Bond', 'M','1992-08-16'),
+   ('JaneSmith@Book.com', 'test', 'Jane', 'Smith', 'F','1988-03-25')
 ;
 
 INSERT INTO address (
@@ -411,6 +412,12 @@ INSERT INTO address (
    "666 Haunted Terrace", "Newark", "New Jersey", "07032", "USA"
 );
 
+INSERT INTO address (
+   street, city, state, zip, country
+) VALUES (
+   "777 Lucky Place", "Harrison", "New Jersey", "07058", "USA"
+);
+
 INSERT INTO place (
    host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
 ) VALUES (
@@ -421,6 +428,12 @@ INSERT INTO place (
    host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
 ) VALUES (
    1, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"
+);
+
+INSERT INTO place (
+   host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
+) VALUES (
+   3, 3, 3, "My Third Housetel", "Welcome to earth.", 777.00, 5, 4, 4, 3, "/images/room3.jpg"
 );
 
 INSERT INTO hostplacelisting (
@@ -435,16 +448,23 @@ INSERT INTO hostplacelisting (
    2, 1, 2, "666.00", "2016-11-02", "2016-11-07"
 );
 
+INSERT INTO hostplacelisting (
+   place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end
+) VALUES (
+   3, 3, 3, "777.00", "2016-11-03", "2016-11-05"
+);
+
+
 INSERT INTO PlaceAmenity (
    place_id, amenity_id
 ) VALUES
    (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19), (1, 20), (1, 21), (1, 22), (1, 23), (1, 24), (1, 25), (1, 26), (1, 27), (1, 28), (1, 29), (1, 30),
-   (2, 20), (2, 21), (2, 22), (2, 23), (2, 24), (2, 25), (2, 27), (2, 28), (2, 29), (2, 30), (2, 31), (2, 32), (2, 33), (2, 34), (2, 35), (2, 36), (2, 37), (2, 38), (2, 39), (2, 40)
+   (2, 20), (2, 21), (2, 22), (2, 23), (2, 24), (2, 25), (2, 27), (2, 28), (2, 29), (2, 30), (2, 31), (2, 32), (2, 33), (2, 34), (2, 35), (2, 36), (2, 37), (2, 38), (2, 39), (2, 40), (3, 1), (3, 2), (3, 3)
 ;
 
 INSERT INTO UserLanguage (
   user_id, language_id
 ) VALUES
    (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13),
-   (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18), (2, 19)
+   (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18), (2, 19), (3, 1), (3, 2)
 ;

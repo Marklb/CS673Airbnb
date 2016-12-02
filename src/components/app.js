@@ -13,6 +13,8 @@ import UsersTrips from './users-trips/users-trips';
 import UsersEdit from './users-edit/users-edit';
 import UsersNotifications from './users-notifications/users-notifications';
 import FilterForm from './filter-form/filter-form';
+import BecomeHostMainPage from './become-host/become-host-page-header';
+import UserTrips from './users-trips/users-trips';
 import RoomPage from './room-page/room-page';
 // Javascript Modules
 import _ from 'lodash';
@@ -44,7 +46,9 @@ export default class App extends React.Component {
           <Route path='/users/edit' component={UsersEdit} />
           <Route path='/users/notifications' component={UsersNotifications} />
           <Route path='/s/:place' component={FilterForm} />
-		  <Route path='/roomdetail/:placeid' component={RoomPage} />
+		  <Route path='/roomdetail/:pidanddate' component={RoomPage} />
+		  <Route path='/become-host' component={BecomeHostMainPage} />
+		  <Route path='/trips' component={UserTrips} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

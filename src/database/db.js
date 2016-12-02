@@ -1,6 +1,13 @@
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
 
+/* For testing script start */
+Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
+	delete require.cache[require.resolve('./db-no-require-cache')];
+	return require('./db-no-require-cache');
+}});
+/* For testing script end */
+
 const TOKEN_SECRET = 'mkokbnbteam2project';
 
 var db = function(app){
@@ -278,6 +285,30 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
+	// Get User Trips
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getUserTrips",function(req,res){
+			var clientID = req.body.clientID;
+			//Returns place_id, room_name, pictures, booked_date_start, booked_date_end
+			var placeQuerySQL = "SELECT place_id, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
+			" NATURAL JOIN hostplacelisting"+
+			" NATURAL JOIN place"+
+			" WHERE client_id = " + clientID;
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+
+
+	/////////////////////////////////////////////////////////////////////////////
 	// Get information about one place
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/getRoomDetailsQuery",function(req,res){
@@ -310,6 +341,9 @@ var db = function(app){
 	/////////////////////////////////////////////////////////////////////////////
 	// Get place search information
 	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/get_places",function(req,res){
+		dbNoRequireCache.api_get_places(req,res,conn);
+	});
 	app.post("/api/showplace",function(req,res){
 		var state = req.body.state;
 		var date_start = req.body.date_start;
@@ -662,9 +696,9 @@ var db = function(app){
 					console.log(err);
 					res.json({'success': false});
 				}else{
-					let msgs = [];
-					for(let i = 0; i < rows.length; i++){
-						let row = rows[i];
+					var msgs = [];
+					for(var i = 0; i < rows.length; i++){
+						var row = rows[i];
 						msgs.push({
 							user_id: row.session_user_id,
 							message_id: row.message_id,
