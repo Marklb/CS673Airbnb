@@ -5,6 +5,8 @@ import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
 import Dropzone from 'react-dropzone';
+import ReactDOM from 'react-dom';
+
 
 
 require("./become-host-page-header.scss");
@@ -15,7 +17,7 @@ var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 export default class BecomeHostMainPage extends React.Component {
  constructor(props) {
 		 super(props)
-   
+
 
 		this.state = {
 			isFiltersVisible: false,
@@ -31,9 +33,15 @@ export default class BecomeHostMainPage extends React.Component {
 			bedroomsize: -1,
 			bathroomsize: -1,
 			numofbeds: -1,
+<<<<<<< HEAD
 			booktypeData: '',
 			response_time: 3,
 			
+=======
+      items: [1,2,3,4],
+
+
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 			checkbox : {
 				roomtype : [
 					{name : 'Entire home', checked : false},
@@ -113,8 +121,9 @@ export default class BecomeHostMainPage extends React.Component {
 					{name : 'Svenska', checked : false}
 				]
 			}
-		};
 
+		};
+    this.handleAdd = this.handleAdd.bind(this);
 		this.numofpeople = [
 			1,
 			2,
@@ -233,7 +242,7 @@ export default class BecomeHostMainPage extends React.Component {
   		});
 	}*/
 
-	
+
 
 	/*renderResult(result) {
 		var rows = [];
@@ -253,7 +262,18 @@ export default class BecomeHostMainPage extends React.Component {
 	render() {
 		let files = this.state.imageFiles;
 		console.log(files);
+<<<<<<< HEAD
 
+=======
+    var items = this.state.items.map(function(item, i) {
+         return (
+            <div key = {item} onClick = {this.handleRemove.bind(this, i)}>
+               {item}
+            </div>
+         );
+
+      }.bind(this));
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 		return (
 			<div>
 				<div className="filter">
@@ -306,7 +326,7 @@ export default class BecomeHostMainPage extends React.Component {
 						</div>
 					</form>
 
-					<form className="f">	
+					<form className="f">
 						How many bathrooms?
 						<div>
 						<select name='bathroomsize' onChange={this.onChange.bind(this)} className="sizeBath">
@@ -316,14 +336,14 @@ export default class BecomeHostMainPage extends React.Component {
 							})}
 						</select>
 						</div>
-						
+
 					</form>
 
-					
+
 
 					{/*{this.renderCheckBox(this.state.neighborhoods)}*/}
 
-					
+
 
 					<form className="f">
 						What amenities do you offer?
@@ -342,7 +362,7 @@ export default class BecomeHostMainPage extends React.Component {
 						})}
 						</div>
 					</form>
-					
+
 					 <form className='f' ref='joinForm' autoComplete='off'>
 						  Photos
 						  <div>
@@ -350,20 +370,20 @@ export default class BecomeHostMainPage extends React.Component {
 							  <div>Try dropping some files here, or click to select files to upload.</div>
 							</Dropzone>
 						  </div>
-					
+
 						{files.length > 0 ? <div>
 					<h2>Uploading {files.length} files...</h2>
 					<div>{files.map((file) => <img src={file.preview} /> )}</div>
 					</div> : null}
 					</form>
-					
+
 					<form className="f">
 						Discription:
 						<div>
 						<input type="text" name="discription"></input>
 						</div>
 					</form>
-					
+
 					<form className="f">
 						Name your place:
 						<div>
@@ -389,7 +409,27 @@ export default class BecomeHostMainPage extends React.Component {
 							{this.renderBookingTypeCode()}
 						</div>
 					</form>
+<<<<<<< HEAD
 					
+=======
+
+          <form className="f">
+          <div>
+             <ReactCSSTransitionGroup transitionName = "example"
+             transitionAppear = {true} transitionAppearTimeout = {500}
+                transitionEnter = {false} transitionLeave = {false}>
+
+            <div>PayExtras</div>
+             </ReactCSSTransitionGroup>
+          </div>
+          <button onClick = {this.handleAdd}>Add Item</button>
+
+          <ReactCSSTransitionGroup transitionName = "example"
+             transitionEnterTimeout = {500} transitionLeaveTimeout = {500}>
+             {items}
+          </ReactCSSTransitionGroup>
+					</form>
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 					<button name='Save and exit' type="button" onClick={this.onClickSave.bind(this)}>Save and Exit</button>
 
 					{/*{this.renderResult(this.state.result)}*/}
@@ -397,10 +437,10 @@ export default class BecomeHostMainPage extends React.Component {
 
 
 				</div>
-				
-				
+
+
 			</div>
-			
+
 
 		);
 	}
@@ -511,4 +551,21 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(this.state.checkbox.bookingtype);
 	}
 
+<<<<<<< HEAD
+=======
+	onClickBookType(event) {
+		console.log("HIT");
+		console.log(event.target.value);
+	}
+  handleAdd() {
+      var newItems = this.state.items.concat([prompt('Create New Item')]);
+      this.setState({items: newItems});
+   }
+   handleRemove(i) {
+      var newItems = this.state.items.slice();
+      newItems.splice(i, 1);
+      this.setState({items: newItems});
+   }
+
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 };
