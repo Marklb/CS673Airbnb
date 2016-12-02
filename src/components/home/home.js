@@ -24,64 +24,78 @@ export default class Home extends React.Component {
     };
   }
 
-  componentDidMount() {
-    //----------------------------
-    // Disqus script start
-    //----------------------------
-    /**
-    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-    var disqus_config = function () {
-    // this.page.url = 'mokbnb.com';  // Replace PAGE_URL with your page's canonical URL variable
-    this.page.identifier = '-=-=-example-page-1-=-=-'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-    };
-    
-    (function() { // DON'T EDIT BELOW THIS LINE
-    var d = document, s = d.createElement('script');
-    s.src = '//mokbnb-1.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
-    })();
-    //----------------------------
-    // Disqus script end
-    //----------------------------
-  }
-
   render() {
     return (
       <div>
         <center><h1>Live There</h1></center>
-        
-        {/* Disqus example start */}
-        <div id="disqus_thread"></div>
-        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        {/* Disqus example end */}
-
-        <div className="search-bar-wrapper">
-          <form className="search-form">
-
-            <div className="search-bar">
-              <div className="search-bar-icon"></div>
-              <input type="text" placeholder="Where to?"
-                autoComplete="off"
-                name="location"
-                id="header-search-form"
-                className="location"
-                onKeyPress={this.onKeyPressSearchInput.bind(this)}
-                />
-
-              <DateRangePicker
-                onDatesChange={this.onDatesChange.bind(this)}
-                onFocusChange={this.onFocusChange.bind(this)}
-                focusedInput={this.state.focusedInput}
-                startDate={this.state.startDate}
-                endDate={this.state.endDate}
-                />
-
-            </div>
-          </form>
-        </div>
-
+                Welcome to mokbnb, a 12-week project where a group of 4 graduate students going for Computer Science at NJIT learn to build a Javascript, ReactJS, and MySQL website. This website is a non-functional imitation of airbnb for educational purposes. We have currently achieved the following features listed below:
+                <ul>
+                <li>User</li>
+                        <li>Sign Up</li>
+                        <li>Login</li>
+                        <li>Verifications</li>
+                        <li>Dashboard Landing Page</li>
+                                <li>Notifications</li>
+                                <li>Messages (This will be one source for all messages)</li>
+                        <li>Your Trips</li>
+                        <li>Account</li>
+                                <li>Change details (e.g. email, password)</li>
+                                <li>Delete account</li>
+                                <li>Notification settings</li>
+                                <li>Payment methods</li>
+                                <li>Payout preferences</li>
+                                <li>Transaction history (As client, and as host, in one location)</li>
+                        <li>Profile</li>
+                                <li>Personal information</li>
+                <li>Search</li>
+                        <li>Filters</li>
+                                <li>Dates</li>
+                                <li># Guests</li>
+                                <li>Room type</li>
+                                <li>Price range</li>
+                                <li>Size</li>
+                                <li>Book Type</li>
+                                <li>Amenities</li>
+                                <li>Host Language</li>
+                        <li>List of rooms with basic info</li>
+                                <li>Picture of room</li>
+                                <li>Price</li>
+                                <li>Title</li>
+                                <li>Room type</li>
+                                <li>Ratings</li>
+                        <li>Map with markers as room locations</li>
+                <li>Room description page</li>
+                        <li>Photos</li>
+                        <li>Detailed description</li>
+                        <li>Menu to book the room as Instant Booking, Auction, User-Set Time Frame, or Host-Set Time Frame</li>
+                        <li>Reviews</li>
+                        <li>Location on map</li>
+                <li>Host</li>
+                        <li>Set Up a Listing (One large form)</li>
+                               <li>Type of Booking</li>
+                                       <li>Instant Booking</li>
+                                       <li>Auction a listing</li>
+                                       <li>User-Set Time-Frame Option</li>
+                                       <li>Host-Set Time-Frame Option</li>
+                                <li>Space type</li>
+                                        <li>Entire place</li>
+                                        <li>Private room</li>
+                                        <li>Shared room</li>
+                                <li>Details</li>
+                                        <li>Photos</li>
+                                        <li>Description</li>
+                                        <li>Amenities</li>
+                                        <li>Price</li>
+                                        <li>Availability</li>
+                                        <li>House rules</li>
+                                        <li>Paid Extras Options</li>
+                        <li>Manage Listings</li>
+                                <li>Your Listings</li>
+                                        <li>Edit Listing (Here we can adjust the listing
+                settings such as type of booking, space type, details, paid extras options)</li>
+                                <li>Your Reservations (List details such as plan for Check-In and Meet-In-Person options)</li>
+                                <li>Transaction History (Same page as above under User)</li>
+                </ul>
       </div>
     );
   }
