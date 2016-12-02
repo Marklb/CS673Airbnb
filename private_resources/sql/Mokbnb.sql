@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `HostPlaceListing` (
   `booked_dates` VARCHAR(200),
   `response_time` VARCHAR(30),
   `active` VARCHAR(3) NOT NULL,
+  `rating` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`place_id`, `host_id`))
 ENGINE = InnoDB;
 
@@ -132,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `Place` (
   `bedroomsize` INT NULL,
   `bathroomsize` NUMERIC(2,1) NULL,
   `numofbeds` INT NULL,
-  `pictures` VARCHAR(45) NULL,
+  `pictures` VARCHAR(4096) NULL,
   PRIMARY KEY (`place_id`))
 ENGINE = InnoDB;
 
@@ -381,8 +382,8 @@ CREATE TABLE IF NOT EXISTS `Reservation` (
   `host_id` INT NOT NULL,
   `client_id` INT NOT NULL,
   `payment_type_id` INT NOT NULL,
-  `date_range_start` DATE NOT NULL,
-  `date_range_end` DATE NOT NULL,
+  `booked_date_start` DATE NOT NULL,
+  `booked_date_end` DATE NOT NULL,
   `amt_paid` VARCHAR(45) NOT NULL,
   `paid_date` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`reservation_id`))
@@ -416,6 +417,43 @@ INSERT INTO `PaymentType` (`payment_type_id`, `payment_type_name`) VALUES
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
+-- Table `Ratings`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Ratings` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `Ratings` (
+  `place_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `rating` INT NOT NULL,
+  PRIMARY KEY (`place_id`,`user_id`))
+ENGINE=InnoDB;
+SHOW WARNINGS;
+
+DROP TRIGGER IF EXISTS `InsertThenUpdateAvgRatings`;
+CREATE TRIGGER InsertThenUpdateAvgRatings
+AFTER INSERT ON `Ratings`
+FOR EACH ROW
+
+UPDATE hostplacelisting
+SET rating = (SELECT AVG(rating)
+              FROM Ratings
+              WHERE place_id = NEW.place_id)
+WHERE place_id = NEW.place_id;
+
+DROP TRIGGER IF EXISTS `UpdateThenUpdateAvgRatings`;
+CREATE TRIGGER UpdateThenUpdateAvgRatings
+AFTER UPDATE ON `Ratings`
+FOR EACH ROW
+
+UPDATE hostplacelisting
+SET rating = (SELECT AVG(rating)
+              FROM Ratings
+              WHERE place_id = NEW.place_id)
+WHERE place_id = NEW.place_id;
+
+SHOW WARNINGS;
+-- -----------------------------------------------------
 -- Still to Do --- Table `CreditCard, Paypal, Check, Reviews, Comments, Public Q&A`
 -- -----------------------------------------------------
 
@@ -443,19 +481,19 @@ INSERT INTO place (
 ) VALUES
    (1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"),
    (2, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"),
-   (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", 120.00, 3, 1, 1.5, 2, "/images/room3.jpg"),
-   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 69.99, 3, 1, 1.5, 2, "/images/room4.jpg"),
+   (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", 89.99, 3, 1, 1.5, 2, "/images/room3.jpg"),
+   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 64.95, 3, 1, 1.5, 2, "/images/room4.jpg"),
    (1, 5, 1, "The Fifth Scene", "Five is the lucky number.", 200.00, 3, 1, 1.5, 2, "/images/room5.jpg")
 ;
 
 INSERT INTO hostplacelisting (
    place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end, active
 ) VALUE
-   (1, 1, 1, "80.00", "2016-12-30", "2017-01-25", "yes"),
-   (2, 2, 2, "666.00", "2016-11-02", "2016-12-16", "yes"),
+   (1, 1, 2, "80.00", "2016-12-30", "2017-01-25", "yes"),
+   (2, 2, 1, "666.00", "2016-11-02", "2016-12-16", "yes"),
    (3, 3, 3, "89.99", "2016-11-01", "2016-12-16", "yes"),
    (4, 4, 4, "64.95", "2016-11-01", "2016-12-16", "yes"),
-   (5, 1, 1, "200.00", "2016-12-30", "2017-01-02", "yes")
+   (5, 1, 2, "200.00", "2016-12-30", "2017-01-02", "yes")
 ;
 
 INSERT INTO auction (
@@ -463,6 +501,26 @@ INSERT INTO auction (
 ) VALUES
    (1, "80.00", "278.00", "278.00", "2016-11-24", "no"),
    (5, "200.00", "243.00", NULL, "2016-12-06", "yes")
+;
+
+INSERT INTO Ratings (
+ place_id, user_id, rating
+) VALUE
+   (1, 2, 5),
+   (1, 3, 4),
+   (1, 4, 3),
+   (2, 1, 2),
+   (2, 3, 1),
+   (2, 4, 2),
+   (3, 1, 3),
+   (3, 2, 4),
+   (3, 4, 5),
+   (4, 1, 4),
+   (4, 2, 3),
+   (4, 3, 2),
+   (5, 2, 1),
+   (5, 3, 2),
+   (5, 4, 3)
 ;
 
 INSERT INTO PlaceAmenity (
@@ -480,7 +538,25 @@ INSERT INTO UserLanguage (
 ;
 
 INSERT INTO Reservation (
-   place_id, host_id, client_id, payment_type_id, date_range_start, date_range_end, amt_paid, paid_date
+   place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date
 ) VALUES
-   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26")
+   (1, 1, 3, 3, "2016-06-02", "2016-06-05", "150.00", "2016-05-26"),
+   (1, 1, 2, 3, "2016-06-25", "2016-06-27", "105.00", "2016-06-20"),
+   (3, 3, 5, 3, "2016-07-07", "2016-07-10", "215.00", "2016-07-01"),
+   (4, 4, 5, 3, "2016-07-13", "2016-07-15", "197.00", "2016-07-10"),
+   (3, 3, 2, 3, "2016-07-17", "2016-07-20", "145.00", "2016-07-14"),
+   (1, 1, 3, 3, "2016-07-28", "2016-08-01", "165.00", "2016-07-20"),
+   (1, 1, 4, 3, "2016-08-02", "2016-08-10", "316.00", "2016-07-23"),
+   (5, 1, 4, 3, "2016-08-14", "2016-08-20", "290.00", "2016-08-10"),
+   (1, 1, 2, 3, "2016-08-22", "2016-08-25", "175.00", "2016-08-10"),
+   (2, 2, 3, 3, "2016-08-26", "2016-09-03", "223.00", "2016-08-19"),
+   (2, 2, 4, 3, "2016-09-15", "2016-09-17", "144.00", "2016-09-02"),
+   (2, 2, 5, 3, "2016-09-27", "2016-10-06", "173.00", "2016-09-10"),
+   (1, 1, 4, 3, "2016-10-07", "2016-10-15", "259.00", "2016-10-01"),
+   (1, 1, 2, 3, "2016-10-23", "2016-10-26", "193.00", "2016-10-18"),
+   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
+   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
+   (1, 1, 2, 2, "2016-12-06", "2016-12-08", "99.00", "2016-12-01"),
+   (2, 2, 1, 1, "2016-12-05", "2016-12-07", "666.00", "2016-12-01"),
+   (3, 3, 1, 3, "2016-12-07", "2016-12-09", "85.00", "2016-12-01")
 ;
