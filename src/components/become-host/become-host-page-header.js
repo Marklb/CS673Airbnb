@@ -25,13 +25,15 @@ export default class BecomeHostMainPage extends React.Component {
 			//result : [],
 			date_start : 'N/A',
 			date_end : 'N/A',
+			end_auction_time : 'N/A',
 			numofguest: -1,
-			min_cost : -1,
-			max_cost : -1,
+			cost : 100,
 			bedroomsize: -1,
 			bathroomsize: -1,
 			numofbeds: -1,
-
+			booktypeData: '',
+			response_time: 3,
+			
 			checkbox : {
 				roomtype : [
 					{name : 'Entire home', checked : false},
@@ -183,6 +185,7 @@ export default class BecomeHostMainPage extends React.Component {
 			{img: "/images/room2.jpg", title: "room1", price: "$100", roomType: "private"},
 			{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
 		];*/
+		this.onChange = this.onChange.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -194,6 +197,7 @@ export default class BecomeHostMainPage extends React.Component {
 		}
 	}
 
+	
 	/*getNeighborQuery(location) {
 		$.post('/api/showneighbor', {
   			'city': location
@@ -249,7 +253,7 @@ export default class BecomeHostMainPage extends React.Component {
 	render() {
 		let files = this.state.imageFiles;
 		console.log(files);
-		
+
 		return (
 			<div>
 				<div className="filter">
@@ -269,14 +273,6 @@ export default class BecomeHostMainPage extends React.Component {
 							return <label><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
 						</div>
-					</form>
-
-					<form className="f">
-						Price min
-						<input name='min_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
-						<br></br>
-						Price max
-						<input name='max_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
 					</form>
 
 					<form className="f">
@@ -384,13 +380,16 @@ export default class BecomeHostMainPage extends React.Component {
 
 					<form className="f">
 						Booking Type
-						<div onChange={this.onClickBookType.bind(this)}>
-						<input type="radio" value="Instant Book" name="bookType"/> Instant Book
-						<input type="radio" value="Auction" name="bookType"/> Auction
-						<input type="radio" value="User-Set Time Frame" name="bookType"/> User-Set Time Frame
-						<input type="radio" value="Host-Set Time Frame" name="bookType"/> Host-Set Time Frame
+						<div onChange = {this.onChange}>
+							<input type="radio" name="bookType" onChange={this.onChange} value="Instant Book"/> Instant Book<br/>
+							<input type="radio" name="bookType" onChange={this.onChange} value="Auction"/> Auction<br/>
+							<input type="radio" name="bookType" onChange={this.onChange} value="User-Set Time Frame"/> User-Set Time Frame<br/>
+							<input type="radio" name="bookType" onChange={this.onChange} value="Host-Set Time Frame"/> Host-Set Time Frame<br/>
+							<p id="bookingType">{this.state.booktypeData}</p>
+							{this.renderBookingTypeCode()}
 						</div>
 					</form>
+					
 					<button name='Save and exit' type="button" onClick={this.onClickSave.bind(this)}>Save and Exit</button>
 
 					{/*{this.renderResult(this.state.result)}*/}
@@ -406,31 +405,34 @@ export default class BecomeHostMainPage extends React.Component {
 		);
 	}
 
-	renderInstantBook() {
-		return (
-			<div>
-				<div className="filterResult">
-					<div>
-						<div onClick={this.onClickShowFilters.bind(this)}>filters</div>
-					</div>
-
-					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
-
-					{this.state.result.map((val, i) => {
-						return (
-							<form className="f">
-								<img src={val.pictures}  />
-								<br></br>
-								Title<input className="r1" type="text" placeholder={val.name}></input>
-								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
-								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
-								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-							</form>
-						);
-					})}
+		renderBookingTypeCode() {
+		if (this.state.booktypeData == "Instant Book") {
+			return (
+				<div>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
 				</div>
-			</div>
-		);
+				)
+		} else if (this.state.booktypeData == "Auction") {
+			return (
+				<div>
+					Starting Bid: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
+					Auction End Date<input name='end_auction_time' type="date" defaultValue={this.state.end_auction_time} onChange={this.onChange.bind(this)}></input>
+				</div>
+				)
+		} else if (this.state.booktypeData == "User-Set Time Frame") {
+			return (
+				<div>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
+				</div>
+				)
+		} else if (this.state.booktypeData == "Host-Set Time Frame") {
+			return (
+				<div>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
+					How long will you need to response to user requests? : <b>{this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" onChange={this.onChange.bind(this)}></input>
+				</div>
+				)
+		}
 	}
 
 	onClickShowFilters(e){
@@ -438,7 +440,7 @@ export default class BecomeHostMainPage extends React.Component {
 		newState.isFiltersVisible = !newState.isFiltersVisible;
 		this.setState(newState);
 	}
-
+	
 	onChange(e){
 		var name = e.target.name;
 		var val = e.target.value;
@@ -446,6 +448,18 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(e.target.value);
 
 		if (type !== "checkbox") {
+			if (name === "bookType") {
+				console.log("bookType");
+				if (val === "Instant Book") {
+					this.setState({booktypeData: e.target.value});
+				} else if (val === "Auction") {
+					this.setState({booktypeData: e.target.value});
+				} else if (val === "User-Set Time Frame") {
+					this.setState({booktypeData: e.target.value});
+				} else if (val === "Host-Set Time Frame") {
+					this.setState({booktypeData: e.target.value});
+				}
+			}
 			if (name === "numofguest") {
 				this.setState({numofguest: val});
 			} else if (name === "bedroomsize") {
@@ -454,7 +468,13 @@ export default class BecomeHostMainPage extends React.Component {
 				this.setState({bathroomsize: val});
 			} else if (name === "numofbeds") {
 				this.setState({numofbeds: val});
-			}
+			} else if (name === "cost") {
+				this.setState({cost: val});
+			} else if (name === "response_time") {
+				this.setState({response_time: val});
+			} else if (name === "end_auction_time") {
+				this.setState({end_auction_time: val});
+			} 
 		} else {
 			var indx = e.target.value;
 			var checked = e.target.checked;
@@ -489,11 +509,6 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(this.state.bathroomsize);
 		console.log(this.state.numofbeds);
 		console.log(this.state.checkbox.bookingtype);
-	}
-
-	onClickBookType(event) {
-		console.log("HIT");
-		console.log(event.target.value);
 	}
 
 };
