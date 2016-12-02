@@ -285,6 +285,30 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
+	// Get User Trips
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getUserTrips",function(req,res){
+			var clientID = req.body.clientID;
+			//Returns place_id, room_name, pictures, booked_date_start, booked_date_end
+			var placeQuerySQL = "SELECT place_id, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
+			" NATURAL JOIN hostplacelisting"+
+			" NATURAL JOIN place"+
+			" WHERE client_id = " + clientID;
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+	
+	
+	/////////////////////////////////////////////////////////////////////////////
 	// Get information about one place
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/getRoomDetailsQuery",function(req,res){

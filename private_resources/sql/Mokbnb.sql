@@ -381,8 +381,8 @@ CREATE TABLE IF NOT EXISTS `Reservation` (
   `host_id` INT NOT NULL,
   `client_id` INT NOT NULL,
   `payment_type_id` INT NOT NULL,
-  `date_range_start` DATE NOT NULL,
-  `date_range_end` DATE NOT NULL,
+  `booked_date_start` DATE NOT NULL,
+  `booked_date_end` DATE NOT NULL,
   `amt_paid` VARCHAR(45) NOT NULL,
   `paid_date` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`reservation_id`))
@@ -451,11 +451,11 @@ INSERT INTO place (
 INSERT INTO hostplacelisting (
    place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end, active
 ) VALUE
-   (1, 1, 1, "80.00", "2016-12-30", "2017-01-25", "yes"),
-   (2, 2, 2, "666.00", "2016-11-02", "2016-12-16", "yes"),
+   (1, 1, 2, "80.00", "2016-12-30", "2017-01-25", "yes"),
+   (2, 2, 1, "666.00", "2016-11-02", "2016-12-16", "yes"),
    (3, 3, 3, "89.99", "2016-11-01", "2016-12-16", "yes"),
    (4, 4, 4, "64.95", "2016-11-01", "2016-12-16", "yes"),
-   (5, 1, 1, "200.00", "2016-12-30", "2017-01-02", "yes")
+   (5, 1, 2, "200.00", "2016-12-30", "2017-01-02", "yes")
 ;
 
 INSERT INTO auction (
@@ -480,7 +480,10 @@ INSERT INTO UserLanguage (
 ;
 
 INSERT INTO Reservation (
-   place_id, host_id, client_id, payment_type_id, date_range_start, date_range_end, amt_paid, paid_date
+   place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date
 ) VALUES
-   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26")
+   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
+   (1, 1, 2, 2, "2016-12-06", "2016-12-08", "99.00", "2016-12-01"),
+   (2, 2, 1, 1, "2016-12-05", "2016-12-07", "666.00", "2016-12-01"),
+   (3, 3, 1, 3, "2016-12-07", "2016-12-09", "85.00", "2016-12-01")
 ;
