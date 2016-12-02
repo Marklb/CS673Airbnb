@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `HostPlaceListing` (
   `booked_dates` VARCHAR(200),
   `response_time` VARCHAR(30),
   `active` VARCHAR(3) NOT NULL,
+  `rating` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`place_id`, `host_id`))
 ENGINE = InnoDB;
 
@@ -415,6 +416,43 @@ INSERT INTO `PaymentType` (`payment_type_id`, `payment_type_name`) VALUES
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
+-- Table `Ratings`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Ratings` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `Ratings` (
+  `place_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `rating` INT NOT NULL,
+  PRIMARY KEY (`place_id`,`user_id`))
+ENGINE=InnoDB;
+SHOW WARNINGS;
+
+DROP TRIGGER IF EXISTS `InsertThenUpdateAvgRatings`;
+CREATE TRIGGER InsertThenUpdateAvgRatings
+AFTER INSERT ON `Ratings`
+FOR EACH ROW
+
+UPDATE hostplacelisting
+SET rating = (SELECT AVG(rating)
+              FROM Ratings
+              WHERE place_id = NEW.place_id)
+WHERE place_id = NEW.place_id;
+
+DROP TRIGGER IF EXISTS `UpdateThenUpdateAvgRatings`;
+CREATE TRIGGER UpdateThenUpdateAvgRatings
+AFTER UPDATE ON `Ratings`
+FOR EACH ROW
+
+UPDATE hostplacelisting
+SET rating = (SELECT AVG(rating)
+              FROM Ratings
+              WHERE place_id = NEW.place_id)
+WHERE place_id = NEW.place_id;
+
+SHOW WARNINGS;
+-- -----------------------------------------------------
 -- Still to Do --- Table `CreditCard, Paypal, Check, Reviews, Comments, Public Q&A`
 -- -----------------------------------------------------
 
@@ -442,8 +480,8 @@ INSERT INTO place (
 ) VALUES
    (1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"),
    (2, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"),
-   (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", 120.00, 3, 1, 1.5, 2, "/images/room3.jpg"),
-   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 69.99, 3, 1, 1.5, 2, "/images/room4.jpg"),
+   (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", 89.99, 3, 1, 1.5, 2, "/images/room3.jpg"),
+   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 64.95, 3, 1, 1.5, 2, "/images/room4.jpg"),
    (1, 5, 1, "The Fifth Scene", "Five is the lucky number.", 200.00, 3, 1, 1.5, 2, "/images/room5.jpg")
 ;
 
@@ -462,6 +500,26 @@ INSERT INTO auction (
 ) VALUES
    (1, "80.00", "278.00", "278.00", "2016-11-24", "no"),
    (5, "200.00", "243.00", NULL, "2016-12-06", "yes")
+;
+
+INSERT INTO Ratings (
+ place_id, user_id, rating
+) VALUE
+   (1, 2, 5),
+   (1, 3, 4),
+   (1, 4, 3),
+   (2, 1, 2),
+   (2, 3, 1),
+   (2, 4, 2),
+   (3, 1, 3),
+   (3, 2, 4),
+   (3, 4, 5),
+   (4, 1, 4),
+   (4, 2, 3),
+   (4, 3, 2),
+   (5, 2, 1),
+   (5, 3, 2),
+   (5, 4, 3)
 ;
 
 INSERT INTO PlaceAmenity (

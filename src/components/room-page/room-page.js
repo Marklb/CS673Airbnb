@@ -29,6 +29,7 @@ export default class RoomPage extends React.Component {
 			room_title: "N/A",
 			description: "N/A",
 			cost_per_night: -1,//This is the same as ask_amount in hostplacelisting?
+			rating: -1,
 			max_people: -1,
 			bedroomsize: -1,
 			bathroomsize: -1,
@@ -68,6 +69,7 @@ export default class RoomPage extends React.Component {
 					host_name: 'default',
 					description: 'default',
 					cost_per_night: 'default',
+					rating: 'default',
 					max_people: 'default',
 					bedroomsize: 'default',
 					bathroomsize: 'default',
@@ -126,6 +128,7 @@ export default class RoomPage extends React.Component {
 			'room_title': this.state.name,
 			'description': this.state.description,
 			'cost_per_night': this.state.cost_per_night,//This is the same as ask_amount in hostplacelisting?
+			'rating': this.state.rating,
 			'max_people': this.state.max_people,
 			'bedroomsize': this.state.bedroomsize,
 			'bathroomsize': this.state.bathroomsize,
@@ -248,6 +251,8 @@ export default class RoomPage extends React.Component {
 				Description : {this.state.result[0].description}
 				<br></br>
 				Cost per night : {this.state.result[0].cost_per_night}
+				<br></br>
+				Rating : {this.state.result[0].rating}/5
 				<br></br>
 				Max people : {this.state.result[0].max_people}
 				<br></br>
