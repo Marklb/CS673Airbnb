@@ -6,7 +6,8 @@ import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
 import Dropzone from 'react-dropzone';
 import ReactDOM from 'react-dom';
-import UserSessionHandler from '../../user-session-handler';
+
+
 
 require("./become-host-page-header.scss");
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
@@ -14,10 +15,6 @@ var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 */
 export default class BecomeHostMainPage extends React.Component {
-  static contextTypes = {
-	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired  
-  };
-  
  constructor(props) {
 		 super(props)
 
@@ -36,11 +33,15 @@ export default class BecomeHostMainPage extends React.Component {
 			bedroomsize: -1,
 			bathroomsize: -1,
 			numofbeds: -1,
+<<<<<<< HEAD
 			booktypeData: '',
 			response_time: 3,
-			host_id: -1, 
-			items: [1,2,3,4],
+			
+=======
+      items: [1,2,3,4],
 
+
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 			checkbox : {
 				roomtype : [
 					{name : 'Entire home', checked : false},
@@ -196,17 +197,6 @@ export default class BecomeHostMainPage extends React.Component {
 		this.onChange = this.onChange.bind(this);
 	}
 
-	componentDidMount() {
-	  $.get('/api/getUserInfo', {
-		authType: this.context.userSessionHandler.getAuthType(),
-		authToken: this.context.userSessionHandler.getAuthToken()
-	}, (data, status) => {
-		console.log("data:" + data);
-		console.log("host_id:" + data.host_id);
-		this.state.host_id = data.host_id;
-	});
-  }
-  
 	componentWillReceiveProps(nextProps) {
 	// You don't have to do this check first, but it can help prevent an unneeded render
 		if (nextProps.params.place !== this.state.inputLocation) {
@@ -272,7 +262,9 @@ export default class BecomeHostMainPage extends React.Component {
 	render() {
 		let files = this.state.imageFiles;
 		console.log(files);
+<<<<<<< HEAD
 
+=======
     var items = this.state.items.map(function(item, i) {
          return (
             <div key = {item} onClick = {this.handleRemove.bind(this, i)}>
@@ -281,7 +273,7 @@ export default class BecomeHostMainPage extends React.Component {
          );
 
       }.bind(this));
-	  
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 		return (
 			<div>
 				<div className="filter">
@@ -417,22 +409,27 @@ export default class BecomeHostMainPage extends React.Component {
 							{this.renderBookingTypeCode()}
 						</div>
 					</form>
+<<<<<<< HEAD
+					
+=======
+
           <form className="f">
           <div>
              <ReactCSSTransitionGroup transitionName = "example"
              transitionAppear = {true} transitionAppearTimeout = {500}
                 transitionEnter = {false} transitionLeave = {false}>
 
-            <div>Paid Extras</div>
+            <div>PayExtras</div>
              </ReactCSSTransitionGroup>
           </div>
-          <button onClick = {this.handleAdd}>Add Extra Service/Product</button>
+          <button onClick = {this.handleAdd}>Add Item</button>
 
           <ReactCSSTransitionGroup transitionName = "example"
              transitionEnterTimeout = {500} transitionLeaveTimeout = {500}>
              {items}
           </ReactCSSTransitionGroup>
 					</form>
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 					<button name='Save and exit' type="button" onClick={this.onClickSave.bind(this)}>Save and Exit</button>
 
 					{/*{this.renderResult(this.state.result)}*/}
@@ -452,27 +449,27 @@ export default class BecomeHostMainPage extends React.Component {
 		if (this.state.booktypeData == "Instant Book") {
 			return (
 				<div>
-					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
 				</div>
 				)
 		} else if (this.state.booktypeData == "Auction") {
 			return (
 				<div>
-					Starting Bid: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
+					Starting Bid: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
 					Auction End Date<input name='end_auction_time' type="date" defaultValue={this.state.end_auction_time} onChange={this.onChange.bind(this)}></input>
 				</div>
 				)
 		} else if (this.state.booktypeData == "User-Set Time Frame") {
 			return (
 				<div>
-					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
 				</div>
 				)
 		} else if (this.state.booktypeData == "Host-Set Time Frame") {
 			return (
 				<div>
-					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
-					How long will you need to response to user requests? : <b>{this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
+					How long will you need to response to user requests? : <b>{this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" onChange={this.onChange.bind(this)}></input>
 				</div>
 				)
 		}
@@ -539,28 +536,8 @@ export default class BecomeHostMainPage extends React.Component {
       console.log('Rejected files: ', rejectedFiles);
     }
 
-	/*insertNewPlace() {
-		$.post('/api/insertNewPlace', {
-			'bedroomsize': this.state.bedroomsize,
-			'bathroomsize': this.state.bathroomsize,
-			'numofbeds': this.state.numofbeds
-			'host_id' : this.state.host_id,
-			'room_name': this.state.room_name, 
-			'pictures': this.state.pictures, 
-			'booked_date_start': this.state.booked_date_start, 
-			'booked_date_end': this.state.booked_date_end
-		}, (data, status) => {
-			if(data.query_success === false) {
-				console.log('Trip details query not successful');
-			} else {
-				console.log('Trip details query successful');
-				this.setState({result: data.result});
-			}
-		});
-	}*/
-	
 	onClickSave() {
-		this.insertNewPlace();
+		this.getPlaceQuery(this.state.inputLocation);
 		console.log(this.state.checkbox.roomtype[0].checked);
 		console.log(this.state.checkbox.bookingtype[0].checked);
 		console.log(this.state.checkbox.amenity[0].checked);
@@ -574,6 +551,8 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(this.state.checkbox.bookingtype);
 	}
 
+<<<<<<< HEAD
+=======
 	onClickBookType(event) {
 		console.log("HIT");
 		console.log(event.target.value);
@@ -588,4 +567,5 @@ export default class BecomeHostMainPage extends React.Component {
       this.setState({items: newItems});
    }
 
+>>>>>>> 6eab9ffbffaa7c71b50dc604b7e0140490b2b469
 };
