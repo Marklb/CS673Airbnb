@@ -1,0 +1,73 @@
+@import "../../common.scss";
+
+
+.maps-demo {
+  background-color: rgba(190,190,190,1);
+  border: 1px solid rgba(10,10,10,1);
+  border-left: 0;
+  border-right: 0;
+  padding: 5px;
+  // @include center-block;
+  // width: 800px;
+  text-align: center;
+
+  > div {
+    margin: 0px 2px 0px 2px;
+  }
+}
+
+
+
+.google-maps-location-selector-example {
+  background-color: rgba(210,210,210,1);
+  border: 1px solid rgba(30,30,30,1);
+  border-radius: 1px;
+  display: inline-block;
+
+  > .header {
+    background-color: rgba(130,140,210,1);
+    text-align: center;
+    padding: 2px;
+    color: rgba(230,230,230,1);
+  }
+
+  > .body {
+    padding: 4px;
+  }
+}
+
+.google-maps-search-places-example {
+  background-color: rgba(210,210,210,1);
+  border: 1px solid rgba(30,30,30,1);
+  border-radius: 1px;
+  display: inline-block;
+
+  > .header {
+    background-color: rgba(130,140,210,1);
+    text-align: center;
+    padding: 2px;
+    color: rgba(230,230,230,1);
+  }
+
+  > .body {
+    padding: 4px;
+  }
+}
+
+.google-maps-single-place-example {
+  background-color: rgba(210,210,210,1);
+  border: 1px solid rgba(30,30,30,1);
+  border-radius: 1px;
+  display: inline-block;
+
+  > .header {
+    background-color: rgba(130,140,210,1);
+    text-align: center;
+    padding: 2px;
+    color: rgba(230,230,230,1);
+  }
+
+  > .body {
+    padding: 4px;
+  }
+}
