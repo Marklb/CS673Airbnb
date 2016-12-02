@@ -12,6 +12,7 @@ import UsersRooms from './users-rooms/users-rooms';
 import UsersTrips from './users-trips/users-trips';
 import UsersEdit from './users-edit/users-edit';
 import UsersNotifications from './users-notifications/users-notifications';
+import TransactionHistory from './transaction-history';
 import FilterForm from './filter-form/filter-form';
 import BecomeHostMainPage from './become-host/become-host-page-header';
 import RoomPage from './room-page/room-page';
@@ -44,9 +45,10 @@ export default class App extends React.Component {
           <Route path='/trips/current' component={UsersTrips} />
           <Route path='/users/edit' component={UsersEdit} />
           <Route path='/users/notifications' component={UsersNotifications} />
+          <Route path='/users/transaction_history/:user_id' component={TransactionHistory} />
           <Route path='/s/:place' component={FilterForm} />
-		  <Route path='/roomdetail/:pidanddate' component={RoomPage} />
-		  <Route path='/become-host' component={BecomeHostMainPage} />
+    		  <Route path='/roomdetail/:pidanddate' component={RoomPage} />
+    		  <Route path='/become-host' component={BecomeHostMainPage} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

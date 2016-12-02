@@ -48,10 +48,13 @@ export default class PhotosAndVideo extends React.Component {
       $.get('/api/get_user_profile_image_url', {
         userId: data.user_id
       }, (data2, status2) => {
-        this.setState({
-          userId: data.user_id, 
-          profilePhotoPreviewUrl: data2.data.profile_pic
-        });
+        let newState = {
+          userId: data.user_id,
+        };
+        if(data2.data.profile_pic && data2.data.profile_pic.trim() != ''){
+          newState.profilePhotoPreviewUrl = data2.data.profile_pic;
+        }
+        this.setState(newState);
       });
     });
   }

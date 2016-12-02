@@ -243,9 +243,10 @@ export default class RoomPage extends React.Component {
 	}
 
 	render() {
+    this.ref.roomElem
 		return (
 			<div className="roompage">
-				<h1>Room { this.state.placeID } display page</h1>
+				<h1 ref="roomElem">Room { this.state.placeID } display page</h1>
 				<br></br>
 				<img src={this.state.result[0].pictures} />
 				<br></br>
@@ -281,7 +282,7 @@ export default class RoomPage extends React.Component {
 				Booking({this.state.result[0].bookingtype_name})
 				{this.renderBooking()}
 
-				<ReactDisqusThread
+				{/*<ReactDisqusThread
 					//shortname="mokbnb"
 					shortname="example"
 					identifier="something-unique-12345"
@@ -289,7 +290,7 @@ export default class RoomPage extends React.Component {
 					title={`Reviews for ${this.state.result[0].name}`}
 					url="//www.jeremyhoc.com/mokbnb"
 					category_id={`${this.state.placeID}`}
-					onNewComment={console.log(this.text)}/>
+					onNewComment={console.log(this.text)}/>*/}
 			</div>
 		);
 	}

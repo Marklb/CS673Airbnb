@@ -6,6 +6,9 @@ import _ from 'lodash';
 
 // React Components
 import {DateRangePicker} from 'react-dates';
+import MapsDemo from '../google-components/maps-demo';
+import ListingImageUploaderDemo from '../listing-image-uploader/listing-image-uploader-demo';
+
 
 require("./home.scss");
 require("../top-header/top-header.scss");
@@ -20,7 +23,7 @@ export default class Home extends React.Component {
     this.state = {
       focusedInput: null,
       startDate: null,
-      endDate: null,
+      endDate: null
     };
   }
 
@@ -35,28 +38,41 @@ export default class Home extends React.Component {
     // this.page.url = 'mokbnb.com';  // Replace PAGE_URL with your page's canonical URL variable
     this.page.identifier = '-=-=-example-page-1-=-=-'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
-    
-    (function() { // DON'T EDIT BELOW THIS LINE
-    var d = document, s = d.createElement('script');
-    s.src = '//mokbnb-1.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
-    })();
+
+    // (function() { // DON'T EDIT BELOW THIS LINE
+    // var d = document, s = d.createElement('script');
+    // s.src = '//mokbnb-1.disqus.com/embed.js';
+    // s.setAttribute('data-timestamp', +new Date());
+    // (d.head || d.body).appendChild(s);
+    // })();
     //----------------------------
     // Disqus script end
     //----------------------------
   }
 
+  
+
+
+
+
   render() {
+
     return (
       <div>
         <center><h1>Live There</h1></center>
-        
+
+        <MapsDemo />
+
+        <br/><br/>
+
+        <ListingImageUploaderDemo />
+
         {/* Disqus example start */}
         <div id="disqus_thread"></div>
         <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
         {/* Disqus example end */}
 
+        {/*
         <div className="search-bar-wrapper">
           <form className="search-form">
 
@@ -81,6 +97,7 @@ export default class Home extends React.Component {
             </div>
           </form>
         </div>
+        */}
 
       </div>
     );

@@ -1,7 +1,7 @@
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
 
-/* For testing script start */ 
+/* For testing script start */
 Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
 	delete require.cache[require.resolve('./db-no-require-cache')];
 	return require('./db-no-require-cache');
@@ -10,10 +10,10 @@ Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
 
 const TOKEN_SECRET = 'mkokbnbteam2project';
 
+var mysql      = require('mysql');
 var db = function(app){
 	console.log('Loading db');
 
-	var mysql      = require('mysql');
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
@@ -48,7 +48,8 @@ var db = function(app){
 				if(rows.length > 0){
 					res.json({
 						'veri_success': true,
-						'first_name': rows[0].first_name
+						'first_name': rows[0].first_name,
+						'user_id': rows[0].user_id
 					});
 				}else{
 					res.json({'veri_success': false});
@@ -89,6 +90,7 @@ var db = function(app){
 						if (err) console.log(err);
 							res.json({
 								'veri_success': true,
+								'user_id': user_id,
 								'first_name': rows[0].first_name,
 								'auth_type': 'mokbnb',
 								'auth_token': auth_token
@@ -164,6 +166,7 @@ var db = function(app){
 
   							res.json({
   								'insert_success': true,
+									'user_id': row[0].user_id,
   								'first_name': row[0].first_name,
   								'auth_type': req.body.auth_type,
   								'auth_token': auth_token
@@ -220,6 +223,7 @@ var db = function(app){
 
   							res.json({
   								'insert_success': true,
+									'user_id': row[0].user_id,
   								'first_name': row[0].first_name,
   								'auth_type': 'mokbnb',
   								'auth_token': auth_token
@@ -780,6 +784,74 @@ var db = function(app){
 				}
 			});
 
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Upload place picture
+	/////////////////////////////////////////////////////////////////////////////
+	app.post('/api/upload_place_image', function(req, res){
+		var authToken = req.body.authToken;
+		var authType = req.body.authType;
+		var imgData = req.body.imgData;
+		var place_id = req.body.place_id;
+
+		var match = imgData.match(/^data:image\/(png|gif|jpeg);base64,(.+)$/);
+		var fileExt = match[1];
+		var base64Data = match[2];
+
+		var uploadedImgsDir = __dirname+'/../../public/images/uploaded_images';
+		var userProfilePicsDir = uploadedImgsDir+'/place_pictures';
+
+		// Generate random string
+		var crypto = require('crypto');
+		var seed = crypto.randomBytes(20);
+		var uniqueStr = crypto.createHash('sha1').update(seed).digest('hex');
+
+		var fname = `${uniqueStr}.${fileExt}`;
+
+		var buffer = new Buffer(base64Data, 'base64');
+
+		var filePathFull = userProfilePicsDir+'/'+fname;
+		fs.writeFile(filePathFull,buffer,(err) => {
+			if(err) throw 'Error: Could not write user profile picture file';
+		});
+
+
+		var query_str = `
+		UPDATE Place
+		SET pictures = CONCAT_WS(',',?,pictures)
+		WHERE host_id = (SELECT user_id FROM UserSession
+										WHERE auth_type = ? AND session_auth_id = ?)
+				AND
+					place_id = ?
+
+		`;
+
+		var placePicUrl = `/images/uploaded_images/place_pictures/${fname}`;
+		// console.log(placePicUrl);
+
+		var inserts = [placePicUrl, authType, authToken, place_id];
+		query_str = mysql.format(query_str, inserts);
+		// console.log(query_str);
+
+		conn.query(query_str, function(err, rows, fields) {
+			if(err){
+				console.log(err);
+				res.json({'success': false});
+			}else{
+				res.json({'success': true});
+			}
+		});
+
+
+
+	});
+
+  /////////////////////////////////////////////////////////////////////////////
+	// Get user reservations
+	/////////////////////////////////////////////////////////////////////////////
+	app.get("/api/get_user_reservations",function(req,res){
+    dbNoRequireCache.api_get_user_reservations(req,res,conn);
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
