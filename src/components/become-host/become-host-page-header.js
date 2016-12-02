@@ -8,7 +8,7 @@ import Dropzone from 'react-dropzone';
 
 
 require("./become-host-page-header.scss");
-
+var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 /*
 
 */
@@ -229,19 +229,7 @@ export default class BecomeHostMainPage extends React.Component {
   		});
 	}*/
 
-	/*renderCheckBox(neighbor) {
-		var rows = [];
-		for (var i=0; i < neighbor.length; i++) {
-			rows.push(<MyCheckBox street={neighbor[i].street} />);
-		}
-		return (
-			<form className="f">
-				Neighborhoods
-				<br></br>
-				{rows.length === 0 ? 'None' : rows}
-			</form>
-		);
-	}*/
+	
 
 	/*renderResult(result) {
 		var rows = [];
@@ -267,22 +255,20 @@ export default class BecomeHostMainPage extends React.Component {
 				<div className="filter">
 
 					<form className="f">
-						Dates
+						Update your calendar
+						<div>
 						<input name='date_start' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
 						<input name='date_end' onChange={this.onChange.bind(this)} className="t" type="date"></input>
-						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
-							<option>Number of guest</option>
-							{this.numofpeople.map((val, i) => {
-								return <option key={i}>{val}</option>;
-							})}
-						</select>
+						</div>
 					</form>
 
 					<form className="f">
-						Room type
+						What kind of place are you listing?
+						<div>
 						{this.state.checkbox.roomtype.map((val, i) => {
 							return <label><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
+						</div>
 					</form>
 
 					<form className="f">
@@ -294,52 +280,75 @@ export default class BecomeHostMainPage extends React.Component {
 					</form>
 
 					<form className="f">
-						Size
+						How many guests can your place accommodate?
+						<div>
 						<select name='bedroomsize' onChange={this.onChange.bind(this)} className="sizeBedRoom">
 							<option>Bedrooms</option>
 							{this.bedroomsize.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
-						<select name='bathroomsize' onChange={this.onChange.bind(this)} className="sizeBath">
-							<option>Bathrooms</option>
-							{this.bathroomsize.map((val, i) => {
-								return <option key={i}>{val}</option>;
-							})}
-						</select>
+
 						<select name='numofbeds' onChange={this.onChange.bind(this)} className="sizeBed">
 							<option>Beds</option>
 							{this.numofbeds.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
+						</div>
+					</form>
+
+					<form className="f">
+						How many guests can stay?
+						<div>
+						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
+							<option>Number of guest</option>
+							{this.numofpeople.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
+						</select>
+						</div>
+					</form>
+
+					<form className="f">	
+						How many bathrooms?
+						<div>
+						<select name='bathroomsize' onChange={this.onChange.bind(this)} className="sizeBath">
+							<option>Bathrooms</option>
+							{this.bathroomsize.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
+						</select>
+						</div>
 						
 					</form>
 
+					
+
 					{/*{this.renderCheckBox(this.state.neighborhoods)}*/}
 
-					<form className="f">
-						Booking Type
-						{this.state.checkbox.bookingtype.map((val, i) => {
-							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
-						})}
-					</form>
+					
 
 					<form className="f">
-						Amenities
+						What amenities do you offer?
+						<div>
 						{this.state.checkbox.amenity.map((val, i) => {
 							return <label><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
+						</div>
 					</form>
 
 					<form className="f">
-						Host Language
+						What Language do you use?
+						<div>
 						{this.state.checkbox.hostlanguage.map((val, i) => {
 							return <label><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
+						</div>
 					</form>
 					
 					 <form className='f' ref='joinForm' autoComplete='off'>
+						  Photos
 						  <div>
 							<Dropzone onDrop={this.onDrop}>
 							  <div>Try dropping some files here, or click to select files to upload.</div>
@@ -354,14 +363,35 @@ export default class BecomeHostMainPage extends React.Component {
 					
 					<form className="f">
 						Discription:
+						<div>
 						<input type="text" name="discription"></input>
+						</div>
 					</form>
 					
 					<form className="f">
 						Name your place:
+						<div>
 						<input type="text" name="title"></input>
+						</div>
 					</form>
-					<button name='Save and exist' type="button" onClick={this.onClickApplyFilter.bind(this)}>Save and Exist</button>
+
+					{/*<form className="f">
+						Booking Type
+						{this.state.checkbox.bookingtype.map((val, i) => {
+							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						})}
+					</form>*/}
+
+					<form className="f">
+						Booking Type
+						<div onChange={this.onClickBookType.bind(this)}>
+						<input type="radio" value="Instant Book" name="bookType"/> Instant Book
+						<input type="radio" value="Auction" name="bookType"/> Auction
+						<input type="radio" value="User-Set Time Frame" name="bookType"/> User-Set Time Frame
+						<input type="radio" value="Host-Set Time Frame" name="bookType"/> Host-Set Time Frame
+						</div>
+					</form>
+					<button name='Save and exit' type="button" onClick={this.onClickSave.bind(this)}>Save and Exit</button>
 
 					{/*{this.renderResult(this.state.result)}*/}
 
@@ -376,7 +406,7 @@ export default class BecomeHostMainPage extends React.Component {
 		);
 	}
 
-	/*renderPicture() {
+	renderInstantBook() {
 		return (
 			<div>
 				<div className="filterResult">
@@ -401,7 +431,7 @@ export default class BecomeHostMainPage extends React.Component {
 				</div>
 			</div>
 		);
-	}*/
+	}
 
 	onClickShowFilters(e){
 		let newState = this.state;
@@ -446,7 +476,7 @@ export default class BecomeHostMainPage extends React.Component {
       console.log('Rejected files: ', rejectedFiles);
     }
 
-	onClickApplyFilter() {
+	onClickSave() {
 		this.getPlaceQuery(this.state.inputLocation);
 		console.log(this.state.checkbox.roomtype[0].checked);
 		console.log(this.state.checkbox.bookingtype[0].checked);
@@ -461,5 +491,9 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(this.state.checkbox.bookingtype);
 	}
 
+	onClickBookType(event) {
+		console.log("HIT");
+		console.log(event.target.value);
+	}
 
 };
