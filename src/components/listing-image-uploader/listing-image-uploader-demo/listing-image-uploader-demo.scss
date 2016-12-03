@@ -1,0 +1,11 @@
+@import "../../common.scss";
+
+.listing-image-uploader-demo {
+  width: 800px;
+  margin: 0 auto;
+
+  > button {
+    margin-top: 10px;
+    padding: 5px;
+  }
+}

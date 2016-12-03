@@ -1,7 +1,7 @@
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
 
-/* For testing script start */ 
+/* For testing script start */
 Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
 	delete require.cache[require.resolve('./db-no-require-cache')];
 	return require('./db-no-require-cache');
@@ -10,14 +10,14 @@ Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
 
 const TOKEN_SECRET = 'mkokbnbteam2project';
 
+var mysql      = require('mysql');
 var db = function(app){
 	console.log('Loading db');
 
-	var mysql      = require('mysql');
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '9993kuo',
+		password : '',
 		database : 'mokbnb'
 	});
 
@@ -48,7 +48,8 @@ var db = function(app){
 				if(rows.length > 0){
 					res.json({
 						'veri_success': true,
-						'first_name': rows[0].first_name
+						'first_name': rows[0].first_name,
+						'user_id': rows[0].user_id
 					});
 				}else{
 					res.json({'veri_success': false});
@@ -89,6 +90,7 @@ var db = function(app){
 						if (err) console.log(err);
 							res.json({
 								'veri_success': true,
+								'user_id': user_id,
 								'first_name': rows[0].first_name,
 								'auth_type': 'mokbnb',
 								'auth_token': auth_token
@@ -164,6 +166,7 @@ var db = function(app){
 
   							res.json({
   								'insert_success': true,
+									'user_id': row[0].user_id,
   								'first_name': row[0].first_name,
   								'auth_type': req.body.auth_type,
   								'auth_token': auth_token
@@ -220,6 +223,7 @@ var db = function(app){
 
   							res.json({
   								'insert_success': true,
+									'user_id': row[0].user_id,
   								'first_name': row[0].first_name,
   								'auth_type': 'mokbnb',
   								'auth_token': auth_token
@@ -283,6 +287,30 @@ var db = function(app){
 			}
 		});
 	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Get User Trips
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getUserTrips",function(req,res){
+			var clientID = req.body.clientID;
+			//Returns place_id, room_name, pictures, booked_date_start, booked_date_end
+			var placeQuerySQL = "SELECT place_id, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
+			" NATURAL JOIN hostplacelisting"+
+			" NATURAL JOIN place"+
+			" WHERE client_id = " + clientID;
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Get information about one place
@@ -423,17 +451,18 @@ var db = function(app){
 		var placeQuerySQL;
 		placeQuerySQL = "" +
 			"SELECT *" +
-			" FROM (SELECT placeamenity.place_id, placeamenity.amenity_id, A.name, A.pictures, A.bookingtype_id, A.roomtype_id, A.cost_per_night" +
-					" FROM (placeamenity " +
-					(amenity_id.length == 0 ? "NATURAL JOIN " : "JOIN ") +
-					"(SELECT place.place_id, place.name, amenity_id, place.pictures, hostplacelisting.bookingtype_id, place.roomtype_id, place.cost_per_night" +
-												" FROM (place join hostplacelisting on place.place_id = hostplacelisting.place_id" +
-															" join userlanguage on place.host_id = userlanguage.user_id" +
-															" join placeamenity on place.place_id = placeamenity.place_id)" +
+			" FROM (SELECT placeamenity.amenity_id, A.place_id, A.name, A.pictures, A.bookingtype_id, A.rating, A.roomtype_id, A.cost_per_night" +
+					" FROM placeamenity " +
+					(amenity_id.length == 0 ? "RIGHT JOIN " : "JOIN ") +
+					"(SELECT place.place_id, place.name, amenity_id, pictures, hostplacelisting.bookingtype_id, hostplacelisting.rating, place.roomtype_id, place.cost_per_night" +
+												" FROM (place NATURAL JOIN hostplacelisting" +
+															" LEFT JOIN placeamenity on place.place_id = placeamenity.place_id" +
+                                                            " LEFT JOIN userlanguage on place.host_id = userlanguage.user_id)" +
 												" WHERE (addr_id IN (SELECT addr_id" +
 																	" FROM address" +
-																	" WHERE state='" + state + "')" +
-																		" AND cost_per_night BETWEEN " + (min_cost == -1 ? "0" : min_cost) + " AND " + (max_cost == -1 ? "1000" : max_cost) +
+																	" WHERE state = '" + state + "')" +
+																		" AND active = 'yes'" +
+                                                                        " AND cost_per_night BETWEEN " + (min_cost == -1 ? "0" : min_cost) + " AND " + (max_cost == -1 ? "1000" : max_cost) +
 																		" AND max_people >= " + (numofguest == -1 ? "0" : numofguest) +
 																		" AND bedroomsize >= " + (bedroomsize == -1 ? "0" : bedroomsize) +
 																		" AND bathroomsize >= " + (bathroomsize == -1 ? "0" : bathroomsize) +
@@ -446,8 +475,8 @@ var db = function(app){
 																			placeQuerySQL += " AND amenity_id IN (SELECT amenity_id" +
 																							" FROM Amenity" +
 																							" WHERE " + amenity_string + ")" +
-												" GROUP BY place.place_id) AS A" +
-							" on placeamenity.place_id = A.place_id)) AS B" +
+												" GROUP BY place.place_id) AS A " +
+							" on placeamenity.place_id = A.place_id) AS B" +
 					" WHERE B.amenity_id IN (SELECT amenity_id" +
 											" FROM Amenity" +
 											" WHERE " + amenity_string + ")" +
@@ -456,7 +485,7 @@ var db = function(app){
 			" FROM Amenity" +
 			" WHERE " + amenity_string + ")";
 																		} else {
-																			placeQuerySQL += ") AS A)) AS B" +
+																			placeQuerySQL += ") AS A ON placeamenity.place_id = A.place_id) AS B" +
 																							" GROUP BY B.place_id";
 																		}
 
@@ -780,6 +809,74 @@ var db = function(app){
 				}
 			});
 
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Upload place picture
+	/////////////////////////////////////////////////////////////////////////////
+	app.post('/api/upload_place_image', function(req, res){
+		var authToken = req.body.authToken;
+		var authType = req.body.authType;
+		var imgData = req.body.imgData;
+		var place_id = req.body.place_id;
+
+		var match = imgData.match(/^data:image\/(png|gif|jpeg);base64,(.+)$/);
+		var fileExt = match[1];
+		var base64Data = match[2];
+
+		var uploadedImgsDir = __dirname+'/../../public/images/uploaded_images';
+		var userProfilePicsDir = uploadedImgsDir+'/place_pictures';
+
+		// Generate random string
+		var crypto = require('crypto');
+		var seed = crypto.randomBytes(20);
+		var uniqueStr = crypto.createHash('sha1').update(seed).digest('hex');
+
+		var fname = `${uniqueStr}.${fileExt}`;
+
+		var buffer = new Buffer(base64Data, 'base64');
+
+		var filePathFull = userProfilePicsDir+'/'+fname;
+		fs.writeFile(filePathFull,buffer,(err) => {
+			if(err) throw 'Error: Could not write user profile picture file';
+		});
+
+
+		var query_str = `
+		UPDATE Place
+		SET pictures = CONCAT_WS(',',?,pictures)
+		WHERE host_id = (SELECT user_id FROM UserSession
+										WHERE auth_type = ? AND session_auth_id = ?)
+				AND
+					place_id = ?
+
+		`;
+
+		var placePicUrl = `/images/uploaded_images/place_pictures/${fname}`;
+		// console.log(placePicUrl);
+
+		var inserts = [placePicUrl, authType, authToken, place_id];
+		query_str = mysql.format(query_str, inserts);
+		// console.log(query_str);
+
+		conn.query(query_str, function(err, rows, fields) {
+			if(err){
+				console.log(err);
+				res.json({'success': false});
+			}else{
+				res.json({'success': true});
+			}
+		});
+
+
+
+	});
+
+  /////////////////////////////////////////////////////////////////////////////
+	// Get user reservations
+	/////////////////////////////////////////////////////////////////////////////
+	app.get("/api/get_user_reservations",function(req,res){
+    dbNoRequireCache.api_get_user_reservations(req,res,conn);
 	});
 
 	/////////////////////////////////////////////////////////////////////////////

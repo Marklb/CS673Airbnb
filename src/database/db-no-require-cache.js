@@ -1,4 +1,4 @@
-var mysql      = require('mysql');
+var mysql = require('mysql');
 
 module.exports.api_get_places = function(req,res,conn){
   var state = req.body.state;
@@ -47,7 +47,7 @@ module.exports.api_get_places = function(req,res,conn){
   var query_str =  `
   SELECT *
   FROM Place AS P NATURAL JOIN HostPlaceListing AS HPL NATURAL JOIN Address AS A
-  WHERE 
+  WHERE
       P.addr_id IN (SELECT A1.addr_id
                       FROM Address AS A1
                       WHERE A1.state = ? /* state */)
@@ -58,14 +58,14 @@ module.exports.api_get_places = function(req,res,conn){
       AND
         (SELECT COUNT(*)
         FROM Reservation AS R1
-        WHERE 
+        WHERE
             P.place_id = R1.place_id
           AND
             ((R1.booked_date_start BETWEEN ? /* date_start */ AND ? /* date_end */)
               OR
             (R1.booked_date_end BETWEEN ? /* date_start */ AND ? /* date_end */))) <= 0
     `;
-    var inserts = [state, date_start, date_end, date_start, date_end, 
+    var inserts = [state, date_start, date_end, date_start, date_end,
                    date_start, date_end];
     query_str = mysql.format(query_str, inserts);
 
@@ -81,14 +81,14 @@ module.exports.api_get_places = function(req,res,conn){
       var inserts = [numofguest];
       query_str = mysql.format(query_str, inserts);
     }
-    
+
     //-------------------------------
-    // Cost 
+    // Cost
     //-------------------------------
 
     if(min_cost && max_cost && min_cost >= 0 && max_cost >= 0 && min_cost <= max_cost){
       query_str += `
-        AND 
+        AND
           P.cost_per_night BETWEEN ? /* min_cost */ AND ? /* max_cost */
       `;
       var inserts = [min_cost, max_cost];
@@ -101,7 +101,7 @@ module.exports.api_get_places = function(req,res,conn){
 
     if(bedroomsize && bedroomsize >= 0){
       query_str += `
-        AND 
+        AND
           P.bedroomsize >= ? /* bedroomsize */
       `;
       var inserts = [bedroomsize];
@@ -109,7 +109,7 @@ module.exports.api_get_places = function(req,res,conn){
     }
 
     //-------------------------------
-    // Bathroom size 
+    // Bathroom size
     //-------------------------------
 
     if(bathroomsize && bathroomsize >= 0){
@@ -237,7 +237,7 @@ module.exports.api_get_places = function(req,res,conn){
     amenity_id_list = amenity_id_list.filter(function(val, i){
       return val !== undefined;
     });
-    
+
     if(amenity_id_list && amenity_id_list.length > 0){
       query_str += `
         AND
@@ -317,3 +317,37 @@ module.exports.api_get_places = function(req,res,conn){
     });
 
 };
+
+module.exports.api_get_user_reservations = function(req,res,conn){
+  // console.log('/api/get_user_reservations');
+  var authToken = req.query.authToken;
+  var authType = req.query.authType;
+
+  var query_str = `
+  SELECT *
+  FROM Reservation
+  WHERE host_id = (SELECT user_id
+                   FROM UserSession
+                   WHERE auth_type = ? AND session_auth_id = ?)
+
+  `;
+
+  conn.query(query_str,
+    [authType, authToken],
+    function (err, rows, fields) {
+      if (err) {
+        console.log(err);
+        res.json({ 'success': false });
+      } else {
+        console.log(rows);
+        var reservations = [];
+        for (var i = 0; i < rows.length; i++) {
+          var reservations = reservations[i];
+          msgs.push({
+
+          });
+        }
+        res.json({ 'success': true, msgs: msgs });
+      }
+    });
+}

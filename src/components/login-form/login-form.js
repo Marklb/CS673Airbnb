@@ -177,6 +177,7 @@ export default class LoginForm extends React.Component {
           isLoggedIn: true,
           authType: data.auth_type,
           response: {
+            user_id: data.user_id,
             firstName: data.first_name,
             authToken: data.auth_token
           }
@@ -219,6 +220,7 @@ export default class LoginForm extends React.Component {
           isLoggedIn: true,
           authType: data.auth_type,
           response: {
+            user_id: data.user_id,
             firstName: data.first_name,
             authToken: data.auth_token
           }
@@ -295,6 +297,7 @@ export default class LoginForm extends React.Component {
             isLoggedIn: true,
             authType: data.auth_type,
             response: {
+              user_id: data.user_id,
               firstName: data.first_name,
               authToken: data.auth_token
             }

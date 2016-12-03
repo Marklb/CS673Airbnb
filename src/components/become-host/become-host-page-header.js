@@ -5,17 +5,20 @@ import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
 import Dropzone from 'react-dropzone';
-
+import ReactDOM from 'react-dom';
+import UserSessionHandler from '../../user-session-handler';
 
 require("./become-host-page-header.scss");
-
 /*
 
 */
 export default class BecomeHostMainPage extends React.Component {
+  static contextTypes = {
+	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired  
+  };
+  
  constructor(props) {
 		 super(props)
-   
 
 		this.state = {
 			isFiltersVisible: false,
@@ -25,13 +28,23 @@ export default class BecomeHostMainPage extends React.Component {
 			//result : [],
 			date_start : 'N/A',
 			date_end : 'N/A',
+			end_auction_time : 'N/A',
 			numofguest: -1,
-			min_cost : -1,
-			max_cost : -1,
+			cost : 100,
 			bedroomsize: -1,
 			bathroomsize: -1,
 			numofbeds: -1,
-
+			booktypeData: '',
+			response_time: 3,
+			host_id: -1, 
+			paidExtras:
+			[
+				{
+					name: 'Grocery Shopping',
+					cost: 20.00
+				}
+			],
+			
 			checkbox : {
 				roomtype : [
 					{name : 'Entire home', checked : false},
@@ -111,8 +124,8 @@ export default class BecomeHostMainPage extends React.Component {
 					{name : 'Svenska', checked : false}
 				]
 			}
-		};
 
+		};
 		this.numofpeople = [
 			1,
 			2,
@@ -183,8 +196,23 @@ export default class BecomeHostMainPage extends React.Component {
 			{img: "/images/room2.jpg", title: "room1", price: "$100", roomType: "private"},
 			{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
 		];*/
+		this.onChange = this.onChange.bind(this);
+		this.addPaidExtra = this.addPaidExtra.bind(this);
+		this.removePaidExtra = this.removePaidExtra.bind(this);
+		this.renderPaidExtras = this.renderPaidExtras.bind(this);
 	}
 
+	componentDidMount() {
+	  $.get('/api/getUserInfo', {
+		authType: this.context.userSessionHandler.getAuthType(),
+		authToken: this.context.userSessionHandler.getAuthToken()
+	}, (data, status) => {
+		console.log("data:" + data);
+		console.log("host_id:" + data.user_id);
+		this.state.host_id = data.user_id;
+	});
+  }
+  
 	componentWillReceiveProps(nextProps) {
 	// You don't have to do this check first, but it can help prevent an unneeded render
 		if (nextProps.params.place !== this.state.inputLocation) {
@@ -194,6 +222,7 @@ export default class BecomeHostMainPage extends React.Component {
 		}
 	}
 
+	
 	/*getNeighborQuery(location) {
 		$.post('/api/showneighbor', {
   			'city': location
@@ -229,19 +258,7 @@ export default class BecomeHostMainPage extends React.Component {
   		});
 	}*/
 
-	/*renderCheckBox(neighbor) {
-		var rows = [];
-		for (var i=0; i < neighbor.length; i++) {
-			rows.push(<MyCheckBox street={neighbor[i].street} />);
-		}
-		return (
-			<form className="f">
-				Neighborhoods
-				<br></br>
-				{rows.length === 0 ? 'None' : rows}
-			</form>
-		);
-	}*/
+
 
 	/*renderResult(result) {
 		var rows = [];
@@ -261,154 +278,236 @@ export default class BecomeHostMainPage extends React.Component {
 	render() {
 		let files = this.state.imageFiles;
 		console.log(files);
-		
+	  
 		return (
 			<div>
 				<div className="filter">
 
 					<form className="f">
-						Dates
+						Update your calendar
+						<div>
 						<input name='date_start' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
 						<input name='date_end' onChange={this.onChange.bind(this)} className="t" type="date"></input>
-						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
-							<option>Number of guest</option>
-							{this.numofpeople.map((val, i) => {
-								return <option key={i}>{val}</option>;
-							})}
-						</select>
+						</div>
 					</form>
 
 					<form className="f">
-						Room type
+						What kind of place are you listing?
+						<div>
 						{this.state.checkbox.roomtype.map((val, i) => {
 							return <label><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
+						</div>
 					</form>
 
 					<form className="f">
-						Price min
-						<input name='min_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
-						<br></br>
-						Price max
-						<input name='max_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
-					</form>
-
-					<form className="f">
-						Size
+						How many guests can your place accommodate?
+						<div>
 						<select name='bedroomsize' onChange={this.onChange.bind(this)} className="sizeBedRoom">
 							<option>Bedrooms</option>
 							{this.bedroomsize.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
-						<select name='bathroomsize' onChange={this.onChange.bind(this)} className="sizeBath">
-							<option>Bathrooms</option>
-							{this.bathroomsize.map((val, i) => {
-								return <option key={i}>{val}</option>;
-							})}
-						</select>
+
 						<select name='numofbeds' onChange={this.onChange.bind(this)} className="sizeBed">
 							<option>Beds</option>
 							{this.numofbeds.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
 						</select>
-						
+						</div>
 					</form>
+
+					<form className="f">
+						How many guests can stay?
+						<div>
+						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
+							<option>Number of guest</option>
+							{this.numofpeople.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
+						</select>
+						</div>
+					</form>
+
+					<form className="f">
+						How many bathrooms?
+						<div>
+						<select name='bathroomsize' onChange={this.onChange.bind(this)} className="sizeBath">
+							<option>Bathrooms</option>
+							{this.bathroomsize.map((val, i) => {
+								return <option key={i}>{val}</option>;
+							})}
+						</select>
+						</div>
+
+					</form>
+
+
 
 					{/*{this.renderCheckBox(this.state.neighborhoods)}*/}
 
-					<form className="f">
-						Booking Type
-						{this.state.checkbox.bookingtype.map((val, i) => {
-							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
-						})}
-					</form>
+
 
 					<form className="f">
-						Amenities
+						What amenities do you offer?
+						<div>
 						{this.state.checkbox.amenity.map((val, i) => {
 							return <label><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
+						</div>
 					</form>
 
 					<form className="f">
-						Host Language
+						What Language do you use?
+						<div>
 						{this.state.checkbox.hostlanguage.map((val, i) => {
 							return <label><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
+						</div>
 					</form>
-					
+
 					 <form className='f' ref='joinForm' autoComplete='off'>
+						  Photos
 						  <div>
 							<Dropzone onDrop={this.onDrop}>
 							  <div>Try dropping some files here, or click to select files to upload.</div>
 							</Dropzone>
 						  </div>
-					
+
 						{files.length > 0 ? <div>
 					<h2>Uploading {files.length} files...</h2>
 					<div>{files.map((file) => <img src={file.preview} /> )}</div>
 					</div> : null}
 					</form>
-					
+
 					<form className="f">
 						Discription:
+						<div>
 						<input type="text" name="discription"></input>
+						</div>
 					</form>
-					
+
 					<form className="f">
 						Name your place:
+						<div>
 						<input type="text" name="title"></input>
+						</div>
 					</form>
-					<button name='Save and exist' type="button" onClick={this.onClickApplyFilter.bind(this)}>Save and Exist</button>
 
+					{/*<form className="f">
+						Booking Type
+						{this.state.checkbox.bookingtype.map((val, i) => {
+							return <label><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						})}
+					</form>*/}
+
+					<form className="f">
+						Booking Type
+						<div onChange = {this.onChange}>
+							<input type="radio" name="bookType" onChange={this.onChange} value="Instant Book"/> Instant Book<br/>
+							<input type="radio" name="bookType" onChange={this.onChange} value="Auction"/> Auction<br/>
+							<input type="radio" name="bookType" onChange={this.onChange} value="User-Set Time Frame"/> User-Set Time Frame<br/>
+							<input type="radio" name="bookType" onChange={this.onChange} value="Host-Set Time Frame"/> Host-Set Time Frame<br/>
+							<p id="bookingType">{this.state.booktypeData}</p>
+							{this.renderBookingTypeCode()}
+						</div>
+					</form>
+				  <form className="f">
+					  <div>
+						<h2>Paid Extras</h2>
+					<button onClick={this.addPaidExtra}>
+						Add Paid Extra
+						</button>
+						<div id="adjust-import-data-rows">
+							{this.renderPaidExtras}
+						</div>
+					</div>
+					</form>
+					<button name='Save and exit' type="button" onClick={this.onClickSave.bind(this)}>Save and Exit</button>
+					
 					{/*{this.renderResult(this.state.result)}*/}
-
-
-
 				</div>
-				
-				
 			</div>
-			
-
 		);
 	}
+	
+	addPaidExtra() {
+        return (
+           <tr>
+             <td>
+               Paid Extra: 
+             </td>
+             <td>
+               Name <input type="text" name="paidExtraName" />
+             </td>
+             <td>
+               Cost <input type="text" name="paidExtraCost" />
+             </td>
+             <td>
+               <button className="btn btn-danger" onClick={this.removePaidExtra.bind(null, this.state.paidExtras.index)} > Remove </button>
+             </td>
+           </tr>           
+        );
+    }
+	
+	removePaidExtra(index) {
+        var paidExtras = this.state.paidExtras;
+        paidExtras.splice(index,1);
+        this.setState({paidExtras:paidExtras});
+    }
+	
+	renderPaidExtras() {
+       var fields = this.state.paidExtras.map((operation,index) =>{
+		   return (<addPaidExtra key={index} index={index} removePaidExtra={this.removePaidExtra(this)} />);
+		   });
 
-	/*renderPicture() {
-		return (
-			<div>
-				<div className="filterResult">
-					<div>
-						<div onClick={this.onClickShowFilters.bind(this)}>filters</div>
-					</div>
-
-					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
-
-					{this.state.result.map((val, i) => {
-						return (
-							<form className="f">
-								<img src={val.pictures}  />
-								<br></br>
-								Title<input className="r1" type="text" placeholder={val.name}></input>
-								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
-								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
-								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-							</form>
-						);
-					})}
+       return (
+           <table>
+             <tbody>
+              {fields}
+             </tbody>
+           </table>
+       );
+    }
+	
+		renderBookingTypeCode() {
+		if (this.state.booktypeData == "Instant Book") {
+			return (
+				<div>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
 				</div>
-			</div>
-		);
-	}*/
+				)
+		} else if (this.state.booktypeData == "Auction") {
+			return (
+				<div>
+					Starting Bid: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
+					Auction End Date<input name='end_auction_time' type="date" defaultValue={this.state.end_auction_time} onChange={this.onChange.bind(this)}></input>
+				</div>
+				)
+		} else if (this.state.booktypeData == "User-Set Time Frame") {
+			return (
+				<div>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
+				</div>
+				)
+		} else if (this.state.booktypeData == "Host-Set Time Frame") {
+			return (
+				<div>
+					Cost per night: <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="10" max="1000" value={this.state.cost} onChange={this.onChange.bind(this)}></input>
+					How long will you need to response to user requests? : <b>{this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
+				</div>
+				)
+		}
+	}
 
 	onClickShowFilters(e){
 		let newState = this.state;
 		newState.isFiltersVisible = !newState.isFiltersVisible;
 		this.setState(newState);
 	}
-
+	
 	onChange(e){
 		var name = e.target.name;
 		var val = e.target.value;
@@ -416,6 +515,18 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(e.target.value);
 
 		if (type !== "checkbox") {
+			if (name === "bookType") {
+				console.log("bookType");
+				if (val === "Instant Book") {
+					this.setState({booktypeData: e.target.value});
+				} else if (val === "Auction") {
+					this.setState({booktypeData: e.target.value});
+				} else if (val === "User-Set Time Frame") {
+					this.setState({booktypeData: e.target.value});
+				} else if (val === "Host-Set Time Frame") {
+					this.setState({booktypeData: e.target.value});
+				}
+			}
 			if (name === "numofguest") {
 				this.setState({numofguest: val});
 			} else if (name === "bedroomsize") {
@@ -424,7 +535,13 @@ export default class BecomeHostMainPage extends React.Component {
 				this.setState({bathroomsize: val});
 			} else if (name === "numofbeds") {
 				this.setState({numofbeds: val});
-			}
+			} else if (name === "cost") {
+				this.setState({cost: val});
+			} else if (name === "response_time") {
+				this.setState({response_time: val});
+			} else if (name === "end_auction_time") {
+				this.setState({end_auction_time: val});
+			} 
 		} else {
 			var indx = e.target.value;
 			var checked = e.target.checked;
@@ -446,8 +563,28 @@ export default class BecomeHostMainPage extends React.Component {
       console.log('Rejected files: ', rejectedFiles);
     }
 
-	onClickApplyFilter() {
-		this.getPlaceQuery(this.state.inputLocation);
+	/*insertNewPlace() {
+		$.post('/api/insertNewPlace', {
+			'bedroomsize': this.state.bedroomsize,
+			'bathroomsize': this.state.bathroomsize,
+			'numofbeds': this.state.numofbeds
+			'host_id' : this.state.host_id,
+			'room_name': this.state.room_name, 
+			'pictures': this.state.pictures, 
+			'booked_date_start': this.state.booked_date_start, 
+			'booked_date_end': this.state.booked_date_end
+		}, (data, status) => {
+			if(data.query_success === false) {
+				console.log('Trip details query not successful');
+			} else {
+				console.log('Trip details query successful');
+				this.setState({result: data.result});
+			}
+		});
+	}*/
+	
+	onClickSave() {
+		this.insertNewPlace();
 		console.log(this.state.checkbox.roomtype[0].checked);
 		console.log(this.state.checkbox.bookingtype[0].checked);
 		console.log(this.state.checkbox.amenity[0].checked);
@@ -460,6 +597,5 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(this.state.numofbeds);
 		console.log(this.state.checkbox.bookingtype);
 	}
-
 
 };

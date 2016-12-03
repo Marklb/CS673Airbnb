@@ -12,6 +12,7 @@ export default class userSessionHandler {
     this._isLoggedIn = false;
     this._authType = undefined;
 
+    this._userId = undefined;
     this._firstName = FIRST_NAME_PLACEHOLDER;
     this._lastName = undefined;
     this._email = undefined;
@@ -43,6 +44,7 @@ export default class userSessionHandler {
 
     if(options.response !== undefined){
       console.log(options.response);
+      this._userId = options.response.user_id;
       switch(options.authType){
         case 'facebook':
           // this._email = (options.response.email !== undefined) ?
@@ -79,6 +81,7 @@ export default class userSessionHandler {
   */
   logout() {
     // console.log('Logout');
+    localStorage.removeItem("user_id");
     localStorage.removeItem("first_name");
     localStorage.removeItem("auth_type");
     localStorage.removeItem("auth_token");
@@ -86,6 +89,7 @@ export default class userSessionHandler {
     this._isLoggedIn = false;
     this._authType = undefined;
 
+    this._userId = undefined;
     this._firstName = undefined;
     this._lastName = undefined;
     this._email = undefined;
@@ -95,6 +99,13 @@ export default class userSessionHandler {
     this._reactComponent.setState(newState);
 
     browserHistory.push('/');
+  }
+
+  /*
+
+  */
+  getUserID() {
+    return this._userId;
   }
 
   /*
@@ -126,6 +137,7 @@ export default class userSessionHandler {
     // console.log(this._firstName);
     // console.log(this._authType);
     // console.log(this._authToken);
+    localStorage.setItem('user_id', this._userId);
     localStorage.setItem('first_name', this._firstName);
     localStorage.setItem('auth_type', this._authType);
     localStorage.setItem('auth_token', this._authToken);
@@ -135,9 +147,17 @@ export default class userSessionHandler {
 
   */
   attemptPreAuthenticated() {
+    this._userId = localStorage.getItem('user_id');
     this._firstName = localStorage.getItem('first_name');
     this._authType = localStorage.getItem('auth_type');
     this._authToken = localStorage.getItem('auth_token');
+
+    if(this._userId == 'undefined'
+      || this._userId == undefined
+      || this._userId == null
+      || this._userId == ''){
+      return;
+    }
 
     if(this._firstName == 'undefined'
       || this._firstName == undefined
@@ -165,6 +185,7 @@ export default class userSessionHandler {
         // console.log(data);
         // console.log(status);
         if(data.veri_success === false) return;
+        this._userId = data.user_id;
         this._firstName = data.first_name;
         this._isLoggedIn = true;
 
