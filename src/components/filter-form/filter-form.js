@@ -392,7 +392,7 @@ export default class FilterForm extends React.Component {
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-								Rating<input classname="r3" type="text" placeholder={`${val.rating}/5`}></input>
+								Rating<input className="r3" type="text" placeholder={`${val.rating}/5`}></input>
 							</div>
 						);
 					})}

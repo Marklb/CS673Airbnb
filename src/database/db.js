@@ -17,7 +17,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : 'd927392316',
+		password : '',
 		database : 'mokbnb'
 	});
 

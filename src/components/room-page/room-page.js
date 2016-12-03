@@ -366,7 +366,7 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				Your Bid<input type="text"></input> {this.state.bid_update ? "(your bid is updated)" : ""}
 				<br></br>
-				{!this.state.bid_update ? <button type="button" onClick={this.onClickAuctionBooking.bind(this)}>Submit</button> : ""}
+				<button type="button" onClick={this.onClickAuctionBooking.bind(this)}>Submit</button>
 			</div>
 		);
 	}
