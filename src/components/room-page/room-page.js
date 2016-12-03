@@ -17,7 +17,7 @@ export default class RoomPage extends React.Component {
 
 	constructor(props) {
 		super(props);
-
+		
 		var p_id = this.props.params.pidanddate.split("_")[0];
 		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
 		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
@@ -42,6 +42,10 @@ export default class RoomPage extends React.Component {
 			room_title: "N/A",
 			description: "N/A",
 			cost_per_night: -1,//This is the same as ask_amount in hostplacelisting?
+			cost: -1,
+			min_cost: -1,
+			max_cost: -1,
+			ask_amount: -1,
 			rating: -1,
 			max_people: -1,
 			bedroomsize: -1,
@@ -61,7 +65,7 @@ export default class RoomPage extends React.Component {
 			date_range_end: "N/A",//hostplacelisting
 			booked_dates: ["N/A"],//hostplacelisting
 			//if host-set time frame
-			response_time: "N/A",//hostplacelisting
+			response_time: 3,//place
 			//if instant book, user-set/host-set time frame
 			ask_amount: -1,//hostplacelisting
 			//if not auction, create html components for date_start and date_end to insert into clientplacerequest. additionally, if user-set time frame, create html components for resp_time as well.
@@ -70,6 +74,7 @@ export default class RoomPage extends React.Component {
 			starting_price: -1,//auction
 			current_price: -1,//auction
 			sold_price: -1,//auction
+			payment_type_id: -1, //for insertion into reservation
 
 			//result
 			result: [
@@ -83,6 +88,9 @@ export default class RoomPage extends React.Component {
 					host_name: 'default',
 					description: 'default',
 					cost_per_night: 'default',
+					cost: 'default',
+					min_cost: 'default',
+					max_cost: 'default',
 					rating: 'default',
 					max_people: 'default',
 					bedroomsize: 'default',
@@ -177,6 +185,7 @@ export default class RoomPage extends React.Component {
 			'room_title': this.state.name,
 			'description': this.state.description,
 			'cost_per_night': this.state.cost_per_night,//This is the same as ask_amount in hostplacelisting?
+			'cost': this.state.cost_per_night,
 			'rating': this.state.rating,
 			'max_people': this.state.max_people,
 			'bedroomsize': this.state.bedroomsize,
@@ -196,7 +205,7 @@ export default class RoomPage extends React.Component {
 			'date_range_end': this.state.date_range_end,//hostplacelisting
 			'booked_dates': this.state.booked_dates,//hostplacelisting
 			//if host-set time frame
-			'response_time': this.state.response_time,//hostplacelisting
+			'response_time': this.state.response_time,//place
 			//if instant book, user-set/host-set time frame
 			'ask_amount': this.state.ask_amount,//hostplacelisting
 			//if not auction, create html components for date_start and date_end to insert into clientplacerequest. additionally, if user-set time frame, create html components for resp_time as well.
@@ -211,6 +220,7 @@ export default class RoomPage extends React.Component {
 			} else {
 				console.log('Place details query successful');
 				this.setState({result: data.result});
+				this.setState({cost: this.state.result[0].cost_per_night});
 			}
   		});
 	}
@@ -224,10 +234,10 @@ export default class RoomPage extends React.Component {
 			'place_id' : this.state.placeID,
 			'host_id' : this.state.result[0].host_id,
 			'client_id' : this.state.clientID,
-			'payment_type_id' : '1',
+			'payment_type_id' : this.state.payment_type_id,
 			'booked_date_start' : this.state.bookCheckinTime,
 			'booked_date_end' : this.state.bookCheckoutTime,
-			'amt_paid' : this.state.result[0].cost_per_night,
+			'amt_paid' : this.state.result[0].cost,
 			'paid_date' : datetime
   		}, (data, status) => {
   			if(data.query_success === false) {
@@ -242,8 +252,8 @@ export default class RoomPage extends React.Component {
 	render() {
     // this.ref.roomElem
 		return (
-			<div className="roompage">
-				<h1 ref="roomElem">Room { this.state.placeID } display page</h1>
+			<div ref='roomElem' className="roompage">
+				<h1>Room { this.state.placeID } display page</h1>
 				<br></br>
 				<img src={this.state.result[0].pictures} />
 				<br></br>
@@ -376,6 +386,8 @@ export default class RoomPage extends React.Component {
 	userSetTimeFrameBooking() {
 		return (
 			<div>
+				How much do you want to pay?: <b>${this.state.cost}</b> <input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
+				How long will you give the host to respond?: <b> {this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				response time<input name='book_check_response' type="date"></input>
@@ -388,6 +400,10 @@ export default class RoomPage extends React.Component {
 	hostSetTimeFrameBooking() {
 		return (
 			<div>
+				Response Time for host to get back to you : {this.state.result[0].response_time}
+				<br/>
+				How much do you want to pay? <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
+				<br/>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				response time<input name='book_check_response' type="date"></input>
@@ -414,6 +430,11 @@ export default class RoomPage extends React.Component {
 			this.setState({payMethod: 'credit'});
 		} else if (type == "radio" && name == 'debit') {
 			this.setState({payMethod: 'debit'});
+		}
+		if (name === "cost") {
+			this.setState({cost: val});
+		} else if (name === "response_time") {
+			this.setState({response_time: val});
 		}
 	}
 

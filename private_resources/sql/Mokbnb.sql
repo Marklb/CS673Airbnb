@@ -103,11 +103,9 @@ CREATE TABLE IF NOT EXISTS `HostPlaceListing` (
   `place_id` INT NOT NULL,
   `host_id` INT NOT NULL,
   `bookingtype_id` INT NOT NULL,
-  `ask_amount` VARCHAR(8) NOT NULL,
   `date_range_start` DATE NOT NULL,
   `date_range_end` DATE NOT NULL,
   `booked_dates` VARCHAR(200),
-  `response_time` VARCHAR(30),
   `active` VARCHAR(3) NOT NULL,
   `rating` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`place_id`, `host_id`))
@@ -128,6 +126,7 @@ CREATE TABLE IF NOT EXISTS `Place` (
   `roomtype_id` INT NULL,
   `name` VARCHAR(45) NULL,
   `description` VARCHAR(45) NULL,
+  `response_time` INT(2) NULL,
   `cost_per_night` NUMERIC(7,2) NULL,
   `max_people` INT NULL,
   `bedroomsize` INT NULL,
@@ -318,7 +317,8 @@ CREATE TABLE IF NOT EXISTS `ClientPlaceRequest` (
   `req_id` INT NOT NULL AUTO_INCREMENT,
   `client_id` INT NOT NULL,
   `place_id` INT NOT NULL,
-  `resp_time` VARCHAR(45) NULL,
+  `ask_amount` VARCHAR(8) NOT NULL,
+  `resp_time` INT(2) NULL,
   `date_start` VARCHAR(45) NULL,
   `date_end` VARCHAR(45) NULL,
   `date_req` VARCHAR(45) NULL,
@@ -477,30 +477,89 @@ INSERT INTO address (
 ;
 
 INSERT INTO place (
-   host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
+   host_id, addr_id, roomtype_id, name, description, response_time, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds, pictures
 ) VALUES
-   (1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"),
-   (2, 2, 2, "My Second Housetel", "Welcome to hell.", 666.00, 5, 3, 3, 2, "/images/room2.jpg"),
-   (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", 89.99, 3, 1, 1.5, 2, "/images/room3.jpg"),
-   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 64.95, 3, 1, 1.5, 2, "/images/room4.jpg"),
-   (1, 5, 1, "The Fifth Scene", "Five is the lucky number.", 200.00, 3, 1, 1.5, 2, "/images/room5.jpg")
+   (1, 1, 1, "My First Cool Housetel", "Welcome to paradise.", null, 80.00, 2, 1, 1.5, 2, "/images/room1.jpg"),
+   (2, 2, 2, "My Second Housetel", "Welcome to hell.", null, 666.00, 5, 3, 3, 2, "/images/room2.jpg"),
+   (3, 3, 3, "The Third Floor", "Walk-Up to this gorgeous apartment.", null, 89.99, 3, 1, 1.5, 2, "/images/room3.jpg"),
+   (4, 4, 2, "The Fourth Wall", "Stare at the fourth wall.", 3, 64.95, 3, 1, 1.5, 2, "/images/room4.jpg"),
+   (1, 5, 1, "The Fifth Scene", "Five is the lucky number.", null, 200.00, 3, 1, 1.5, 2, "/images/room5.jpg")
 ;
 
 INSERT INTO hostplacelisting (
-   place_id, host_id, bookingtype_id, ask_amount, date_range_start, date_range_end, active
+   place_id, host_id, bookingtype_id, date_range_start, date_range_end, active
 ) VALUE
-   (1, 1, 2, "80.00", "2016-12-30", "2017-01-25", "yes"),
-   (2, 2, 1, "666.00", "2016-11-02", "2016-12-16", "yes"),
-   (3, 3, 3, "89.99", "2016-11-01", "2016-12-16", "yes"),
-   (4, 4, 4, "64.95", "2016-11-01", "2016-12-16", "yes"),
-   (5, 1, 2, "200.00", "2016-12-30", "2017-01-02", "yes")
+   (1, 1, 2, "2016-12-30", "2017-01-25", "yes"),
+   (2, 2, 1, "2016-11-02", "2016-12-16", "yes"),
+   (3, 3, 3, "2016-11-01", "2016-12-16", "yes"),
+   (4, 4, 4, "2016-11-01", "2016-12-16", "yes"),
+   (5, 1, 2, "2016-12-30", "2017-01-02", "yes")
 ;
 
 INSERT INTO auction (
    place_id, starting_price, current_price, sold_price, end_auction_time, active
 ) VALUES
-   (1, "80.00", "278.00", "278.00", "2016-11-24", "no"),
+   (1, "80.00", "150.00", "150.00", "2016-05-26", "no"),
+   (1, "80.00", "105.00", "105.00", "2016-06-20", "no"),
+   (1, "80.00", "165.00", "165.00", "2016-07-20", "no"),
+   (1, "80.00", "316.00", "316.00", "2016-07-23", "no"),
+   (5, "200.00", "290.00", "290.00", "2016-08-10", "no"),
+   (1, "80.00", "175.00", "175.00", "2016-08-10", "no"),
+   (5, "200.00", "259.00", "259.00", "2016-10-01", "no"),
+   (1, "80.00", "193.00", "193.00", "2016-10-18", "no"),
+   (5, "200.00", "278.00", "278.00", "2016-11-26", "no"),
+   (1, "80.00", "99.00", "99.00", "2016-12-01", "no"),
+   (1, "80.00", "278.00", NULL, "2016-11-24", "yes"),
    (5, "200.00", "243.00", NULL, "2016-12-06", "yes")
+;
+
+INSERT INTO ClientAuctionBids (
+	auction_id, client_id, bid_price
+) VALUES
+	(1, 2, "90.00"), 
+	(1, 4, "100.00"),
+	(1, 2, "125.00"),
+	(1, 3, "150.00"),
+	(2, 1, "89.00"),
+	(2, 3, "92.00"),
+	(2, 4, "98.00"),
+	(2, 2, "105.00"),
+	(3, 4, "95.00"),
+	(3, 2, "102.48"),
+	(3, 1, "149.98"),
+	(3, 3, "165.00"),
+	(4, 3, "125.00"),
+	(4, 2, "210.00"),
+	(4, 1, "292.00"),
+	(4, 4, "316.00"),
+	(5, 3, "242.00"),
+	(5, 4, "265.00"),
+	(5, 3, "280.00"),
+	(5, 4, "290.00"),
+	(6, 2, "99.00"),
+	(6, 1, "119.00"),
+	(6, 3, "143.00"),
+	(6, 2, "175.00"),
+	(7, 3, "212.00"),
+	(7, 2, "214.00"),
+	(7, 3, "228.00"),
+	(7, 4, "259.00"),
+	(8, 1, "119.00"),
+	(8, 2, "137.00"),
+	(8, 3, "168.00"),
+	(8, 2, "193.00"),
+	(9, 2, "210.00"),
+	(9, 3, "230.00"),
+	(9, 4, "260.00"),
+	(9, 3, "278.00"),
+	(10, 1, "110.00"),
+	(10, 3, "140.00"),
+	(10, 4, "169.00"),
+	(10, 2, "199.00"),
+	(11, 2, "199.00"),
+	(11, 3, "278.00"),
+	(12, 3, "224.00"),
+	(12, 4, "243.00")
 ;
 
 INSERT INTO Ratings (
@@ -537,14 +596,25 @@ INSERT INTO UserLanguage (
    (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18), (2, 19)
 ;
 
+INSERT INTO ClientPlaceRequest (
+	place_id, client_id, ask_amount, resp_time, date_start, date_end, date_req, date_resp, status
+) VALUES
+	(3, 5, "79.99", 2, "2016-07-07", "2016-07-10",  "2016-07-01", "2016-07-02", "accepted"),
+	(4, 5, "60.00", 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "rejected"),
+	(4, 5, "62.00", 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "accepted"),
+    (3, 2, "82.50", 1, "2016-07-17", "2016-07-20",  "2016-07-14", NULL, "failure to respond"),
+	(3, 2, "82.50", 1, "2016-07-17", "2016-07-20",  "2016-07-15", "2016-07-16", "accepted"),
+    (3, 1, "83.00", 5, "2016-12-07", "2016-12-09", "2016-12-01", NULL, "pending")
+;
+
 INSERT INTO Reservation (
    place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date
 ) VALUES
    (1, 1, 3, 3, "2016-06-02", "2016-06-05", "150.00", "2016-05-26"),
    (1, 1, 2, 3, "2016-06-25", "2016-06-27", "105.00", "2016-06-20"),
-   (3, 3, 5, 3, "2016-07-07", "2016-07-10", "215.00", "2016-07-01"),
-   (4, 4, 5, 3, "2016-07-13", "2016-07-15", "197.00", "2016-07-10"),
-   (3, 3, 2, 3, "2016-07-17", "2016-07-20", "145.00", "2016-07-14"),
+   (3, 3, 5, 3, "2016-07-07", "2016-07-10", "79.99", "2016-07-01"),
+   (4, 4, 5, 3, "2016-07-13", "2016-07-15", "62.00", "2016-07-10"),
+   (3, 3, 2, 3, "2016-07-17", "2016-07-20", "82.50", "2016-07-14"),
    (1, 1, 3, 3, "2016-07-28", "2016-08-01", "165.00", "2016-07-20"),
    (1, 1, 4, 3, "2016-08-02", "2016-08-10", "316.00", "2016-07-23"),
    (5, 1, 4, 3, "2016-08-14", "2016-08-20", "290.00", "2016-08-10"),
@@ -552,11 +622,9 @@ INSERT INTO Reservation (
    (2, 2, 3, 3, "2016-08-26", "2016-09-03", "223.00", "2016-08-19"),
    (2, 2, 4, 3, "2016-09-15", "2016-09-17", "144.00", "2016-09-02"),
    (2, 2, 5, 3, "2016-09-27", "2016-10-06", "173.00", "2016-09-10"),
-   (1, 1, 4, 3, "2016-10-07", "2016-10-15", "259.00", "2016-10-01"),
+   (5, 1, 4, 3, "2016-10-07", "2016-10-15", "259.00", "2016-10-01"),
    (1, 1, 2, 3, "2016-10-23", "2016-10-26", "193.00", "2016-10-18"),
-   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
-   (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
+   (5, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
    (1, 1, 2, 2, "2016-12-06", "2016-12-08", "99.00", "2016-12-01"),
-   (2, 2, 1, 1, "2016-12-05", "2016-12-07", "666.00", "2016-12-01"),
-   (3, 3, 1, 3, "2016-12-07", "2016-12-09", "85.00", "2016-12-01")
+   (2, 2, 1, 1, "2016-12-05", "2016-12-07", "666.00", "2016-12-01")
 ;
