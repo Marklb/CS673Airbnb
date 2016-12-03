@@ -22,6 +22,8 @@ export default class RoomPage extends React.Component {
 		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
 		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
 		this.state = {
+			bid_update : false,
+			payMethod: 'credit',
 			submit: false,
 			clientID: -1,
 			default_check_in_date: d_date_check_in,
@@ -92,6 +94,8 @@ export default class RoomPage extends React.Component {
 					date_range_end: 'default',
 					booked_dates: 'default',
 					response_time: 'default',
+					active: 'default',
+					rating: 'default',
 					street: 'default',
 					city: 'default',
 					state: 'default',
@@ -127,9 +131,8 @@ export default class RoomPage extends React.Component {
 			authType: this.context.userSessionHandler.getAuthType(),
 			authToken: this.context.userSessionHandler.getAuthToken()
 		}, (data, status) => {
-			// console.log("data:" + data);
 			console.log("user_id" + data.user_id);
-			// this.state.clientID = data.user_id;
+			this.state.clientID = data.user_id;
 		});
 
 
@@ -202,79 +205,6 @@ export default class RoomPage extends React.Component {
 			'starting_price': this.state.starting_price,//auction
 			'current_price': this.state.current_price,//auction
 			'sold_price': this.state.sold_price,//auction
-			/*'amenity' : //create list of amenities that exist at place
-			[
-					{name : 'Wireless Internet', checked : false},
-					{name : 'Pool', checked : false},
-					{name : 'Kitchen', checked : false},
-					{name : '24-hour check-in', checked : false},
-					{name : 'Air conditioning', checked : false},
-					{name : 'Buzzer/wireless intercom', checked : false},
-					{name : 'Cable TV', checked : false},
-					{name : 'Carbon monoxide detector', checked : false},
-					{name : 'Doorman', checked : false},
-					{name : 'Doorman Entry', checked : false},
-					{name : 'Dryer', checked : false},
-					{name : 'Elevator in building', checked : false},
-					{name : 'Essentials', checked : false},
-					{name : 'Family/kid friendly', checked : false},
-					{name : 'Fire extinguisher', checked : false},
-					{name : 'First aid kit', checked : false},
-					{name : 'Free parking on premises', checked : false},
-					{name : 'Free parking on street', checked : false},
-					{name : 'Gym', checked : false},
-					{name : 'Hair dryer', checked : false},
-					{name : 'Hangers', checked : false},
-					{name : 'Heating', checked : false},
-					{name : 'Hot tub', checked : false},
-					{name : 'Indoor fireplace', checked : false},
-					{name : 'Internet', checked : false},
-					{name : 'Iron', checked : false},
-					{name : 'Keypad', checked : false},
-					{name : 'Laptop friendly workspace', checked : false},
-					{name : 'Lock on bedroom door', checked : false},
-					{name : 'Lockbox', checked : false},
-					{name : 'Pets allowed', checked : false},
-					{name : 'Safety card', checked : false},
-					{name : 'Shampoo', checked : false},
-					{name : 'Smartlock', checked : false},
-					{name : 'Smoke detector', checked : false},
-					{name : 'Smoking allowed', checked : false},
-					{name : 'Suitable for events', checked : false},
-					{name : 'TV', checked : false},
-					{name : 'Washer', checked : false},
-					{name : 'Wheelchair accessible', checked : false}
-				],*/
-
-				/*hostlanguage: //create list of languages that host of place knows
-				[
-					{name : 'English', checked : false},
-					{name : 'Español', checked : false},
-					{name : 'Français', checked : false},
-					{name : 'Bahasa Indonesia', checked : false},
-					{name : 'Bahasa Malaysia', checked : false},
-					{name : 'Bengali', checked : false},
-					{name : 'Dansk', checked : false},
-					{name : 'Deutsch', checked : false},
-					{name : 'Hindi', checked : false},
-					{name : 'Italiano', checked : false},
-					{name : 'Magyar', checked : false},
-					{name : 'Nederlands', checked : false},
-					{name : 'Norsk', checked : false},
-					{name : 'Polski', checked : false},
-					{name : 'Português', checked : false},
-					{name : 'Punjabi', checked : false},
-					{name : 'Sign Language', checked : false},
-					{name : 'Suomi', checked : false},
-					{name : 'Svenska', checked : false}
-				],*/
-
-			/*this.rooms = //grab list of pictures that exist at place, using this.state.pictures for img's
-			[
-				{img: "/images/room1.jpg", title: "room1", price: "$100", roomType: "private"},
-				{img: "/images/room2.jpg", title: "room1", price: "$100", roomType: "private"},
-				{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
-			];*/
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('Place details query not successful');
@@ -285,17 +215,20 @@ export default class RoomPage extends React.Component {
   		});
 	}
 
-	insertReservationQuery(placeID) {
+	instantInsertReservationQuery(placeID) {
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
+		console.log("current day : " + datetime);
 		$.post('/api/addreservation', {
 			//General place information
 			'place_id' : this.state.placeID,
 			'host_id' : this.state.result[0].host_id,
-			'client_id' : '1',
+			'client_id' : this.state.clientID,
 			'payment_type_id' : '1',
 			'booked_date_start' : this.state.bookCheckinTime,
 			'booked_date_end' : this.state.bookCheckoutTime,
 			'amt_paid' : this.state.result[0].cost_per_night,
-			'paid_date' : '2017-01-01'
+			'paid_date' : datetime
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('insert reservation not successful');
@@ -305,10 +238,9 @@ export default class RoomPage extends React.Component {
 			}
   		});
 	}
-	
 
 	render() {
-    this.ref.roomElem
+    // this.ref.roomElem
 		return (
 			<div className="roompage">
 				<h1 ref="roomElem">Room { this.state.placeID } display page</h1>
@@ -346,7 +278,7 @@ export default class RoomPage extends React.Component {
 				Amenities : {this.state.result[0].amenities}
 				<br></br>
 				<br></br>
-				Booking({this.state.result[0].bookingtype_name})
+				Booking type ({this.state.result[0].bookingtype_name})
 				{!(this.state.submit)? this.renderBooking(): null}
 				{(this.state.submit)? this.renderPayment() : null}
 
@@ -363,8 +295,8 @@ export default class RoomPage extends React.Component {
 		return (
 			<div>
 				<div>
-					<input type="radio" name="Credit" value="credit"/> Credit
-					<input type="radio" name="Debit" value="debit"/> Debit
+					<input type="radio" name="credit" value="credit" checked={this.state.payMethod === 'credit'} onChange={this.onChange.bind(this)}/> Credit
+					<input type="radio" name="debit" value="debit" checked={this.state.payMethod === 'debit'} onChange={this.onChange.bind(this)}/> Debit
 				</div>
 				<button type="button" onClick={this.onClickPay.bind(this)}>Pay!!</button>
 			</div>
@@ -375,8 +307,10 @@ export default class RoomPage extends React.Component {
 	renderBooking() {
 		if (this.state.result[0].bookingtype_id == "1") {
 			return (this.instantBooking());
-		} else if (this.state.result[0].bookingtype_id == "2") {
+		} else if (this.state.result[0].bookingtype_id == "2" && this.state.result[0].active == 'no') {
 			return (this.auctionBooking());
+		} else if (this.state.result[0].bookingtype_id == "2" && this.state.result[0].active == 'no') {
+			return (this.auctionNotAvailable());
 		} else if (this.state.result[0].bookingtype_id == "3") {
 			return (this.userSetTimeFrameBooking());
 		} else if (this.state.result[0].bookingtype_id == "4") {
@@ -414,15 +348,27 @@ export default class RoomPage extends React.Component {
 	auctionBooking() {
 		return (
 			<div>
-				Starting price<input type="text" placeholder='none'></input>
+				Starting price: {this.state.result[0].starting_price}
 				<br></br>
-				Current bid<input type="text" placeholder='none'></input>
+				Current bid: {this.state.result[0].current_price}
 				<br></br>
-				Bid end date<input type="text" placeholder={this.state.result[0].date_range_end}></input>
+				Bid end date : {this.state.result[0].date_range_end}
 				<br></br>
-				Your Bid<input type="text"></input>
+				Your Bid<input type="text"></input> {this.state.bid_update ? "(your bid is updated)" : ""}
 				<br></br>
-				<button type="button">Submit</button>
+				{!this.state.bid_update ? <button type="button" onClick={this.onClickAuctionBooking.bind(this)}>Submit</button> : ""}
+			</div>
+		);
+	}
+
+	auctionNotAvailable() {
+		return (
+			<div>
+				Starting price : {this.state.result[0].starting_price}
+				<br></br>
+				Current bid : {this.state.result[0].current_price}
+				<br></br>
+				Bid end date : {this.state.result[0].date_range_end}
 			</div>
 		);
 	}
@@ -464,6 +410,10 @@ export default class RoomPage extends React.Component {
 		} else if (this.state.result[0].bookingtype_id == "4" && type == "date") {
 			var date = new Date(val);
 			this.checkBookDate(date, name, val);
+		} else if (type == "radio" && name == 'credit') {
+			this.setState({payMethod: 'credit'});
+		} else if (type == "radio" && name == 'debit') {
+			this.setState({payMethod: 'debit'});
 		}
 	}
 
@@ -512,6 +462,10 @@ export default class RoomPage extends React.Component {
 
 	onClickInstantBooking() {
 		this.setState({submit: true});
+	}
+
+	onClickAuctionBooking() {
+		this.setState({bid_update: true});
 	}
 
 	onClickPay() {
