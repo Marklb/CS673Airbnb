@@ -26,8 +26,8 @@ export default class FilterForm extends React.Component {
 			date_end : 'N/A',
 			numofguest: -1,
 			rating: -1,
-			min_cost : -1,
-			max_cost : -1,
+			min_cost : 10,
+			max_cost : 1000,
 			bedroomsize: -1,
 			bathroomsize: -1,
 			numofbeds: -1,
@@ -291,8 +291,8 @@ export default class FilterForm extends React.Component {
 				<div className="filter">
 					<form className="f">
 						Dates
-						<input name='date_start' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
-						<input name='date_end' onChange={this.onChange.bind(this)} className="t" type="date"></input>
+						<input name='date_start' defaultValue='2016-12-04' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
+						<input name='date_end' defaultValue='2016-12-05' onChange={this.onChange.bind(this)} className="t" type="date"></input>
 						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
 							<option>Number of guest</option>
 							{this.numofpeople.map((val, i) => {
@@ -309,11 +309,11 @@ export default class FilterForm extends React.Component {
 					</form>
 
 					<form className="f">
-						Price min
-						<input name='min_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
+						Price min: <b>${this.state.min_cost}</b> 
+						<input name='min_cost' className="slide" type="range" min="10" max="1000" defaultValue="10" onChange={this.onChange.bind(this)}></input>
 						<br></br>
-						Price max
-						<input name='max_cost' className="slide" type="range" min="10" max="1000" onChange={this.onChange.bind(this)}></input>
+						Price max: <b>${this.state.max_cost}</b> 
+						<input name='max_cost' className="slide" type="range" min="10" max="1000" defaultValue="1000" onChange={this.onChange.bind(this)}></input>
 					</form>
 
 					<form className="f">
