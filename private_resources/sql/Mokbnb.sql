@@ -381,8 +381,8 @@ CREATE TABLE IF NOT EXISTS `Reservation` (
   `host_id` INT NOT NULL,
   `client_id` INT NOT NULL,
   `payment_type_id` INT NOT NULL,
-  `date_range_start` DATE NOT NULL,
-  `date_range_end` DATE NOT NULL,
+  `booked_date_start` DATE NOT NULL,
+  `booked_date_end` DATE NOT NULL,
   `amt_paid` VARCHAR(45) NOT NULL,
   `paid_date` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`reservation_id`))
@@ -480,7 +480,7 @@ INSERT INTO UserLanguage (
 ;
 
 INSERT INTO Reservation (
-   place_id, host_id, client_id, payment_type_id, date_range_start, date_range_end, amt_paid, paid_date
+   place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date
 ) VALUES
    (1, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26")
 ;

@@ -61,9 +61,9 @@ module.exports.api_get_places = function(req,res,conn){
         WHERE 
             P.place_id = R1.place_id
           AND
-            ((R1.date_range_start BETWEEN ? /* date_start */ AND ? /* date_end */)
+            ((R1.booked_date_start BETWEEN ? /* date_start */ AND ? /* date_end */)
               OR
-            (R1.date_range_end BETWEEN ? /* date_start */ AND ? /* date_end */))) <= 0
+            (R1.booked_date_end BETWEEN ? /* date_start */ AND ? /* date_end */))) <= 0
     `;
     var inserts = [state, date_start, date_end, date_start, date_end, 
                    date_start, date_end];

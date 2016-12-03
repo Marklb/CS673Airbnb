@@ -17,7 +17,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -799,6 +799,23 @@ var db = function(app){
 	app.get('/api/*', function(req, res){
 		// Temporary string response until implemented
 		res.send('This api call does not exist.');
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Add a reservation
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/addreservation",function(req,res){
+		var city = req.body.city;
+		conn.query("SELECT street from Address WHERE city=" + "'" + city + "'",
+		function(err, rows, fields){
+			if (!err) {
+				console.log(rows);
+				res.json({'query_success': true, 'neighborhoods': rows});
+			} else {
+				console.log('Error while performing Query.');
+				res.json({'query_success': false});
+			}
+		});
 	});
 
 	console.log('Done Loading db');
