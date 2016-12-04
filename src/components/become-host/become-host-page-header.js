@@ -12,7 +12,6 @@ import ListingImageUploader from '../listing-image-uploader';
 import GoogleMapsLocationSelector from '../google-components/google-maps-location-selector';
 
 require("./become-host-page-header.scss");
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 /*
 
 */
@@ -24,6 +23,7 @@ export default class BecomeHostMainPage extends React.Component {
  constructor(props) {
 		 super(props)
 
+		 var place_id = this.props.params.place_id;
 
 		this.state = {
 			isFiltersVisible: false,
@@ -41,6 +41,7 @@ export default class BecomeHostMainPage extends React.Component {
 			numofbeds: -1,
 			booktypeData: '',
 			response_time: 3,
+
 			host_id: -1,
 			items: [],
       street:'',
@@ -54,6 +55,14 @@ export default class BecomeHostMainPage extends React.Component {
       imagesUploadedToBrowser:[],
       locationLatLng: null,
       isBookingActive: true,
+
+			// paidExtras:
+			// [
+			// 	{
+			// 		name: 'Grocery Shopping',
+			// 		cost: 20.00
+			// 	}
+			// ],
 			checkbox : {
 				roomtype : [
 					{name : 'Entire home', checked : false},
@@ -135,7 +144,6 @@ export default class BecomeHostMainPage extends React.Component {
 			}
 
 		};
-    this.handleAdd = this.handleAdd.bind(this);
 		this.numofpeople = [
 			1,
 			2,
@@ -216,6 +224,9 @@ export default class BecomeHostMainPage extends React.Component {
     this.handleTitle = this.handleTitle.bind(this);
     this.onChangeBookingActive = this.onChangeBookingActive.bind(this);
 
+		// this.addPaidExtra = this.addPaidExtra.bind(this);
+		// this.removePaidExtra = this.removePaidExtra.bind(this);
+		// this.renderPaidExtras = this.renderPaidExtras.bind(this);
 	}
 
 	componentDidMount() {
@@ -224,8 +235,8 @@ export default class BecomeHostMainPage extends React.Component {
 		authToken: this.context.userSessionHandler.getAuthToken()
 	}, (data, status) => {
 		console.log("data:" + data);
-		console.log("host_id:" + data.host_id);
-		this.state.host_id = data.host_id;
+		console.log("host_id:" + data.user_id);
+		this.state.host_id = data.user_id;
 	});
   }
 
@@ -471,6 +482,7 @@ export default class BecomeHostMainPage extends React.Component {
 							{this.renderBookingTypeCode()}
 						</div>
 					</form>
+
           <form className="f">
           <div>
              <ReactCSSTransitionGroup transitionName = "example"
@@ -487,25 +499,69 @@ export default class BecomeHostMainPage extends React.Component {
              transitionEnterTimeout = {500} transitionLeaveTimeout = {500}>
              {items}
           </ReactCSSTransitionGroup>
+				  {/*<form className="f">
+					  <div>
+						<h2>Paid Extras</h2>
+					<button onClick={this.addPaidExtra}>
+						Add Paid Extra
+						</button>
+						<div id="adjust-import-data-rows">
+							{this.renderPaidExtras}
+						</div>
+					</div>*/}
 					</form>
 
           <input type="checkbox" onChange={this.onChangeBookingActive} defaultChecked />Booking Active<br/>
 					<button name='Save and exit' type="button" onClick={this.onClickSave.bind(this)}>Save and Exit</button>
 
 					{/*{this.renderResult(this.state.result)}*/}
-
-
-
 				</div>
-
-
 			</div>
-
-
 		);
 	}
 
 	renderBookingTypeCode() {
+	//
+	// addPaidExtra() {
+  //       return (
+  //          <tr>
+  //            <td>
+  //              Paid Extra:
+  //            </td>
+  //            <td>
+  //              Name <input type="text" name="paidExtraName" />
+  //            </td>
+  //            <td>
+  //              Cost <input type="text" name="paidExtraCost" />
+  //            </td>
+  //            <td>
+  //              <button className="btn btn-danger" onClick={this.removePaidExtra.bind(null, this.state.paidExtras.index)} > Remove </button>
+  //            </td>
+  //          </tr>
+  //       );
+  //   }
+	//
+	// removePaidExtra(index) {
+  //       var paidExtras = this.state.paidExtras;
+  //       paidExtras.splice(index,1);
+  //       this.setState({paidExtras:paidExtras});
+  //   }
+	//
+	// renderPaidExtras() {
+  //      var fields = this.state.paidExtras.map((operation,index) =>{
+	// 	   return (<addPaidExtra key={index} index={index} removePaidExtra={this.removePaidExtra(this)} />);
+	// 	   });
+  //
+  //      return (
+  //          <table>
+  //            <tbody>
+  //             {fields}
+  //            </tbody>
+  //          </table>
+  //      );
+  //   }
+	//
+	// 	renderBookingTypeCode() {
 		if (this.state.booktypeData == "Instant Book") {
 			return (
 				<div>
@@ -838,6 +894,7 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log(this.state.numofbeds);
 		console.log(this.state.checkbox.bookingtype);
 	}
+
 
 	onClickBookType(event) {
 		console.log("HIT");

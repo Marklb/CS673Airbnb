@@ -56,6 +56,8 @@ module.exports.api_get_places = function(req,res,conn){
         AND
         HPL.date_range_end >= ? /* date_end */)
       AND
+		HPL.active = 'yes'
+	  AND
         (SELECT COUNT(*)
         FROM Reservation AS R1
         WHERE
@@ -332,8 +334,7 @@ module.exports.api_get_user_reservations = function(req,res,conn){
 
   `;
 
-  conn.query(query_str,
-    [authType, authToken],
+  conn.query(query_str, [authType, authToken],
     function (err, rows, fields) {
       if (err) {
         console.log(err);

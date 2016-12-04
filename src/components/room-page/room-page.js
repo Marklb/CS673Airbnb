@@ -4,20 +4,28 @@ import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 're
 // Javascript modules
 import _ from 'lodash';
 import $ from 'jquery';
+import UserSessionHandler from '../../user-session-handler';
 
 // React Components
 import ReactDisqusThread from 'react-disqus-thread';
 
 require("./room-page.scss");
 export default class RoomPage extends React.Component {
+	static contextTypes = {
+		userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
+	};
 
 	constructor(props) {
 		super(props);
-
+		
 		var p_id = this.props.params.pidanddate.split("_")[0];
 		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
 		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
 		this.state = {
+			bid_update : false,
+			payMethod: 'credit',
+			jumpToPay: false,
+			clientID: -1,
 			default_check_in_date: d_date_check_in,
 			default_check_out_date: d_date_check_out,
 			shortname: null,
@@ -34,6 +42,10 @@ export default class RoomPage extends React.Component {
 			room_title: "N/A",
 			description: "N/A",
 			cost_per_night: -1,//This is the same as ask_amount in hostplacelisting?
+			cost: -1,
+			min_cost: -1,
+			max_cost: -1,
+			ask_amount: -1,
 			rating: -1,
 			max_people: -1,
 			bedroomsize: -1,
@@ -53,7 +65,7 @@ export default class RoomPage extends React.Component {
 			date_range_end: "N/A",//hostplacelisting
 			booked_dates: ["N/A"],//hostplacelisting
 			//if host-set time frame
-			response_time: "N/A",//hostplacelisting
+			response_time: 3,//place
 			//if instant book, user-set/host-set time frame
 			ask_amount: -1,//hostplacelisting
 			//if not auction, create html components for date_start and date_end to insert into clientplacerequest. additionally, if user-set time frame, create html components for resp_time as well.
@@ -62,10 +74,14 @@ export default class RoomPage extends React.Component {
 			starting_price: -1,//auction
 			current_price: -1,//auction
 			sold_price: -1,//auction
+			payment_type_id: -1, //for insertion into reservation
+			bid_amount: 0,
+			bid_amount_ok: false,
 
 			//result
 			result: [
 				{
+					clientID: 'default',
 					roomtype_id: 'default',
 					bookingtype_id: 'default',
 					addr_id: 'default',
@@ -74,6 +90,9 @@ export default class RoomPage extends React.Component {
 					host_name: 'default',
 					description: 'default',
 					cost_per_night: 'default',
+					cost: 'default',
+					min_cost: 'default',
+					max_cost: 'default',
 					rating: 'default',
 					max_people: 'default',
 					bedroomsize: 'default',
@@ -85,6 +104,8 @@ export default class RoomPage extends React.Component {
 					date_range_end: 'default',
 					booked_dates: 'default',
 					response_time: 'default',
+					active: 'default',
+					rating: 'default',
 					street: 'default',
 					city: 'default',
 					state: 'default',
@@ -106,37 +127,48 @@ export default class RoomPage extends React.Component {
 				}
 			],
 
-			bookCheckinRangeOK : false,
-			bookCheckinTime : '1980-12-12',
-			bookCheckoutRangeOK : false,
-			bookCheckoutTime : '1980-12-12',
-			bookButtonOK : false
+			bookCheckinRangeOK : true,
+			bookCheckinTime : d_date_check_in,
+			bookCheckoutRangeOK : true,
+			bookCheckoutTime : d_date_check_out,
+			bookResponseOK : true,
+			bookResponseTime : d_date_check_in,
+			bookButtonOK : true
 		};
 		this.getRoomDetailsQuery(this.state.placeID);
 	}
 
-  componentDidMount() {
-    //----------------------------
-    // Disqus script start
-    //----------------------------
-    /**
-    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-    var disqus_config = function () {
-    this.page.url = '//www.jeremyhoc.com/mokbnb';
-    this.page.identifier = 'mokbnb-room-${this.state.placeID}';
-    };
+	componentDidMount() {
+	  	$.get('/api/getUserInfo', {
+			authType: this.context.userSessionHandler.getAuthType(),
+			authToken: this.context.userSessionHandler.getAuthToken()
+		}, (data, status) => {
+			console.log("user_id" + data.user_id);
+			this.state.clientID = data.user_id;
+		});
 
-    (function() { // DON'T EDIT BELOW THIS LINE
-    var d = document, s = d.createElement('script');
-    s.src = '//mokbnb-1.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
-    })();
-    //----------------------------
-    // Disqus script end
-    //----------------------------
-  }
+
+		//----------------------------
+		// Disqus script start
+		//----------------------------
+		/**
+		*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+		*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+		var disqus_config = function () {
+			this.page.url = '//www.jeremyhoc.com/mokbnb';
+			this.page.identifier = 'mokbnb-room-${this.state.placeID}';
+		};
+
+		(function() { // DON'T EDIT BELOW THIS LINE
+			var d = document, s = d.createElement('script');
+			s.src = '//mokbnb-1.disqus.com/embed.js';
+			s.setAttribute('data-timestamp', +new Date());
+			(d.head || d.body).appendChild(s);
+		})();
+		//----------------------------
+		// Disqus script end
+		//----------------------------
+	}
 
 	componentWillReceiveProps(nextProps) {
 		var new_p_id = nextProps.params.pidanddate.split("_")[0];
@@ -157,6 +189,7 @@ export default class RoomPage extends React.Component {
 			'room_title': this.state.name,
 			'description': this.state.description,
 			'cost_per_night': this.state.cost_per_night,//This is the same as ask_amount in hostplacelisting?
+			'cost': this.state.cost_per_night,
 			'rating': this.state.rating,
 			'max_people': this.state.max_people,
 			'bedroomsize': this.state.bedroomsize,
@@ -176,7 +209,7 @@ export default class RoomPage extends React.Component {
 			'date_range_end': this.state.date_range_end,//hostplacelisting
 			'booked_dates': this.state.booked_dates,//hostplacelisting
 			//if host-set time frame
-			'response_time': this.state.response_time,//hostplacelisting
+			'response_time': this.state.response_time,//place
 			//if instant book, user-set/host-set time frame
 			'ask_amount': this.state.ask_amount,//hostplacelisting
 			//if not auction, create html components for date_start and date_end to insert into clientplacerequest. additionally, if user-set time frame, create html components for resp_time as well.
@@ -185,94 +218,67 @@ export default class RoomPage extends React.Component {
 			'starting_price': this.state.starting_price,//auction
 			'current_price': this.state.current_price,//auction
 			'sold_price': this.state.sold_price,//auction
-			/*'amenity' : //create list of amenities that exist at place
-			[
-					{name : 'Wireless Internet', checked : false},
-					{name : 'Pool', checked : false},
-					{name : 'Kitchen', checked : false},
-					{name : '24-hour check-in', checked : false},
-					{name : 'Air conditioning', checked : false},
-					{name : 'Buzzer/wireless intercom', checked : false},
-					{name : 'Cable TV', checked : false},
-					{name : 'Carbon monoxide detector', checked : false},
-					{name : 'Doorman', checked : false},
-					{name : 'Doorman Entry', checked : false},
-					{name : 'Dryer', checked : false},
-					{name : 'Elevator in building', checked : false},
-					{name : 'Essentials', checked : false},
-					{name : 'Family/kid friendly', checked : false},
-					{name : 'Fire extinguisher', checked : false},
-					{name : 'First aid kit', checked : false},
-					{name : 'Free parking on premises', checked : false},
-					{name : 'Free parking on street', checked : false},
-					{name : 'Gym', checked : false},
-					{name : 'Hair dryer', checked : false},
-					{name : 'Hangers', checked : false},
-					{name : 'Heating', checked : false},
-					{name : 'Hot tub', checked : false},
-					{name : 'Indoor fireplace', checked : false},
-					{name : 'Internet', checked : false},
-					{name : 'Iron', checked : false},
-					{name : 'Keypad', checked : false},
-					{name : 'Laptop friendly workspace', checked : false},
-					{name : 'Lock on bedroom door', checked : false},
-					{name : 'Lockbox', checked : false},
-					{name : 'Pets allowed', checked : false},
-					{name : 'Safety card', checked : false},
-					{name : 'Shampoo', checked : false},
-					{name : 'Smartlock', checked : false},
-					{name : 'Smoke detector', checked : false},
-					{name : 'Smoking allowed', checked : false},
-					{name : 'Suitable for events', checked : false},
-					{name : 'TV', checked : false},
-					{name : 'Washer', checked : false},
-					{name : 'Wheelchair accessible', checked : false}
-				],*/
-
-				/*hostlanguage: //create list of languages that host of place knows
-				[
-					{name : 'English', checked : false},
-					{name : 'Español', checked : false},
-					{name : 'Français', checked : false},
-					{name : 'Bahasa Indonesia', checked : false},
-					{name : 'Bahasa Malaysia', checked : false},
-					{name : 'Bengali', checked : false},
-					{name : 'Dansk', checked : false},
-					{name : 'Deutsch', checked : false},
-					{name : 'Hindi', checked : false},
-					{name : 'Italiano', checked : false},
-					{name : 'Magyar', checked : false},
-					{name : 'Nederlands', checked : false},
-					{name : 'Norsk', checked : false},
-					{name : 'Polski', checked : false},
-					{name : 'Português', checked : false},
-					{name : 'Punjabi', checked : false},
-					{name : 'Sign Language', checked : false},
-					{name : 'Suomi', checked : false},
-					{name : 'Svenska', checked : false}
-				],*/
-
-			/*this.rooms = //grab list of pictures that exist at place, using this.state.pictures for img's
-			[
-				{img: "/images/room1.jpg", title: "room1", price: "$100", roomType: "private"},
-				{img: "/images/room2.jpg", title: "room1", price: "$100", roomType: "private"},
-				{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
-			];*/
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('Place details query not successful');
 			} else {
 				console.log('Place details query successful');
 				this.setState({result: data.result});
+				this.setState({cost: data.result[0].cost_per_night});
+			}
+  		});
+	}
+
+	insertReservationQuery() {
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
+		console.log("current day : " + datetime);
+		$.post('/api/addreservation', {
+			'bookingtype' : this.state.result[0].bookingtype_name,
+			'place_id' : this.state.placeID,
+			'host_id' : this.state.result[0].host_id,
+			'client_id' : this.state.clientID,
+			'payment_type_id' : this.state.payment_type_id,
+			'booked_date_start' : this.state.bookCheckinTime,
+			'booked_date_end' : this.state.bookCheckoutTime,
+			'amt_paid' : this.state.cost,
+			'paid_date' : datetime
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('insert reservation not successful');
+			} else {
+				console.log('insert reservation successful');
+				if (this.state.result[0].bookingtype_id == "1") {
+					let url = `/trips`;
+					browserHistory.push(url);
+				}
+			}
+  		});
+	}
+
+	insertClientAuctionBids() {
+		$.post('/api/addbid', {
+			'auction_id' : this.state.result[0].auction_id,
+			'client_id' : this.state.clientID,
+			'bid_price' : this.state.bid_amount,
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('insert ClientAuctionBids not successful');
+			} else {
+				console.log('insert ClientAuctionBids successful');
+				// if (this.state.result[0].bookingtype_id == "2") {
+					// let url = `/trips`;
+					// browserHistory.push(url);
+				// }
 			}
   		});
 	}
 
 	render() {
-    this.ref.roomElem
+    // this.ref.roomElem
 		return (
 			<div className="roompage">
-				<h1 ref="roomElem">Room { this.state.placeID } display page</h1>
+				<h1>Room { this.state.placeID } display page</h1>
 				<br></br>
 				<img src={this.state.result[0].pictures} />
 				<br></br>
@@ -307,9 +313,9 @@ export default class RoomPage extends React.Component {
 				Amenities : {this.state.result[0].amenities}
 				<br></br>
 				<br></br>
-				Booking({this.state.result[0].bookingtype_name})
-				{this.renderBooking()}
-
+				Booking type ({this.state.result[0].bookingtype_name})
+				{!(this.state.jumpToPay)? this.renderBooking(): null}
+				{(this.state.jumpToPay)? this.renderPayment() : null}
 
 				{/* Disqus example start */}
 				<div id="disqus_thread"></div>
@@ -319,11 +325,29 @@ export default class RoomPage extends React.Component {
 		);
 	}
 
+	renderPayment() {
+		return (
+			<div>
+				<div>
+					<input type="radio" name="cash" value="cash" checked={this.state.payMethod === 'cash'} onChange={this.onChange.bind(this)}/>Cash
+					<input type="radio" name="check" value="check" checked={this.state.payMethod === 'check'} onChange={this.onChange.bind(this)}/>Check
+					<input type="radio" name="credit" value="credit" checked={this.state.payMethod === 'credit'} onChange={this.onChange.bind(this)}/>Credit
+					<input type="radio" name="paypal" value="paypal" checked={this.state.payMethod === 'paypal'} onChange={this.onChange.bind(this)}/>Paypal
+					<input type="radio" name="other" value="other" checked={this.state.payMethod === 'other'} onChange={this.onChange.bind(this)}/>Other
+				</div>
+				<button type="button" onClick={this.onClickPay.bind(this)}>Pay!!</button>
+			</div>
+		);
+	}
+	
+
 	renderBooking() {
 		if (this.state.result[0].bookingtype_id == "1") {
 			return (this.instantBooking());
-		} else if (this.state.result[0].bookingtype_id == "2") {
+		} else if (this.state.result[0].bookingtype_id == "2" && this.state.result[0].active == 'yes') {
 			return (this.auctionBooking());
+		} else if (this.state.result[0].bookingtype_id == "2" && this.state.result[0].active == 'no') {
+			return (this.auctionNotAvailable());
 		} else if (this.state.result[0].bookingtype_id == "3") {
 			return (this.userSetTimeFrameBooking());
 		} else if (this.state.result[0].bookingtype_id == "4") {
@@ -345,7 +369,7 @@ export default class RoomPage extends React.Component {
 	renderingInstantBookingButton() {
 		return (
 			<div>
-				<button type="button">Instant book!!</button>
+				<button type="button" onClick={this.onClickInstantBooking.bind(this)}>Instant book!!</button>
 			</div>
 		);
 	}
@@ -361,15 +385,28 @@ export default class RoomPage extends React.Component {
 	auctionBooking() {
 		return (
 			<div>
-				Starting price<input type="text" placeholder='none'></input>
+				Starting price: {this.state.result[0].starting_price}
 				<br></br>
-				Current bid<input type="text" placeholder='none'></input>
+				Current bid: {this.state.result[0].current_price}
 				<br></br>
-				Bid end date<input type="text" placeholder={this.state.result[0].date_range_end}></input>
+				Bid end date : {this.state.result[0].date_range_end}
 				<br></br>
-				Your Bid<input type="text"></input>
+				Your Bid<input name='bid_amount' type="number" onChange={this.onChange.bind(this)}></input> {this.state.bid_update ? "(your bid is updated)" : ""}
 				<br></br>
-				<button type="button">Submit</button>
+				{this.state.bid_amount_ok ? <button type="button" onClick={this.onClickAuctionBooking.bind(this)}>Submit</button> : null}
+				
+			</div>
+		);
+	}
+
+	auctionNotAvailable() {
+		return (
+			<div>
+				Starting price : {this.state.result[0].starting_price}
+				<br></br>
+				Current bid : {this.state.result[0].current_price}
+				<br></br>
+				Bid end date : {this.state.result[0].date_range_end}
 			</div>
 		);
 	}
@@ -377,9 +414,10 @@ export default class RoomPage extends React.Component {
 	userSetTimeFrameBooking() {
 		return (
 			<div>
+				How much do you want to pay?: <b>${this.state.cost}</b> <input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
+				How long will you give the host to respond?: <b> {this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
-				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
-				response time<input name='book_check_response' type="date"></input>
+				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
 				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
 			</div>
@@ -389,9 +427,12 @@ export default class RoomPage extends React.Component {
 	hostSetTimeFrameBooking() {
 		return (
 			<div>
+				Response Time for host to get back to you : {this.state.result[0].response_time}
+				<br/>
+				How much do you want to pay? <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
+				<br/>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
-				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
-				response time<input name='book_check_response' type="date"></input>
+				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
 				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
 			</div>
@@ -411,6 +452,34 @@ export default class RoomPage extends React.Component {
 		} else if (this.state.result[0].bookingtype_id == "4" && type == "date") {
 			var date = new Date(val);
 			this.checkBookDate(date, name, val);
+		} else if (type == "radio" && name == 'cash') {
+			this.setState({payMethod: 'cash'});
+			this.setState({payment_type_id: 1});
+		} else if (type == "radio" && name == 'check') {
+			this.setState({payMethod: 'check'});
+			this.setState({payment_type_id: 2});
+		} else if (type == "radio" && name == 'credit') {
+			this.setState({payMethod: 'credit'});
+			this.setState({payment_type_id: 3});
+		} else if (type == "radio" && name == 'paypal') {
+			this.setState({payMethod: 'paypal'});
+			this.setState({payment_type_id: 4});
+		} else if (type == "radio" && name == 'other') {
+			this.setState({payMethod: 'other'});
+			this.setState({payment_type_id: 5});
+		} else if (name === "cost") {
+			this.setState({cost: val});
+		} else if (name === "response_time") {
+			this.setState({response_time: val});
+		} else if (name === "bid_amount") {
+			var input = new Number(val);
+			var current = new Number(this.state.result[0].current_price);
+			this.setState({bid_amount: input});
+			if (input <= current) {
+				this.setState({bid_amount_ok: false});
+			} else {
+				this.setState({bid_amount_ok: true});
+			}
 		}
 	}
 
@@ -427,7 +496,9 @@ export default class RoomPage extends React.Component {
 		if (name == "book_check_in") {
 			console.log("check date in check in");
 			var outTime = new Date(this.state.bookCheckoutTime);
+			var resTime = new Date(this.state.bookResponseTime);
 			var timeDiffOut	= date.getTime() - outTime.getTime();
+			var timeDiffRes = date.getTime() - resTime.getTime();
 			this.setState({bookCheckinTime: val});
 			if (timeInHostRange) {
 				this.setState({bookCheckinRangeOK: true});
@@ -442,7 +513,9 @@ export default class RoomPage extends React.Component {
 		} else if (name == "book_check_out") {
 			console.log("check date in check out");
 			var inTime = new Date(this.state.bookCheckinTime);
+			var resTime = new Date(this.state.bookResponseTime);
 			var timeDiffIn	= date.getTime() - inTime.getTime();
+			var timeDiffRes = date.getTime() - resTime.getTime();
 			this.setState({bookCheckoutTime: val});
 			if (timeInHostRange) {
 				this.setState({bookCheckoutRangeOK: true});
@@ -454,6 +527,40 @@ export default class RoomPage extends React.Component {
 			} else {
 				this.setState({bookButtonOK: false});
 			}
+		} else if (name == "book_check_response") {
+			console.log("check date in book_check_response");
+			var inTime = new Date(this.state.bookCheckinTime);
+			var timeDiffIn	= date.getTime() - inTime.getTime();
+			var outTime = new Date(this.state.bookCheckoutTime);
+			var timeDiffout	= date.getTime() - outTime.getTime();
+			this.setState({bookResponseTime: val});
+			if (timeDiffout <= 0 && timeDiffIn >= 0) {
+				this.setState({bookResponseOK: true});
+			} else {
+				this.setState({bookResponseOK: false});
+			}
+			if ((timeDiffout <= 0 && timeDiffIn >= 0) && this.state.bookCheckinRangeOK && this.state.bookCheckoutRangeOK) {
+				this.setState({bookButtonOK: true});
+			} else {
+				this.setState({bookButtonOK: false});
+			}
 		}
+	}
+
+	onClickInstantBooking() {
+		this.setState({jumpToPay: true});
+	}
+
+	onClickAuctionBooking() {
+		this.setState({bid_update: true});
+		var newResult = this.state.result;
+		var g = new String(this.state.bid_amount);
+		newResult[0].current_price = g;
+		this.setState({result: newResult});
+		this.insertClientAuctionBids();
+	}
+
+	onClickPay() {
+		this.insertReservationQuery();
 	}
 }
