@@ -11,12 +11,12 @@ export default class TopHeaderBecomeAHostBtn extends TopHeaderDropdownButton {
   }
 
   renderButton() {
-    return (<div><div className="btn-rect">Become a Host</div></div>);   
+    return (<div><div className="btn-rect">Create a new Listing</div></div>);   
 	}
 
   renderDropdownContent() {
     return (
-      <div>You could earn $324 sharing your home in Newark in a week. Become a host.</div>
+      <div>Create a new listing to host! You could earn $324 sharing your home in Newark in a week.	</div>
     );
   }
 	// render() {

@@ -37,7 +37,7 @@ export default class TopHeader extends React.Component {
           <TopHeaderProfileBtn className="profile-btn" />
           <TopHeaderMessagesBtn />
           <Link to="/trips"><TopHeaderTripsBtn /></Link>
-          <Link to="/become-host"><TopHeaderBecomeAHostBtn className="become-a-host" /></Link>
+          <Link to="/become-host/0"><TopHeaderBecomeAHostBtn className="become-a-host" /></Link>
         </div>
       );
     }else{
@@ -50,7 +50,7 @@ export default class TopHeader extends React.Component {
             <div>Sign Up</div>
           </div>
           {/*<div className="right-btn help">Help</div>*/}
-          <Link to="/become-host"><TopHeaderBecomeAHostBtn className="become-a-host" /></Link>
+          <Link to="/become-host/0"><TopHeaderBecomeAHostBtn className="become-a-host" /></Link>
         </div>
       );
     }

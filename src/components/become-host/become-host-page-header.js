@@ -20,6 +20,8 @@ export default class BecomeHostMainPage extends React.Component {
  constructor(props) {
 		 super(props)
 
+		 var place_id = this.props.params.place_id;
+		 
 		this.state = {
 			isFiltersVisible: false,
 			imageFiles: [],

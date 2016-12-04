@@ -311,6 +311,116 @@ var db = function(app){
 			});
 	});
 
+	/////////////////////////////////////////////////////////////////////////////
+	// Update Request
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/updateRequest",function(req,res) {
+			var currentdate = new Date();
+			var currentDateMySQLFormat = (currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate());
+			var req_id = req.body.id;
+			var status = req.body.val;
+			if (status === "reject") {
+			var handleRequestSQL = "UPDATE clientplacerequest" +
+								" SET status = 'rejected', date_resp = ?"
+								" WHERE req_id = ?",
+								[currentDateMySQLFormat, req_id];
+			} else if (status === accept) {
+			var handleRequestSQL = "UPDATE clientplacerequest" +
+								" SET status = 'accepted', date_resp = ?"
+								" WHERE req_id = ?",
+								[currentDateMySQLFormat, req_id];
+								
+			} else if (status === cancel) {
+			var handleRequestSQL = "UPDATE clientplacerequest" +
+								" SET status = 'cancelled'"
+								" WHERE req_id = ?",
+								[req_id];
+			}
+			//Update req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
+
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// clientPendingRequests
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/clientPendingRequests",function(req,res) {
+			var client_id = req.body.user_id;
+			//Returns req_id, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			var placeQuerySQL = "SELECT req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
+			" NATURAL JOIN place" +
+			" NATURAL JOIN hostplacelisting" +
+			" JOIN users ON users.user_id = clientplacerequest.client_id" +
+			" WHERE client_id = " + client_id;
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+	
+	/////////////////////////////////////////////////////////////////////////////
+	// hostPendingRequests
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/hostPendingRequests",function(req,res) {
+			var host_id = req.body.user_id;
+			//Returns req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			var placeQuerySQL = "SELECT req_id, place_id, client_id, users.name as client_name, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
+			" NATURAL JOIN place" +
+			" NATURAL JOIN hostplacelisting" +
+			" JOIN users ON users.user_id = clientplacerequest.client_id" +
+			" WHERE host_id = " + host_id + " AND status = 'pending'";
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
+	
+	/////////////////////////////////////////////////////////////////////////////
+	// Get Host Place Listings
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getUserListings",function(req,res){
+			var host_id = req.body.host_id;
+			//Returns place_id, bookingtype_name, date_range_start, date_range_end, room_name, rating, pictures
+			var placeQuerySQL = "SELECT place_id, rating, name as room_name, pictures, date_range_start, date_range_end, bookingtype_name FROM place"+
+			" NATURAL JOIN hostplacelisting"+
+			" NATURAL JOIN bookingtype"+
+			" WHERE host_id = " + host_id;
+			console.log(placeQuerySQL);
+			conn.query(placeQuerySQL,
+			function(err, rows, fields){
+					if (!err) {
+							console.log(rows);
+							res.json({'query_success': true, 'result': rows});
+					} else {
+							console.log('Error while performing Query.');
+							res.json({'query_success': false});
+					}
+			});
+	});
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Get information about one place
@@ -876,7 +986,7 @@ var db = function(app){
 	// Get user reservations
 	/////////////////////////////////////////////////////////////////////////////
 	app.get("/api/get_user_reservations",function(req,res){
-    dbNoRequireCache.api_get_user_reservations(req,res,conn);
+		dbNoRequireCache.api_get_user_reservations(req,res,conn);
 	});
 
 	/////////////////////////////////////////////////////////////////////////////

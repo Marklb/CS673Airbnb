@@ -13,7 +13,7 @@ require("./users-trips.scss");
 */
 export default class UsersTrips extends React.Component {
   static contextTypes = {
-	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired  
+	  userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired  
   };
   
   constructor(props) {
@@ -46,6 +46,7 @@ export default class UsersTrips extends React.Component {
 			'clientID' : this.state.clientID,
 			'place_ID' : this.state.placeID,
 			'room_name': this.state.room_name, 
+			'rating': this.state.rating,
 			'pictures': this.state.pictures, 
 			'booked_date_start': this.state.booked_date_start, 
 			'booked_date_end': this.state.booked_date_end
