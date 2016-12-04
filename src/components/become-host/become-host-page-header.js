@@ -8,6 +8,9 @@ import Dropzone from 'react-dropzone';
 import ReactDOM from 'react-dom';
 import UserSessionHandler from '../../user-session-handler';
 
+import ListingImageUploader from '../listing-image-uploader';
+import GoogleMapsLocationSelector from '../google-components/google-maps-location-selector';
+
 require("./become-host-page-header.scss");
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 /*
@@ -15,9 +18,9 @@ var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 */
 export default class BecomeHostMainPage extends React.Component {
   static contextTypes = {
-	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired  
+	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
   };
-  
+
  constructor(props) {
 		 super(props)
 
@@ -38,9 +41,19 @@ export default class BecomeHostMainPage extends React.Component {
 			numofbeds: -1,
 			booktypeData: '',
 			response_time: 3,
-			host_id: -1, 
-			items: [1,2,3,4],
-
+			host_id: -1,
+			items: [],
+      street:'',
+      city:'',
+      state:'',
+      zip:'',
+      country:'',
+      description:'',
+      title:'',
+      descriptionError:'',
+      imagesUploadedToBrowser:[],
+      locationLatLng: null,
+      isBookingActive: true,
 			checkbox : {
 				roomtype : [
 					{name : 'Entire home', checked : false},
@@ -194,6 +207,15 @@ export default class BecomeHostMainPage extends React.Component {
 			{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
 		];*/
 		this.onChange = this.onChange.bind(this);
+    this.handleStreet = this.handleStreet.bind(this);
+    this.handleCity = this.handleCity.bind(this);
+    this.handleZip = this.handleZip.bind(this);
+    this.handleState = this.handleState.bind(this);
+    this.handleCountry = this.handleCountry.bind(this);
+    this.handleDescription = this.handleDescription.bind(this);
+    this.handleTitle = this.handleTitle.bind(this);
+    this.onChangeBookingActive = this.onChangeBookingActive.bind(this);
+
 	}
 
 	componentDidMount() {
@@ -206,7 +228,7 @@ export default class BecomeHostMainPage extends React.Component {
 		this.state.host_id = data.host_id;
 	});
   }
-  
+
 	componentWillReceiveProps(nextProps) {
 	// You don't have to do this check first, but it can help prevent an unneeded render
 		if (nextProps.params.place !== this.state.inputLocation) {
@@ -216,7 +238,7 @@ export default class BecomeHostMainPage extends React.Component {
 		}
 	}
 
-	
+
 	/*getNeighborQuery(location) {
 		$.post('/api/showneighbor', {
   			'city': location
@@ -270,18 +292,18 @@ export default class BecomeHostMainPage extends React.Component {
 	}*/
 
 	render() {
-		let files = this.state.imageFiles;
-		console.log(files);
+		// let files = this.state.imageFiles;
+		// console.log(files);
 
     var items = this.state.items.map(function(item, i) {
          return (
-            <div key = {item} onClick = {this.handleRemove.bind(this, i)}>
-               {item}
+            <div key = {i} onClick = {this.handleRemove.bind(this, i)}>
+               {item.name+' : $'+item.price}
             </div>
          );
 
       }.bind(this));
-	  
+
 		return (
 			<div>
 				<div className="filter">
@@ -289,8 +311,8 @@ export default class BecomeHostMainPage extends React.Component {
 					<form className="f">
 						Update your calendar
 						<div>
-						<input name='date_start' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
-						<input name='date_end' onChange={this.onChange.bind(this)} className="t" type="date"></input>
+						<input name='date_start' onChange={this.onChangeDateRange.bind(this)} className="t1" type="date"></input>
+						<input name='date_end' onChange={this.onChangeDateRange.bind(this)} className="t" type="date"></input>
 						</div>
 					</form>
 
@@ -373,29 +395,61 @@ export default class BecomeHostMainPage extends React.Component {
 
 					 <form className='f' ref='joinForm' autoComplete='off'>
 						  Photos
-						  <div>
-							<Dropzone onDrop={this.onDrop}>
-							  <div>Try dropping some files here, or click to select files to upload.</div>
-							</Dropzone>
-						  </div>
+              <ListingImageUploader onImageListChange={this.onImageListChange.bind(this)}/>
 
-						{files.length > 0 ? <div>
-					<h2>Uploading {files.length} files...</h2>
-					<div>{files.map((file) => <img src={file.preview} /> )}</div>
-					</div> : null}
+							{/*<div>
+                <Dropzone onDrop={this.onDrop}>
+							  <div>Try dropping some files here, or click to select files to upload.</div>
+							</Dropzone></div>
+              {files.length > 0 ? <div>
+  					<h2>Uploading {files.length} files...</h2>
+  					<div>{files.map((file) => <img src={file.preview} /> )}</div>
+  					</div> : null}*/}
+
+
+
+					</form>
+
+          <form className="f">
+          <div>
+            street:
+						<div>
+						<input type="text" name="street" value={this.state.street} onChange={this.handleStreet}></input>
+						</div>
+            city
+            <div>
+						<input type="text" name="city" value={this.state.city} onChange={this.handleCity}></input>
+						</div>
+            state
+            <div>
+						<input type="text" name="state" value={this.state.state} onChange={this.handleState}></input>
+						</div>
+            zip
+            <div>
+            <input type="text" name="zip" value={this.state.zip} onChange={this.handleZip}></input>
+            </div>
+            country
+            <div>
+            <input type="text" name="country" value={this.state.country} onChange={this.handleCountry}></input>
+            </div>
+          </div>
+          <div>
+          <GoogleMapsLocationSelector onCoordinatesChanged={this.onMapCoordsChange.bind(this)} />
+          </div>
 					</form>
 
 					<form className="f">
-						Discription:
+						Description:
 						<div>
-						<input type="text" name="discription"></input>
-						</div>
+						<textarea type="text" name="description" value={this.state.description} onChange={this.handleDescription}></textarea>
+            <span>{this.state.descriptionError}</span>
+            </div>
 					</form>
 
 					<form className="f">
 						Name your place:
 						<div>
-						<input type="text" name="title"></input>
+						<input type="text" name="title" value={this.state.title} onChange={this.handleTitle}></input>
 						</div>
 					</form>
 
@@ -426,6 +480,7 @@ export default class BecomeHostMainPage extends React.Component {
             <div>Paid Extras</div>
              </ReactCSSTransitionGroup>
           </div>
+
           <button onClick = {this.handleAdd}>Add Extra Service/Product</button>
 
           <ReactCSSTransitionGroup transitionName = "example"
@@ -433,6 +488,8 @@ export default class BecomeHostMainPage extends React.Component {
              {items}
           </ReactCSSTransitionGroup>
 					</form>
+
+          <input type="checkbox" onChange={this.onChangeBookingActive} defaultChecked />Booking Active<br/>
 					<button name='Save and exit' type="button" onClick={this.onClickSave.bind(this)}>Save and Exit</button>
 
 					{/*{this.renderResult(this.state.result)}*/}
@@ -448,7 +505,7 @@ export default class BecomeHostMainPage extends React.Component {
 		);
 	}
 
-		renderBookingTypeCode() {
+	renderBookingTypeCode() {
 		if (this.state.booktypeData == "Instant Book") {
 			return (
 				<div>
@@ -483,7 +540,25 @@ export default class BecomeHostMainPage extends React.Component {
 		newState.isFiltersVisible = !newState.isFiltersVisible;
 		this.setState(newState);
 	}
-	
+
+  inputChange(e){
+    var val = e.target.value;
+    if (name === "street") {
+      this.setState({street: val});
+    } else if (name === "city") {
+      this.setState({city: val});
+    } else if (name === "state") {
+      this.setState({street: val});
+    } else if (name === "zip") {
+      this.setState({street: val});
+    } else if (name === "country") {
+      this.setState({street: val});
+    } else if (name === "description") {
+      this.setState({street: val});
+    } else if (name === "title") {
+      this.setState({street: val});
+    }
+  }
 	onChange(e){
 		var name = e.target.name;
 		var val = e.target.value;
@@ -517,7 +592,7 @@ export default class BecomeHostMainPage extends React.Component {
 				this.setState({response_time: val});
 			} else if (name === "end_auction_time") {
 				this.setState({end_auction_time: val});
-			} 
+			}
 		} else {
 			var indx = e.target.value;
 			var checked = e.target.checked;
@@ -534,21 +609,212 @@ export default class BecomeHostMainPage extends React.Component {
 			this.setState(newState);
 		}
 	}
+
+  onChangeDateRange(e){
+    let newState = this.state;
+    if(e.target.name == 'date_start'){
+      newState.date_start = e.target.value;
+    }else if(e.target.name == 'date_end'){
+      newState.date_end = e.target.value;
+    }
+    this.setState(newState);
+  }
+
+
+  onImageListChange(imgList){
+    this.setState({imagesUploadedToBrowser: imgList});
+  }
+
+  onMapCoordsChange(latlng){
+    this.setState({locationLatLng: latlng});
+  }
+
+  handleStreet(e) {
+      var value = e.target.value;
+      this.setState({
+        street: value,
+      });
+  }
+  handleCity(e) {
+      var value = e.target.value;
+      this.setState({
+        city: value,
+      });
+  }
+  handleState(e) {
+      var value = e.target.value;
+      this.setState({
+        state: value,
+      });
+  }
+  handleZip(e) {
+      var value = e.target.value;
+      this.setState({
+        zip: value,
+      });
+  }
+
+  handleCountry(e) {
+      var value = e.target.value;
+      this.setState({
+        country: value,
+      });
+  }
+
+  handleDescription(e) {
+      var value = e.target.value;
+      var error = "";
+      if(value.length < 10) {
+        error = "Description cannot less than 10 words";
+      }
+      this.setState({
+        description: value,
+        descriptionError: error
+      });
+  }
+
+  handleTitle(e) {
+        var value = e.target.value;
+        this.setState({
+          title: value,
+        });
+  }
+
+  onChangeBookingActive(e){
+    this.setState({isBookingActive: e.target.checked});
+  }
+
 	onDrop(acceptedFiles, rejectedFiles) {
       console.log('Accepted files: ', acceptedFiles);
       console.log('Rejected files: ', rejectedFiles);
     }
 
-	/*insertNewPlace() {
+	insertNewPlace() {
+
+      var roomtypeLOOKUP = {
+        'Entire home': 1,
+        'Private room': 2,
+        'Shared room': 3
+      };
+
+      var bookingtypeLOOKUP = {
+        'Instant Book': 1,
+        'Auction': 2,
+        'User-set Time Frame': 3,
+        'Host-set Time Frame': 4
+      };
+
+      var languageLOOKUP = {
+        'English': 1,
+        'Español': 2,
+        'Français': 3,
+        'Bahasa Indonesian': 4,
+        'Bahasa Malaysia': 5,
+        'Bengali': 6,
+        'Dansk': 7,
+        'Deutsch': 8,
+        'Hindi': 9,
+        'Italiano': 10,
+        'Magyar': 11,
+        'Nederlands': 12,
+        'Norsk': 13,
+        'Polski': 14,
+        'Português': 15,
+        'Punjabi': 16,
+        'Sign Language': 17,
+        'Suomi': 18,
+        'Svenska': 19
+      };
+
+      var amenityLOOKUP = {
+        'Wireless Internet': 1,
+        'Pool': 2,
+        'Kitchen': 3,
+        '24-hour check-in': 4,
+        'Air conditioning': 5,
+        'Buzzer/wireless intercom': 6,
+        'Cable TV': 7,
+        'Carbon monoxide detector': 8,
+        'Doorman': 9,
+        'Doorman Entry': 10,
+        'Dryer': 11,
+        'Elevator in building': 12,
+        'Essentials': 13,
+        'Family/kid friendly': 14,
+        'Fire extinguisher': 15,
+        'First aid kit': 16,
+        'Free parking on premises': 17,
+        'Free parking on street': 18,
+        'Gym': 19,
+        'Hair dryer': 20,
+        'Hangers': 21,
+        'Heating': 22,
+        'Hot tub': 23,
+        'Indoor fireplace': 24,
+        'Internet': 25,
+        'Iron': 26,
+        'Keypad': 27,
+        'Laptop friendly workspace': 28,
+        'Lock on bedroom door': 29,
+        'Lockbox': 30,
+        'Pets allowed': 31,
+        'Safety card': 32,
+        'Shampoo': 33,
+        'Smartlock': 34,
+        'Smoke detector': 35,
+        'Smoking allowed': 36,
+        'Suitable for events': 37,
+        'TV': 38,
+        'Washer': 39,
+        'Wheelchair accessible': 40
+      };
+
+    var roomtype_id = null;
+    this.state.checkbox.roomtype.forEach((val, i) => {
+      if(val.checked === true) roomtype_id = roomtypeLOOKUP[val.name];
+    });
+
+    var hostlanguage_id = null;
+    this.state.checkbox.hostlanguage.forEach((val, i) => {
+      if(val.checked === true) hostlanguage_id = languageLOOKUP[val.name];
+    });
+
+    var amenity_ids = [];
+    this.state.checkbox.amenity.forEach((val, i) => {
+      if(val.checked === true) amenity_ids.push(amenityLOOKUP[val.name]);
+    });
+
 		$.post('/api/insertNewPlace', {
+
+      //address
+      'street': this.state.street,
+      'city': this.state.city,
+      'state': this.state.state,
+      'zip': this.state.zip,
+      'country': this.state.country,
+      //roomtype
+      'roomtype_id': roomtype_id,
+      //place
+      'authType': this.context.userSessionHandler.getAuthType(),
+      'authToken': this.context.userSessionHandler.getAuthToken(),
+			'room_title': this.state.title,
+			'description': this.state.description,
+			'cost_per_night': this.state.cost,//This is the same as ask_amount in hostplacelisting?
+			'max_people': this.state.numofguest,
 			'bedroomsize': this.state.bedroomsize,
 			'bathroomsize': this.state.bathroomsize,
-			'numofbeds': this.state.numofbeds
-			'host_id' : this.state.host_id,
-			'room_name': this.state.room_name, 
-			'pictures': this.state.pictures, 
-			'booked_date_start': this.state.booked_date_start, 
-			'booked_date_end': this.state.booked_date_end
+			'numofbeds': this.state.numofbeds,
+      'payExtras': this.state.items,
+      'locationLatLng': this.state.locationLatLng,
+      //hostplacelisting
+      'end_auction_time': this.state.end_auction_time,
+			'date_start': this.state.date_start,
+			'date_end': this.state.date_end,
+      'response_time': this.state.response_time,
+      'bookingtype_id': bookingtypeLOOKUP[this.state.booktypeData],
+      'amenity_ids': amenity_ids,
+      'hostlanguage_id': hostlanguage_id,
+      'isBookingActive': this.state.isBookingActive
 		}, (data, status) => {
 			if(data.query_success === false) {
 				console.log('Trip details query not successful');
@@ -557,12 +823,11 @@ export default class BecomeHostMainPage extends React.Component {
 				this.setState({result: data.result});
 			}
 		});
-	}*/
-	
+	}
+
 	onClickSave() {
 		this.insertNewPlace();
 		console.log(this.state.checkbox.roomtype[0].checked);
-		console.log(this.state.checkbox.bookingtype[0].checked);
 		console.log(this.state.checkbox.amenity[0].checked);
 		console.log(this.state.checkbox.hostlanguage[0].checked);
 		console.log(this.state.numofguest);
@@ -578,14 +843,15 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log("HIT");
 		console.log(event.target.value);
 	}
-  handleAdd() {
-      var newItems = this.state.items.concat([prompt('Create New Item')]);
-      this.setState({items: newItems});
-   }
-   handleRemove(i) {
-      var newItems = this.state.items.slice();
-      newItems.splice(i, 1);
-      this.setState({items: newItems});
-   }
+  handleAdd(e) {
+    e.preventDefault();
+    var newItems = this.state.items.concat([{name: prompt('Create New Item'), price: prompt('Price')}]);
+    this.setState({items: newItems});
+  }
+  handleRemove(i) {
+    var newItems = this.state.items.slice();
+    newItems.splice(i, 1);
+    this.setState({items: newItems});
+  }
 
 };

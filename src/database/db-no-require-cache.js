@@ -351,3 +351,148 @@ module.exports.api_get_user_reservations = function(req,res,conn){
       }
     });
 }
+
+module.exports.api_insert_listing = function(req,res,conn){
+try{
+
+  // console.log(req.body);
+  var street = req.body.street;
+  var city = req.body.city;
+  var state = req.body.state;
+  var zip = req.body.zip;
+  var country = req.body.country;
+
+  var room_name = req.body.room_title;
+  var room_description = req.body.description;
+  var date_start = req.body.date_start;
+  var date_end = req.body.date_end;
+  var max_people = req.body.max_people;
+  var cost_per_night = req.body.cost_per_night;
+  var response_time = req.body.response_time;
+  var bedroomsize = req.body.bedroomsize;
+  var bathroomsize = req.body.bathroomsize;
+  var numofbeds = req.body.numofbeds;
+  var roomtype_id = req.body.roomtype_id;
+  var bookingtype_id = req.body.bookingtype_id;
+  var amenity_ids = (req.body.amenity_ids+'').split(',');
+  var hostlanguage_id = req.body.hostlanguage_id;
+  var isBookingActive = req.body.isBookingActive;
+  console.log("---");
+  console.log(isBookingActive);
+  console.log(bookingtype_id);
+  console.log(req.body.bookingtype_id);
+
+  var address_query_str = `
+  INSERT INTO address (street, city, state, zip, country)
+  VALUES (?,?,?,?,?)
+  `;
+
+  address_query_str = mysql.format(address_query_str, [street, city, state, zip, country]);
+  console.log(address_query_str);
+
+  function doPlaceAmenitysQuery(args){
+    var place_amenity_query_str = `
+    INSERT INTO PlaceAmenity (place_id, amenity_id)
+    VALUES
+    `;
+    var placeValues = [];
+    for(var i = 0; i < amenity_ids.length; i++){
+      if(i != 0) place_amenity_query_str += ',';
+      place_amenity_query_str += '(?)';
+      placeValues.push([args.place_id, amenity_ids[i]]);
+    }
+
+    place_amenity_query_str = mysql.format(place_amenity_query_str, placeValues);
+
+    conn.query(place_amenity_query_str, function(err, result){
+      if (!err) {
+        console.log(result.insertId);
+        // doHostPlaceListingQuery({place_id: result.insertId});
+        res.json({'query_success': true});
+      } else {
+        console.log('Error while performing Query.');
+        res.json({'query_success': false});
+      }
+    });
+  }
+
+  function doHostPlaceListingQuery(args) {
+    var hpl_query_str = `
+    INSERT INTO HostPlaceListing (place_id, host_id, bookingtype_id,
+      ask_amount, date_range_start, date_range_end, response_time, active)
+    VALUES (?,1,?,?,?,?,?,?)
+    `;
+
+    hpl_query_str = mysql.format(hpl_query_str, [
+      args.place_id,
+      // req.query.auth_type, req.query.auth_token,
+      bookingtype_id, cost_per_night, date_start, date_end, response_time,
+      (isBookingActive == 'true')? 'yes' : 'no']);
+    console.log(hpl_query_str);
+
+    conn.query(hpl_query_str, function(err, result){
+      if (!err) {
+        console.log(result.insertId);
+        doPlaceAmenitysQuery({place_id: args.place_id});
+        // res.json({'query_success': true});
+      } else {
+        console.log('Error while performing Query.');
+        res.json({'query_success': false});
+      }
+    });
+  }
+
+  function doPlaceQuery(args) {
+    // var place_query_str = `
+    // INSERT INTO Place (host_id, addr_id, roomtype_id, name, description, cost_per_night,
+    //   max_people, bedroomsize, bathroomsize, numofbeds)
+    // VALUES (
+    //   (SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?)
+    //   ,?,?,?,?,?,?,?,?,?)
+    // `;
+    // place_query_str = mysql.format(place_query_str, [
+    //   req.query.auth_type, req.query.auth_token,
+    //   host_id, addr_id, roomtype_id, name, description, cost_per_night,
+    //   max_people, bedroomsize, bathroomsize, numofbeds]);
+    // console.log(place_query_str);
+
+    var place_query_str = `
+    INSERT INTO Place (host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds)
+    VALUES (1,?,?,?,?,?,?,?,?,?)
+    `;
+    place_query_str = mysql.format(place_query_str, [
+      // req.query.auth_type, req.query.auth_token,
+      args.addr_id, roomtype_id, room_name, room_description, cost_per_night,
+      max_people, bedroomsize, bathroomsize, numofbeds]);
+    console.log(place_query_str);
+
+    conn.query(place_query_str, function(err, result){
+      if (!err) {
+        console.log(result.insertId);
+        doHostPlaceListingQuery({place_id: result.insertId});
+        // res.json({'query_success': true});
+      } else {
+        console.log('Error while performing Query.');
+        res.json({'query_success': false});
+      }
+    });
+
+  }
+
+
+  conn.query(address_query_str, function(err, result){
+    if (!err) {
+      console.log(result.insertId);
+      doPlaceQuery({addr_id: result.insertId});
+      // res.json({'query_success': true});
+    } else {
+      console.log('Error while performing Query.');
+      res.json({'query_success': false});
+    }
+  });
+
+}catch(err){
+  console.log('[ERROR THOWN]:');
+  console.log(err);
+}
+}
