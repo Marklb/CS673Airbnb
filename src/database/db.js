@@ -17,7 +17,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : 'd927392316',
+		password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -439,7 +439,7 @@ var db = function(app){
 							" JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
 			" JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
 							" JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
-			" WHERE place.place_id = " + placeID + " AND auction.active = 'yes' GROUP BY place.place_id"
+			" WHERE place.place_id = " + placeID + " AND (auction.active = 'yes' OR auction.active IS NULL) GROUP BY place.place_id"
 			console.log(placeQuerySQL);
 			conn.query(placeQuerySQL,
 			function(err, rows, fields){
