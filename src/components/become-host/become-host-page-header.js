@@ -10,7 +10,7 @@ import UserSessionHandler from '../../user-session-handler';
 
 import ListingImageUploader from '../listing-image-uploader';
 import GoogleMapsLocationSelector from '../google-components/google-maps-location-selector';
-
+var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 require("./become-host-page-header.scss");
 /*
 
