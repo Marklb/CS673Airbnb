@@ -365,7 +365,7 @@ var db = function(app){
 					}
 			});
 	});
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// hostPendingRequests
 	/////////////////////////////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ var db = function(app){
 					}
 			});
 	});
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// Get Host Place Listings
 	/////////////////////////////////////////////////////////////////////////////
@@ -431,7 +431,7 @@ var db = function(app){
 							" JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
 			" JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
 							" JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
-			" WHERE place.place_id = " + placeID + " AND auction.active = 'yes' GROUP BY place.place_id"
+			" WHERE place.place_id = " + placeID + " AND (auction.active = 'yes' OR auction.active IS NULL) GROUP BY place.place_id"
 			console.log(placeQuerySQL);
 			conn.query(placeQuerySQL,
 			function(err, rows, fields){
@@ -444,9 +444,25 @@ var db = function(app){
 					}
 			});
 	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Insert hostplacelisting information
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/insertNewPlace", function(req,res){
+		try{
+			dbNoRequireCache.api_insert_listing(req,res,conn);
+		}catch(err){
+			console.log('[ERROR THOWN]:');
+			console.log(err);
+		}
+
+
+
+	});
+
 	/////////////////////////////////////////////////////////////////////////////
 	// Get place search information
-	/////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	app.post("/api/get_places",function(req,res){
 		dbNoRequireCache.api_get_places(req,res,conn);
 	});
