@@ -378,10 +378,6 @@ try{
   var amenity_ids = (req.body.amenity_ids+'').split(',');
   var hostlanguage_id = req.body.hostlanguage_id;
   var isBookingActive = req.body.isBookingActive;
-  console.log("---");
-  console.log(isBookingActive);
-  console.log(bookingtype_id);
-  console.log(req.body.bookingtype_id);
 
   var address_query_str = `
   INSERT INTO address (street, city, state, zip, country)
@@ -421,12 +417,14 @@ try{
     var hpl_query_str = `
     INSERT INTO HostPlaceListing (place_id, host_id, bookingtype_id,
       ask_amount, date_range_start, date_range_end, response_time, active)
-    VALUES (?,1,?,?,?,?,?,?)
+    VALUES (?,
+      (SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?)
+      ,?,?,?,?,?,?)
     `;
 
     hpl_query_str = mysql.format(hpl_query_str, [
       args.place_id,
-      // req.query.auth_type, req.query.auth_token,
+      req.body.authType, req.body.authToken,
       bookingtype_id, cost_per_night, date_start, date_end, response_time,
       (isBookingActive == 'true')? 'yes' : 'no']);
     console.log(hpl_query_str);
@@ -444,25 +442,12 @@ try{
   }
 
   function doPlaceQuery(args) {
-    // var place_query_str = `
-    // INSERT INTO Place (host_id, addr_id, roomtype_id, name, description, cost_per_night,
-    //   max_people, bedroomsize, bathroomsize, numofbeds)
-    // VALUES (
-    //   (SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?)
-    //   ,?,?,?,?,?,?,?,?,?)
-    // `;
-    // place_query_str = mysql.format(place_query_str, [
-    //   req.query.auth_type, req.query.auth_token,
-    //   host_id, addr_id, roomtype_id, name, description, cost_per_night,
-    //   max_people, bedroomsize, bathroomsize, numofbeds]);
-    // console.log(place_query_str);
-
     var place_query_str = `
     INSERT INTO Place (host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds)
-    VALUES (1,?,?,?,?,?,?,?,?,?)
+    VALUES ((SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?),?,?,?,?,?,?,?,?,?)
     `;
     place_query_str = mysql.format(place_query_str, [
-      // req.query.auth_type, req.query.auth_token,
+      req.body.authType, req.body.authToken,
       args.addr_id, roomtype_id, room_name, room_description, cost_per_night,
       max_people, bedroomsize, bathroomsize, numofbeds]);
     console.log(place_query_str);

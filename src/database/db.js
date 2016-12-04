@@ -17,7 +17,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '9993kuo',
+		password : 'd927392316',
 		database : 'mokbnb'
 	});
 
@@ -329,7 +329,7 @@ var db = function(app){
 								" SET status = 'accepted', date_resp = ?"
 								" WHERE req_id = ?",
 								[currentDateMySQLFormat, req_id];
-								
+
 			} else if (status === cancel) {
 			var handleRequestSQL = "UPDATE clientplacerequest" +
 								" SET status = 'cancelled'"
@@ -374,7 +374,7 @@ var db = function(app){
 					}
 			});
 	});
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// hostPendingRequests
 	/////////////////////////////////////////////////////////////////////////////
@@ -398,7 +398,7 @@ var db = function(app){
 					}
 			});
 	});
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// Get Host Place Listings
 	/////////////////////////////////////////////////////////////////////////////
