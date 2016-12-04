@@ -24,7 +24,9 @@ export default class Dashboard extends React.Component {
 		hostPendingRequestResults: [
 			{
 				req_id: 'default',
+				bookingtype_name: 'default',
 				place_id: 'default',
+				host_id: 'default',
 				client_id: 'default',
 				client_name: 'default',
 				ask_amount: 'default',
@@ -60,7 +62,7 @@ export default class Dashboard extends React.Component {
 		}, (data, status) => {
 			console.log("data:" + data);
 			this.state.user_id = data.user_id;
-			$.post('/api/hostPendingRequests', { //req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			$.post('/api/hostPendingRequests', { //req_id, bookingtype_name, place_id, host_id, client_id, client_name, ask_amount,  payment_type_id, resp_time, date_start, date_end, date_req, room_name
 				'user_id' : this.state.user_id
 			}, (data, status) => {
 				if(data.query_success === false) {
@@ -71,7 +73,7 @@ export default class Dashboard extends React.Component {
 					console.log("hostPendingRequestResults[0].req_id = " + data.hostPendingRequestResults[0].req_id);
 				}
 			});
-			$.post('/api/clientPendingRequests', { //req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			$.post('/api/clientPendingRequests', { //req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
 				'user_id' : this.state.user_id
 			}, (data, status) => {
 				if(data.query_success === false) {
@@ -158,8 +160,8 @@ export default class Dashboard extends React.Component {
 						Booking Request from {val.client_name} on {val.date_req}, {days_remaining} days left to respond:<br/>
 						{val.room_name} from {val.date_start} to {val.date_end} for ${val.ask_amount}.
 						<br/>
-						<button type="button" id={val.req_id} value="accept" onClick={this.runSQL.bind(this)}>Accept</button> or 
-						<button type="button" id={val.req_id} value="reject" onClick={this.runSQL.bind(this)}>Reject</button>
+						<button type="button" id={i} value="accept" onClick={this.runSQL.bind(this)}>Accept</button> or 
+						<button type="button" id={i} value="reject" onClick={this.runSQL.bind(this)}>Reject</button>
 					</div>
 					);
 				})}
@@ -195,7 +197,7 @@ export default class Dashboard extends React.Component {
 						Your Request on {val.date_req} for {val.room_name} from {val.date_start} to {val.date_end} at ${val.ask_amount} 
 						{val.status === 'pending' ? " is pending, and has " + days_remaining + " days left for a response." : " has been " + val.status + "."}
 						<br/> 
-						{val.status === 'pending' ? <button type="button" id={val.req_id} value="cancel" onClick={this.runSQL.bind(this)}>Cancel</button> : ""}
+						{val.status === 'pending' ? <button type="button" id={i} value="cancel" onClick={this.runSQL.bind(this)}>Cancel</button> : ""}
 					</div>
 					);
 				})}
@@ -211,25 +213,63 @@ export default class Dashboard extends React.Component {
 	}
 	
 	runSQL(e) {
-		var id = e.target.id;
+		var i = e.target.id;
 		var val = e.target.value;
-		console.log(id);
 		console.log(val);
-		$.post('/api/updateRequest', {
-			id,
-			val
-		}, (data, status) => {
-			if(data.query_success === false) {
-				console.log('Request Update not successful');
-			} else {
-				console.log('Request Update successful');
-				if (val === "cancel") {
-					this.setState({yourPendingRequestResults: data.result});
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
+		if (val === "accept") {
+			$.post('/api/addreservation', {
+				'req_id': this.state.hostPendingRequestResults[i].req_id,
+				'bookingtype' : this.state.hostPendingRequestResults[i].bookingtype_name,
+				'place_id' : this.state.hostPendingRequestResults[i].place_id,
+				'host_id' : this.state.hostPendingRequestResults[i].host_id,
+				'client_id' : this.state.hostPendingRequestResults[i].client_id,
+				'payment_type_id' : this.state.hostPendingRequestResults[i].payment_type_id,
+				'booked_date_start' : this.state.hostPendingRequestResults[i].date_start,
+				'booked_date_end' : this.state.hostPendingRequestResults[i].date_end,
+				'amt_paid' : this.state.hostPendingRequestResults[i].ask_amount,
+				'paid_date' : datetime
+			}, (data, status) => {
+				if(data.query_success === false) {
+					console.log('Request Update not successful');
 				} else {
-					this.setState({hostPendingRequestResults: data.result});
+					console.log('Request Update successful');
+						this.setState({hostPendingRequestResults: data.result});
+					}
+				});
+		} else if (val === "cancel") {
+			$.post('/api/updateRequest', {
+				'req_id' : this.state.yourPendingRequestResults[i].req_id,
+				'val' : val,
+				'todays_date' : datetime
+			}, (data, status) => {
+				if(data.query_success === false) {
+					console.log('Request Update not successful');
+				} else {
+					console.log('Request Update successful');
+					let newState = this.state;
+					newState.yourPendingRequestResults[i].status = val + 'ed';
+					this.setState(newState);
 				}
-			}
-		});
+			});
+		} else if (val === "reject") {
+			$.post('/api/updateRequest', {
+				'req_id' : this.state.hostPendingRequestResults[i].req_id,
+				'val' : val,
+				'todays_date' : datetime
+			}, (data, status) => {
+				if(data.query_success === false) {
+					console.log('Request Update not successful');
+				} else {
+					console.log('Request Update successful');
+					let newState = this.state;
+					newState.hostPendingRequestResults[i].splice(i,1);
+					this.setState(newState);
+				
+				}
+			});
+		}
 	}
   
 	showReservations() {

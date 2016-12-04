@@ -318,6 +318,7 @@ CREATE TABLE IF NOT EXISTS `ClientPlaceRequest` (
   `client_id` INT NOT NULL,
   `place_id` INT NOT NULL,
   `ask_amount` VARCHAR(8) NOT NULL,
+  `payment_type_id` INT NULL,
   `resp_time` INT(2) NULL,
   `date_start` VARCHAR(45) NULL,
   `date_end` VARCHAR(45) NULL,
@@ -597,14 +598,14 @@ INSERT INTO UserLanguage (
 ;
 
 INSERT INTO ClientPlaceRequest (
-	place_id, client_id, ask_amount, resp_time, date_start, date_end, date_req, date_resp, status
+	place_id, client_id, ask_amount, payment_type_id, resp_time, date_start, date_end, date_req, date_resp, status
 ) VALUES
-	(3, 5, "79.99", 2, "2016-07-07", "2016-07-10",  "2016-07-01", "2016-07-02", "accepted"),
-	(4, 5, "60.00", 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "rejected"),
-	(4, 5, "62.00", 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "accepted"),
-    (3, 2, "82.50", 1, "2016-07-17", "2016-07-20",  "2016-07-14", NULL, "failed"),
-	(3, 2, "82.50", 1, "2016-07-17", "2016-07-20",  "2016-07-15", "2016-07-16", "accepted"),
-    (3, 1, "83.00", 5, "2016-12-07", "2016-12-09", "2016-12-01", NULL, "pending")
+	(3, 1, "79.99", 1, 2, "2016-07-07", "2016-07-10",  "2016-07-01", "2016-07-02", "accepted"),
+	(4, 1, "60.00", 2, 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "rejected"),
+	(4, 5, "62.00", 3, 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "accepted"),
+    (3, 2, "82.50", 2, 1, "2016-07-17", "2016-07-20",  "2016-07-14", NULL, "failed"),
+	(3, 2, "82.50", 4, 1, "2016-07-17", "2016-07-20",  "2016-07-15", "2016-07-16", "accepted"),
+    (3, 1, "83.00", 5, 5, "2016-12-07", "2016-12-09", "2016-12-01", NULL, "pending")
 ;
 
 INSERT INTO Reservation (

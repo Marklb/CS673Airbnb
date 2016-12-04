@@ -17,7 +17,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '9993kuo',
+		password : 'd927392316',
 		database : 'mokbnb'
 	});
 
@@ -312,34 +312,25 @@ var db = function(app){
 	});
 
 	/////////////////////////////////////////////////////////////////////////////
-	// Update Request
+	// Reject/Cancel Request
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/updateRequest",function(req,res) {
-			var currentdate = new Date();
-			var currentDateMySQLFormat = (currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate());
-			var req_id = req.body.id;
-			var status = req.body.val;
-			if (status === "reject") {
+			var req_id = req.body.req_id;
+			var val = req.body.val;
+			var today = req.body.todays_date;
+			if (val === "reject") {
 			var handleRequestSQL = "UPDATE clientplacerequest" +
-								" SET status = 'rejected', date_resp = ?"
-								" WHERE req_id = ?",
-								[currentDateMySQLFormat, req_id];
-			} else if (status === accept) {
+								" SET status = 'rejected', date_resp = ?" +
+								" WHERE req_id = ?";
+			} else if (val === "cancel") {
 			var handleRequestSQL = "UPDATE clientplacerequest" +
-								" SET status = 'accepted', date_resp = ?"
-								" WHERE req_id = ?",
-								[currentDateMySQLFormat, req_id];
-								
-			} else if (status === cancel) {
-			var handleRequestSQL = "UPDATE clientplacerequest" +
-								" SET status = 'cancelled'"
-								" WHERE req_id = ?",
-								[req_id];
+								" SET status = 'cancelled', date_resp = ?" +
+								" WHERE req_id = ?";
 			}
 			//Update req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
 
-			console.log(placeQuerySQL);
-			conn.query(placeQuerySQL,
+			console.log(handleRequestSQL);
+			conn.query(handleRequestSQL, [today, req_id], 
 			function(err, rows, fields){
 					if (!err) {
 							console.log(rows);
@@ -350,13 +341,13 @@ var db = function(app){
 					}
 			});
 	});
-
+	
 	/////////////////////////////////////////////////////////////////////////////
 	// clientPendingRequests
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/clientPendingRequests",function(req,res) {
 			var client_id = req.body.user_id;
-			//Returns req_id, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			//Returns req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
 			var placeQuerySQL = "SELECT req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
 			" NATURAL JOIN place" +
 			" NATURAL JOIN hostplacelisting" +
@@ -379,11 +370,12 @@ var db = function(app){
 	// hostPendingRequests
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/hostPendingRequests",function(req,res) {
-			var host_id = req.body.user_id;
-			//Returns req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
-			var placeQuerySQL = "SELECT req_id, place_id, client_id, users.name as client_name, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
+			var host_id = req.body.user_id; 
+			//Returns req_id, place_id, host_id, bookingtype_name, payment_type_id, client_id, client_name, ask_amount, payment_type_id, resp_time, date_start, date_end, date_req, room_name
+			var placeQuerySQL = "SELECT req_id, place_id, host_id, client_id, payment_type_id, bookingtype_name, users.name as client_name, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
 			" NATURAL JOIN place" +
 			" NATURAL JOIN hostplacelisting" +
+			" NATURAL JOIN bookingtype" +
 			" JOIN users ON users.user_id = clientplacerequest.client_id" +
 			" WHERE host_id = " + host_id + " AND status = 'pending'";
 			console.log(placeQuerySQL);
@@ -1021,7 +1013,6 @@ var db = function(app){
 		var booked_date_end = req.body.booked_date_end;
 		var amt_paid = req.body.amt_paid;
 		var paid_date = req.body.paid_date;
-		var sold_price = req.body.sold_price;
 		console.log("bookingtype : ", bookingtype);
 		console.log("place_id : ", place_id);
 		console.log("host_id : ", host_id);
@@ -1037,25 +1028,43 @@ var db = function(app){
 					" VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 					[place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date],
 		function(err, rows, fields){
-			if (!err) {
-				res.json({'query_success': true});
-			} else {
-				res.json({'query_success': false});
-				console.log(err);
-			}
+			// if (!err) {
+				// res.json({'query_success': true});
+			// } else {
+				// res.json({'query_success': false});
+				// console.log(err);
+			// }
 		});
 		if (bookingtype === "Auction") {
+			var sold_price = req.body.sold_price;
 			conn.query("UPDATE auction" +
 						"SET (active='no', sold_price = (SELECT current_price FROM auction WHERE place_id = ? AND active='yes')" +
 						"WHERE place_id = ? AND active='yes'",
 						[place_id, place_id],
-			function(err, rows, fields){
+			function(err, rows, fields) {
+				// if (!err) {
+					// res.json({'query_success': true});
+				// } else {
+					// res.json({'query_success': false});
+				// }
+			});
+		}
+		if (bookingtype === "User-Set Response Time Frame" || bookingtype === "Host-Set Response Time Frame") {
+			var currentdate = new Date();
+			var currentDateMySQLFormat = (currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate());
+			var req_id = req.body.req_id;
+			
+			conn.query("UPDATE clientplacerequest" +
+						" SET status = 'accepted', date_resp = ?" +
+						" WHERE req_id = ?",
+						[currentDateMySQLFormat, req_id],
+			function(err, rows, fields) {
 				if (!err) {
 					res.json({'query_success': true});
 				} else {
 					res.json({'query_success': false});
 				}
-			});
+			});				
 		}
 	});
 
