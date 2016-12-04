@@ -24,7 +24,7 @@ export default class RoomPage extends React.Component {
 		this.state = {
 			bid_update : false,
 			payMethod: 'credit',
-			submit: false,
+			jumpToPay: false,
 			clientID: -1,
 			default_check_in_date: d_date_check_in,
 			default_check_out_date: d_date_check_out,
@@ -75,6 +75,8 @@ export default class RoomPage extends React.Component {
 			current_price: -1,//auction
 			sold_price: -1,//auction
 			payment_type_id: -1, //for insertion into reservation
+			bid_amount: 0,
+			bid_amount_ok: false,
 
 			//result
 			result: [
@@ -129,6 +131,8 @@ export default class RoomPage extends React.Component {
 			bookCheckinTime : d_date_check_in,
 			bookCheckoutRangeOK : true,
 			bookCheckoutTime : d_date_check_out,
+			bookResponseOK : true,
+			bookResponseTime : d_date_check_in,
 			bookButtonOK : true
 		};
 		this.getRoomDetailsQuery(this.state.placeID);
@@ -220,31 +224,52 @@ export default class RoomPage extends React.Component {
 			} else {
 				console.log('Place details query successful');
 				this.setState({result: data.result});
-				this.setState({cost: this.state.result[0].cost_per_night});
+				this.setState({cost: data.result[0].cost_per_night});
 			}
   		});
 	}
 
-	instantInsertReservationQuery(placeID) {
+	insertReservationQuery() {
 		var currentdate = new Date(); 
 		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
 		console.log("current day : " + datetime);
 		$.post('/api/addreservation', {
-			//General place information
+			'bookingtype' : this.state.result[0].bookingtype_name,
 			'place_id' : this.state.placeID,
 			'host_id' : this.state.result[0].host_id,
 			'client_id' : this.state.clientID,
 			'payment_type_id' : this.state.payment_type_id,
 			'booked_date_start' : this.state.bookCheckinTime,
 			'booked_date_end' : this.state.bookCheckoutTime,
-			'amt_paid' : this.state.result[0].cost,
+			'amt_paid' : this.state.cost,
 			'paid_date' : datetime
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('insert reservation not successful');
 			} else {
 				console.log('insert reservation successful');
-				this.setState({result: data.result});
+				if (this.state.result[0].bookingtype_id == "1") {
+					let url = `/trips`;
+					browserHistory.push(url);
+				}
+			}
+  		});
+	}
+
+	insertClientAuctionBids() {
+		$.post('/api/addbid', {
+			'auction_id' : this.state.result[0].auction_id,
+			'client_id' : this.state.clientID,
+			'bid_price' : this.state.bid_amount,
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('insert ClientAuctionBids not successful');
+			} else {
+				console.log('insert ClientAuctionBids successful');
+				// if (this.state.result[0].bookingtype_id == "2") {
+					// let url = `/trips`;
+					// browserHistory.push(url);
+				// }
 			}
   		});
 	}
@@ -252,7 +277,7 @@ export default class RoomPage extends React.Component {
 	render() {
     // this.ref.roomElem
 		return (
-			<div ref='roomElem' className="roompage">
+			<div className="roompage">
 				<h1>Room { this.state.placeID } display page</h1>
 				<br></br>
 				<img src={this.state.result[0].pictures} />
@@ -289,9 +314,8 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				<br></br>
 				Booking type ({this.state.result[0].bookingtype_name})
-				{!(this.state.submit)? this.renderBooking(): null}
-				{(this.state.submit)? this.renderPayment() : null}
-
+				{!(this.state.jumpToPay)? this.renderBooking(): null}
+				{(this.state.jumpToPay)? this.renderPayment() : null}
 
 				{/* Disqus example start */}
 				<div id="disqus_thread"></div>
@@ -305,8 +329,11 @@ export default class RoomPage extends React.Component {
 		return (
 			<div>
 				<div>
-					<input type="radio" name="credit" value="credit" checked={this.state.payMethod === 'credit'} onChange={this.onChange.bind(this)}/> Credit
-					<input type="radio" name="debit" value="debit" checked={this.state.payMethod === 'debit'} onChange={this.onChange.bind(this)}/> Debit
+					<input type="radio" name="cash" value="cash" checked={this.state.payMethod === 'cash'} onChange={this.onChange.bind(this)}/>Cash
+					<input type="radio" name="check" value="check" checked={this.state.payMethod === 'check'} onChange={this.onChange.bind(this)}/>Check
+					<input type="radio" name="credit" value="credit" checked={this.state.payMethod === 'credit'} onChange={this.onChange.bind(this)}/>Credit
+					<input type="radio" name="paypal" value="paypal" checked={this.state.payMethod === 'paypal'} onChange={this.onChange.bind(this)}/>Paypal
+					<input type="radio" name="other" value="other" checked={this.state.payMethod === 'other'} onChange={this.onChange.bind(this)}/>Other
 				</div>
 				<button type="button" onClick={this.onClickPay.bind(this)}>Pay!!</button>
 			</div>
@@ -317,7 +344,7 @@ export default class RoomPage extends React.Component {
 	renderBooking() {
 		if (this.state.result[0].bookingtype_id == "1") {
 			return (this.instantBooking());
-		} else if (this.state.result[0].bookingtype_id == "2" && this.state.result[0].active == 'no') {
+		} else if (this.state.result[0].bookingtype_id == "2" && this.state.result[0].active == 'yes') {
 			return (this.auctionBooking());
 		} else if (this.state.result[0].bookingtype_id == "2" && this.state.result[0].active == 'no') {
 			return (this.auctionNotAvailable());
@@ -364,9 +391,10 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				Bid end date : {this.state.result[0].date_range_end}
 				<br></br>
-				Your Bid<input type="text"></input> {this.state.bid_update ? "(your bid is updated)" : ""}
+				Your Bid<input name='bid_amount' type="number" onChange={this.onChange.bind(this)}></input> {this.state.bid_update ? "(your bid is updated)" : ""}
 				<br></br>
-				<button type="button" onClick={this.onClickAuctionBooking.bind(this)}>Submit</button>
+				{this.state.bid_amount_ok ? <button type="button" onClick={this.onClickAuctionBooking.bind(this)}>Submit</button> : null}
+				
 			</div>
 		);
 	}
@@ -390,7 +418,6 @@ export default class RoomPage extends React.Component {
 				How long will you give the host to respond?: <b> {this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
-				response time<input name='book_check_response' type="date"></input>
 				<br></br>
 				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
 			</div>
@@ -406,7 +433,6 @@ export default class RoomPage extends React.Component {
 				<br/>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
-				response time<input name='book_check_response' type="date"></input>
 				<br></br>
 				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
 			</div>
@@ -426,15 +452,34 @@ export default class RoomPage extends React.Component {
 		} else if (this.state.result[0].bookingtype_id == "4" && type == "date") {
 			var date = new Date(val);
 			this.checkBookDate(date, name, val);
+		} else if (type == "radio" && name == 'cash') {
+			this.setState({payMethod: 'cash'});
+			this.setState({payment_type_id: 1});
+		} else if (type == "radio" && name == 'check') {
+			this.setState({payMethod: 'check'});
+			this.setState({payment_type_id: 2});
 		} else if (type == "radio" && name == 'credit') {
 			this.setState({payMethod: 'credit'});
-		} else if (type == "radio" && name == 'debit') {
-			this.setState({payMethod: 'debit'});
-		}
-		if (name === "cost") {
+			this.setState({payment_type_id: 3});
+		} else if (type == "radio" && name == 'paypal') {
+			this.setState({payMethod: 'paypal'});
+			this.setState({payment_type_id: 4});
+		} else if (type == "radio" && name == 'other') {
+			this.setState({payMethod: 'other'});
+			this.setState({payment_type_id: 5});
+		} else if (name === "cost") {
 			this.setState({cost: val});
 		} else if (name === "response_time") {
 			this.setState({response_time: val});
+		} else if (name === "bid_amount") {
+			var input = new Number(val);
+			var current = new Number(this.state.result[0].current_price);
+			this.setState({bid_amount: input});
+			if (input <= current) {
+				this.setState({bid_amount_ok: false});
+			} else {
+				this.setState({bid_amount_ok: true});
+			}
 		}
 	}
 
@@ -451,7 +496,9 @@ export default class RoomPage extends React.Component {
 		if (name == "book_check_in") {
 			console.log("check date in check in");
 			var outTime = new Date(this.state.bookCheckoutTime);
+			var resTime = new Date(this.state.bookResponseTime);
 			var timeDiffOut	= date.getTime() - outTime.getTime();
+			var timeDiffRes = date.getTime() - resTime.getTime();
 			this.setState({bookCheckinTime: val});
 			if (timeInHostRange) {
 				this.setState({bookCheckinRangeOK: true});
@@ -466,7 +513,9 @@ export default class RoomPage extends React.Component {
 		} else if (name == "book_check_out") {
 			console.log("check date in check out");
 			var inTime = new Date(this.state.bookCheckinTime);
+			var resTime = new Date(this.state.bookResponseTime);
 			var timeDiffIn	= date.getTime() - inTime.getTime();
+			var timeDiffRes = date.getTime() - resTime.getTime();
 			this.setState({bookCheckoutTime: val});
 			if (timeInHostRange) {
 				this.setState({bookCheckoutRangeOK: true});
@@ -478,18 +527,40 @@ export default class RoomPage extends React.Component {
 			} else {
 				this.setState({bookButtonOK: false});
 			}
+		} else if (name == "book_check_response") {
+			console.log("check date in book_check_response");
+			var inTime = new Date(this.state.bookCheckinTime);
+			var timeDiffIn	= date.getTime() - inTime.getTime();
+			var outTime = new Date(this.state.bookCheckoutTime);
+			var timeDiffout	= date.getTime() - outTime.getTime();
+			this.setState({bookResponseTime: val});
+			if (timeDiffout <= 0 && timeDiffIn >= 0) {
+				this.setState({bookResponseOK: true});
+			} else {
+				this.setState({bookResponseOK: false});
+			}
+			if ((timeDiffout <= 0 && timeDiffIn >= 0) && this.state.bookCheckinRangeOK && this.state.bookCheckoutRangeOK) {
+				this.setState({bookButtonOK: true});
+			} else {
+				this.setState({bookButtonOK: false});
+			}
 		}
 	}
 
 	onClickInstantBooking() {
-		this.setState({submit: true});
+		this.setState({jumpToPay: true});
 	}
 
 	onClickAuctionBooking() {
 		this.setState({bid_update: true});
+		var newResult = this.state.result;
+		var g = new String(this.state.bid_amount);
+		newResult[0].current_price = g;
+		this.setState({result: newResult});
+		this.insertClientAuctionBids();
 	}
 
 	onClickPay() {
-		this.componentDidMount();
+		this.insertReservationQuery();
 	}
 }
