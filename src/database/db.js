@@ -17,7 +17,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : 'd927392316',
+		password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -439,7 +439,7 @@ var db = function(app){
 							" JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
 			" JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
 							" JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
-			" WHERE place.place_id = " + placeID + " GROUP BY place.place_id";
+			" WHERE place.place_id = " + placeID + " AND auction.active = 'yes' GROUP BY place.place_id"
 			console.log(placeQuerySQL);
 			conn.query(placeQuerySQL,
 			function(err, rows, fields){
@@ -1012,15 +1012,84 @@ var db = function(app){
 	// Add a reservation
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/addreservation",function(req,res){
-		var city = req.body.city;
-		conn.query("SELECT street from Address WHERE city=" + "'" + city + "'",
+		var bookingtype = req.body.bookingtype;
+		var place_id = req.body.place_id;
+		var host_id = req.body.host_id;
+		var client_id = req.body.client_id;
+		var payment_type_id = req.body.payment_type_id;
+		var booked_date_start = req.body.booked_date_start;
+		var booked_date_end = req.body.booked_date_end;
+		var amt_paid = req.body.amt_paid;
+		var paid_date = req.body.paid_date;
+		var sold_price = req.body.sold_price;
+		console.log("bookingtype : ", bookingtype);
+		console.log("place_id : ", place_id);
+		console.log("host_id : ", host_id);
+		console.log("client_id : ", client_id);
+		console.log("payment_type_id : ", payment_type_id);
+		console.log("booked_date_start : ", booked_date_start);
+		console.log("booked_date_end : ", booked_date_end);
+		console.log("amt_paid : ", amt_paid);
+		console.log("paid_date : ", paid_date);
+		console.log("sold_price : ", sold_price);
+		conn.query("INSERT INTO Reservation" +
+					" (place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date)" +
+					" VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+					[place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date],
 		function(err, rows, fields){
 			if (!err) {
-				console.log(rows);
-				res.json({'query_success': true, 'neighborhoods': rows});
+				res.json({'query_success': true});
 			} else {
-				console.log('Error while performing Query.');
 				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+		if (bookingtype === "Auction") {
+			conn.query("UPDATE auction" +
+						"SET (active='no', sold_price = (SELECT current_price FROM auction WHERE place_id = ? AND active='yes')" +
+						"WHERE place_id = ? AND active='yes'",
+						[place_id, place_id],
+			function(err, rows, fields){
+				if (!err) {
+					res.json({'query_success': true});
+				} else {
+					res.json({'query_success': false});
+				}
+			});
+		}
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Add a bid
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/addbid",function(req,res){
+		var auction_id = req.body.auction_id;
+		var client_id = req.body.client_id;
+		var bid_price = req.body.bid_price;
+		console.log("auction_id : ", auction_id);
+		console.log("client_id : ", client_id);
+		console.log("bid_price : ", bid_price);
+		conn.query("INSERT INTO ClientAuctionBids" +
+					" (auction_id, client_id, bid_price)" +
+					" VALUES (?, ?, ?)",
+					[auction_id, client_id, bid_price],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true});
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+
+		conn.query("UPDATE auction SET current_price = ? WHERE auction_id = ?",
+					[bid_price, auction_id],
+		function(err, rows, fields){
+			if (!err) {
+				// res.json({'update_success': true});
+			} else {
+				// res.json({'query_success': false});
+				console.log(err);
 			}
 		});
 	});
