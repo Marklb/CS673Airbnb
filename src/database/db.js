@@ -292,15 +292,16 @@ var db = function(app){
 		});
 	});
 
-	/////////////////////////////////////////////////////////////////////////////
-	// Get User Trips
+    ///////////////////////////////////////////////////////////////////////////
+	// Get Client Trips
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/getUserTrips",function(req,res){
 			var clientID = req.body.clientID;
 			//Returns place_id, room_name, pictures, booked_date_start, booked_date_end
-			var placeQuerySQL = "SELECT place_id, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
+			var placeQuerySQL = "SELECT reservation.place_id, IFNULL(ratings.rating, 0) as rating, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
 			" NATURAL JOIN hostplacelisting"+
 			" NATURAL JOIN place"+
+            " LEFT JOIN ratings ON ratings.user_id = reservation.client_id AND ratings.place_id = reservation.place_id" +
 			" WHERE client_id = " + clientID;
 			console.log(placeQuerySQL);
 			conn.query(placeQuerySQL,
@@ -314,6 +315,30 @@ var db = function(app){
 					}
 			});
 	});
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Get Client Reservations
+    /////////////////////////////////////////////////////////////////////////////
+    app.post("/api/getUserReservations",function(req,res){
+            var host_id = req.body.host_id;
+            //Returns paid_date, booked_date_start, booked_date_end, client_name, room_name
+            var placeQuerySQL = "SELECT paid_date, booked_date_start, booked_date_end, users.name as client_name, place.name as room_name FROM reservation"+
+            " NATURAL JOIN hostplacelisting"+
+            " NATURAL JOIN place"+
+            " JOIN users ON users.user_id = reservation.client_id"+
+            " WHERE reservation.host_id = " + host_id;
+            console.log(placeQuerySQL);
+            conn.query(placeQuerySQL,
+            function(err, rows, fields){
+                    if (!err) {
+                            console.log(rows);
+                            res.json({'query_success': true, 'result': rows});
+                    } else {
+                            console.log('Error while performing Query.');
+                            res.json({'query_success': false});
+                    }
+            });
+    });
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Reject/Cancel Request
@@ -334,7 +359,7 @@ var db = function(app){
 			//Update req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
 
 			console.log(handleRequestSQL);
-			conn.query(handleRequestSQL, [today, req_id], 
+			conn.query(handleRequestSQL, [today, req_id],
 			function(err, rows, fields){
 					if (!err) {
 							console.log(rows);
@@ -345,7 +370,7 @@ var db = function(app){
 					}
 			});
 	});
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// clientPendingRequests
 	/////////////////////////////////////////////////////////////////////////////
@@ -374,7 +399,7 @@ var db = function(app){
 	// hostPendingRequests
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/hostPendingRequests",function(req,res) {
-			var host_id = req.body.user_id; 
+			var host_id = req.body.user_id;
 			//Returns req_id, place_id, host_id, bookingtype_name, payment_type_id, client_id, client_name, ask_amount, payment_type_id, resp_time, date_start, date_end, date_req, room_name
 			var placeQuerySQL = "SELECT req_id, place_id, host_id, client_id, payment_type_id, bookingtype_name, users.name as client_name, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
 			" NATURAL JOIN place" +
@@ -395,8 +420,50 @@ var db = function(app){
 			});
 	});
 
-	/////////////////////////////////////////////////////////////////////////////
-	// Get Host Place Listings
+    ///////////////////////////////////////////////////////////////////////////
+    // Insert into Rating
+    /////////////////////////////////////////////////////////////////////////////
+    app.post("/api/rateTrip",function(req,res){
+            var user_id = req.body.user_id;
+            var place_id = req.body.place_id;
+            var rating = req.body.rating;
+            var insert_rating_str = `
+            INSERT INTO Ratings (place_id, user_id, rating)
+            VALUES (?,?,?)
+            `;
+            insert_rating_str = mysql.format(insert_rating_str, [place_id, user_id, rating]);
+            console.log(insert_rating_str);
+
+            conn.query(insert_rating_str, function(err, rows, fields){
+                    if (!err) {
+                            console.log(rows);
+                            res.json({'query_success': true, 'result': rows});
+                    } else {
+                            console.log('Rating exists.');
+                            update_rating_str = `
+                            UPDATE Ratings
+                            SET rating = ?
+                            WHERE place_id = ? AND user_id = ?
+                            `;
+                            update_rating_str = mysql.format(update_rating_str, [rating, place_id, user_id]);
+                            console.log(update_rating_str);
+
+                            conn.query(update_rating_str, function(err, rows, fields){
+                                    if (!err) {
+                                            console.log(rows);
+                                            res.json({'query_success': true, 'result': rows});
+                                    } else {
+                                            console.log('Rating exists.');
+
+                                            res.json({'query_success': false});
+                                    }
+                                });
+                            }
+                        });
+    });
+
+    ///////////////////////////////////////////////////////////////////////////
+	// Get Host Places
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/getUserListings",function(req,res){
 			var host_id = req.body.host_id;
@@ -417,7 +484,7 @@ var db = function(app){
 					}
 			});
 	});
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// Get information about one place
 	/////////////////////////////////////////////////////////////////////////////
@@ -478,15 +545,15 @@ var db = function(app){
 		var is_booking_active = req.body.is_booking_active;
 		var paidExtras = req.body.paidExtras;
 		var end_auction_time = req.body.end_auction_time;
-		
+
 
 		var address_query_str = `INSERT INTO address SET ?`;
 
 		address_query_str = mysql.format(address_query_str, {
-			street: street, 
-			city: city, 
-			state: state, 
-			zip: zip, 
+			street: street,
+			city: city,
+			state: state,
+			zip: zip,
 			country: country,
 			latitude: locationLatLng.lat,
 			longitude: locationLatLng.lng
@@ -498,10 +565,10 @@ var db = function(app){
 			var auction_query_str = `
 			INSERT INTO Auction SET ?
 			`;
-			
+
 			auction_query_str = mysql.format(auction_query_str, {
 				place_id: args.place_id,
-				starting_price: cost_per_night, 
+				starting_price: cost_per_night,
 				current_price: cost_per_night,
 				end_auction_time: end_auction_time,
 				active: (is_booking_active == 'true')? 'yes' : 'no' // Not sure if this is how this should be set
@@ -1269,7 +1336,7 @@ var db = function(app){
 			var currentdate = new Date();
 			var currentDateMySQLFormat = (currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate());
 			var req_id = req.body.req_id;
-			
+
 			conn.query("UPDATE clientplacerequest" +
 						" SET status = 'accepted', date_resp = ?" +
 						" WHERE req_id = ?",
@@ -1280,7 +1347,7 @@ var db = function(app){
 				} else {
 					res.json({'query_success': false});
 				}
-			});				
+			});
 		}
 	});
 
@@ -1358,7 +1425,7 @@ var db = function(app){
 			}
 		});
 	});
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// Check client req
 	/////////////////////////////////////////////////////////////////////////////

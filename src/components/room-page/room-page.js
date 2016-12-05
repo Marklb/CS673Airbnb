@@ -8,6 +8,7 @@ import UserSessionHandler from '../../user-session-handler';
 
 // React Components
 import ReactDisqusThread from 'react-disqus-thread';
+import Rater from 'react-rater';
 
 require("./room-page.scss");
 export default class RoomPage extends React.Component {
@@ -17,7 +18,7 @@ export default class RoomPage extends React.Component {
 
 	constructor(props) {
 		super(props);
-		
+
 		var p_id = this.props.params.pidanddate.split("_")[0];
 		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
 		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
@@ -107,7 +108,6 @@ export default class RoomPage extends React.Component {
 					booked_dates: 'default',
 					response_time: 'default',
 					active: 'default',
-					rating: 'default',
 					street: 'default',
 					city: 'default',
 					state: 'default',
@@ -199,7 +199,7 @@ export default class RoomPage extends React.Component {
 	}
 
 	insertReservationQuery() {
-		var currentdate = new Date(); 
+		var currentdate = new Date();
 		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
 		console.log("current day : " + datetime);
 		$.post('/api/addreservation', {
@@ -245,7 +245,7 @@ export default class RoomPage extends React.Component {
 	}
 
 	UserInsertClientRequestPlace() {
-		var currentdate = new Date(); 
+		var currentdate = new Date();
 		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
 		console.log('client_id : ' + this.state.clientID);
 		console.log('place_id : ' + this.state.placeID);
@@ -282,7 +282,7 @@ export default class RoomPage extends React.Component {
 	}
 
 	HostInsertClientRequestPlace() {
-		var currentdate = new Date(); 
+		var currentdate = new Date();
 		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
 		console.log('client_id : ' + this.state.clientID);
 		console.log('place_id : ' + this.state.placeID);
@@ -392,7 +392,7 @@ export default class RoomPage extends React.Component {
 						this.setState({reservedOK : true});
 					} else if (timeDiff <= 0 && data.result[data.result.length - 1].bid_price == data.result[data.result.length - 1].current_price){
 						this.setState({reservedOK : false});
-						var currentdate = new Date(); 
+						var currentdate = new Date();
 						var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
 						console.log("current day : " + datetime);
 						$.post('/api/addreservation', {
@@ -436,7 +436,7 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				Cost per night : {this.state.result[0].cost_per_night}
 				<br></br>
-				Rating : {this.state.result[0].rating}/5
+				Rating : <Rater interactive={false} rating={this.state.result[0].rating}/>
 				<br></br>
 				Max people : {this.state.result[0].max_people}
 				<br></br>
@@ -579,7 +579,7 @@ export default class RoomPage extends React.Component {
 				Your Bid<input name='bid_amount' type="number" onChange={this.onChange.bind(this)}></input> {this.state.bid_update ? "(your bid is updated)" : ""}
 				<br></br>
 				{this.state.bid_amount_ok ? <button type="button" onClick={this.onClickAuctionBooking.bind(this)}>Submit</button> : null}
-				
+
 			</div>
 		);
 	}

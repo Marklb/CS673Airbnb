@@ -4,6 +4,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
+import Rater from 'react-rater';
+
 require("./filter-form.scss");
 export default class FilterForm extends React.Component {
 
@@ -309,10 +311,10 @@ export default class FilterForm extends React.Component {
 					</form>
 
 					<form className="f">
-						Price min: <b>${this.state.min_cost}</b> 
+						Price min: <b>${this.state.min_cost}</b>
 						<input name='min_cost' className="slide" type="range" min="10" max="1000" defaultValue="10" onChange={this.onChange.bind(this)}></input>
 						<br></br>
-						Price max: <b>${this.state.max_cost}</b> 
+						Price max: <b>${this.state.max_cost}</b>
 						<input name='max_cost' className="slide" type="range" min="10" max="1000" defaultValue="1000" onChange={this.onChange.bind(this)}></input>
 					</form>
 
@@ -392,7 +394,7 @@ export default class FilterForm extends React.Component {
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-								Rating<input className="r3" type="text" placeholder={`${val.rating}/5`}></input>
+								Rating <Rater interactive={false} rating={val.rating}/>
 							</div>
 						);
 					})}

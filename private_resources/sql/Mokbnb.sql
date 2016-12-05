@@ -535,7 +535,7 @@ INSERT INTO auction (
 INSERT INTO ClientAuctionBids (
 	auction_id, client_id, payment_type_id, bid_price
 ) VALUES
-	(1, 2, 1,"90.00"), 
+	(1, 2, 1,"90.00"),
 	(1, 4, 1, "100.00"),
 	(1, 2, 1, "125.00"),
 	(1, 3, 1, "150.00"),

@@ -13,7 +13,6 @@ import UserSessionHandler from '../../user-session-handler';
 
 import ListingImageUploader from '../listing-image-uploader';
 import GoogleMapsLocationSelector from '../google-components/google-maps-location-selector';
-let ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 require("./become-host-page-header.scss");
 
@@ -24,7 +23,7 @@ export default class BecomeHostMainPage extends React.Component {
   static contextTypes = {
 	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
   };
-  
+
  	constructor(props) {
 		super(props)
 
@@ -186,7 +185,7 @@ export default class BecomeHostMainPage extends React.Component {
 		this.bathroomsize = _.range(0, 8.5, 0.5); // Arr 0..8  Increment By 0.5
 		this.numofbeds = _.range(1, 17, 1); // Arr 1..16  Increment By 1
 
-		
+
 		this.onChangeFormData = this.onChangeFormData.bind(this);
 		this.showAddPaidExtraInput = this.showAddPaidExtraInput.bind(this);
 		this.addNewPaidExtra = this.addNewPaidExtra.bind(this);
@@ -200,7 +199,7 @@ export default class BecomeHostMainPage extends React.Component {
 	}
 
 	componentDidMount() {
-		console.log('componentDidMount'); 
+		console.log('componentDidMount');
 		// this.loadTestingData();
 
 		console.log(this.props.params.place_id);
@@ -210,7 +209,7 @@ export default class BecomeHostMainPage extends React.Component {
 			console.log('Edit a listing');
 			this.loadDataEditing();
 		}
-		
+
   }
 
 	componentWillReceiveProps(nextProps) {
@@ -222,38 +221,38 @@ export default class BecomeHostMainPage extends React.Component {
 	}
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param {any} name
 	 * @param {any} [opts={label:(string), labelPos:(top,right,bottom,left), }]
 	 * @returns
-	 * 
+	 *
 	 * @memberOf BecomeHostMainPage
 	 */
 	renderTextInput(name, opts = {}) {
 		return (
 			<input type='text'
-				className={(opts.className)? opts.className : null} 
-				name={name} 
+				className={(opts.className)? opts.className : null}
+				name={name}
 				value={this.state.formData.textInput[name]}
 				onChange={this.onChangeFormData} />
 		);
 	}
 
-	
+
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param {any} name
 	 * @param {any} [opts={label:(string), labelPos:(top,right,bottom,left), }]
 	 * @returns
-	 * 
+	 *
 	 * @memberOf BecomeHostMainPage
 	 */
 	renderTextAreaInput(name, opts = {}) {
 		return (
-			<textarea type='text' 
-				className={(opts.className)? opts.className : null} 
+			<textarea type='text'
+				className={(opts.className)? opts.className : null}
 				name={name}
 				value={this.state.formData.textInput[name]}
 				onChange={this.onChangeFormData} />
@@ -261,19 +260,19 @@ export default class BecomeHostMainPage extends React.Component {
 	}
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param {any} name
 	 * @param {any} options
 	 * @param {any} [opts={className:, noneOption: }]
 	 * @returns
-	 * 
+	 *
 	 * @memberOf BecomeHostMainPage
 	 */
 	renderSelectOneInput(name, options, opts = {}) {
 		// console.log(`Setting: ${name} to: ${this.state.formData.selectOneInput[name]}`);
 		return (
-			<select name={name} 
+			<select name={name}
 				value={this.state.formData.selectOneInput[name]}
 				className={(opts.className)? opts.className : null}
 				onChange={this.onChangeFormData}>
@@ -285,10 +284,10 @@ export default class BecomeHostMainPage extends React.Component {
 
 	renderCheckboxInput(name, opts = {}) {
 		return (
-			<input type="checkbox" 
+			<input type="checkbox"
 				name={name}
 				data-group-name={(opts.groupName)? opts.groupName : null}
-				className={(opts.className)? opts.className : null} 	
+				className={(opts.className)? opts.className : null}
 				checked={(opts.groupName)? this.state.formData.checkboxInput[opts.groupName][name].checked : this.state.formData.checkboxInput[name]}
 				onChange={this.onChangeFormData} />
 		);
@@ -363,16 +362,16 @@ export default class BecomeHostMainPage extends React.Component {
 					<div className="listing-group listing-dates-calendar">
 						{/*Update your calendar*/}
 						<h2>Set your listings availability dates (Start, End)</h2>
-						<div> 
-							<input name='date_start' className="mokbnb-input" 
-								onChange={this.onChangeFormData} type="date" 
+						<div>
+							<input name='date_start' className="mokbnb-input"
+								onChange={this.onChangeFormData} type="date"
 								value={this.state.formData.dateInput.date_start}></input>
-							<input name='date_end' className="mokbnb-input" 
-								onChange={this.onChangeFormData} type="date" 
+							<input name='date_end' className="mokbnb-input"
+								onChange={this.onChangeFormData} type="date"
 								value={this.state.formData.dateInput.date_end}></input>
 						</div>
 					</div>
-					
+
 					<div className="listing-group listing-type-container">
 						<h2>What kind of place are you listing?</h2>
 						<div className="roomtype-table">
@@ -380,7 +379,7 @@ export default class BecomeHostMainPage extends React.Component {
 								return (
 										<label key={key}>
 											{this.renderCheckboxInput(key, {
-												groupName: 'roomtype', 
+												groupName: 'roomtype',
 												className: ''})}
 											<span>{key}</span>
 										</label>
@@ -388,7 +387,7 @@ export default class BecomeHostMainPage extends React.Component {
 							})}
 						</div>
 					</div>
-					
+
 					<div className="listing-group listing-limits-container">
 						<h2>How many guests can your place accommodate?</h2>
 						<label>
@@ -405,7 +404,7 @@ export default class BecomeHostMainPage extends React.Component {
 								className: 'mokbnb-input sizeBed-'})}
 						</label>
 						<br/>
-						
+
 						<h2>How many guests can stay?</h2>
 						<label>
 							<span>Number of guests:</span>
@@ -414,7 +413,7 @@ export default class BecomeHostMainPage extends React.Component {
 								className: 'mokbnb-input t-'})}
 						</label>
 						<br/>
-					
+
 						<h2>How many bathrooms?</h2>
 						<label>
 							<span>Number of bathrooms:</span>
@@ -446,7 +445,7 @@ export default class BecomeHostMainPage extends React.Component {
 					{/*</form>*/}
 
 					{this.renderAddressInputs()}
-					
+
 					<div className="listing-group listing-name-desc-container">
 						<h2>Room Description</h2>
 						<div>
@@ -462,7 +461,7 @@ export default class BecomeHostMainPage extends React.Component {
 							<span>{this.state.error_message.place_description}</span>
 						</div>
 					</div>
-					
+
 
 
 
@@ -488,7 +487,7 @@ export default class BecomeHostMainPage extends React.Component {
 							{this.renderPaidExtras()}
 						</div>
 						<button onClick={this.showAddPaidExtraInput}>Add New Paid Extra</button>
-						{(this.state.showNewPaidExtraInputBox === true)? 
+						{(this.state.showNewPaidExtraInputBox === true)?
 								this.renderNewPaidExtraInput() : null}
 					</div>
 
@@ -556,23 +555,23 @@ export default class BecomeHostMainPage extends React.Component {
 		return (
 			<div className="new-paid-extra-input-box">
 				<div>New Paid Extra:</div>
-				
+
 				<div className="input-wrapper">
 					<label>
 						<span>Name:</span>
-						<input type="text" name="paid_extra_name" 
-							className="mokbnb-input" value={this.state.paidExtraInput.name} 
+						<input type="text" name="paid_extra_name"
+							className="mokbnb-input" value={this.state.paidExtraInput.name}
 							onChange={this.onChangeNewPaidExtraInput} /></label>
 				</div>
 
 				<div className="input-wrapper">
 					<label>
 						<span>Cost: $</span>
-						<input type="text" name="paid_extra_cost" 
-							className="mokbnb-input" value={this.state.paidExtraInput.cost} 
+						<input type="text" name="paid_extra_cost"
+							className="mokbnb-input" value={this.state.paidExtraInput.cost}
 							onChange={this.onChangeNewPaidExtraInput} /></label>
 				</div>
-				
+
 				<div>
 					<button className="" onClick={this.addNewPaidExtra}>Add</button>
 				</div>
@@ -594,13 +593,13 @@ export default class BecomeHostMainPage extends React.Component {
 		this.setState(newState);
 	}
 
-	
+
 	removePaidExtra(index) {
 		var paidExtras = this.state.paidExtras;
 		paidExtras.splice(index,1);
 		this.setState({paidExtras:paidExtras});
 	}
-	
+
 	renderPaidExtras() {
 		var fields = this.state.paidExtras.map((val,i) =>{
 			return (
@@ -609,7 +608,7 @@ export default class BecomeHostMainPage extends React.Component {
 						<td>${val.cost}</td>
 						<td>
 							<button className=""
-								data-key={i} data-name={val.name} data-cost={val.cost} 
+								data-key={i} data-name={val.name} data-cost={val.cost}
 								onClick={this.onRemovePaidExtra}
 								>Remove</button>
 						</td>
@@ -642,7 +641,7 @@ export default class BecomeHostMainPage extends React.Component {
 	addNewPaidExtra(e) {
 		let name = this.state.paidExtraInput.name;
 		let cost = this.state.paidExtraInput.cost;
-		
+
 		let newState = this.state;
 		newState.paidExtras.push({name: name, cost: cost});
 		newState.paidExtraInput.name = '';
@@ -650,15 +649,15 @@ export default class BecomeHostMainPage extends React.Component {
 		newState.showNewPaidExtraInputBox = false;
 		this.setState(newState);
 	}
-	
+
 	renderBookingTypeCode() {
 		let bookingTypeName = this.bookingTypesLOOKUP_NAME[this.state.formData.bookingType];
 		if (bookingTypeName == "Instant Book") {
 			return (
 				<div>
 					Cost per night: <b>${this.state.formData.rangeInput.cost}</b>
-					<input name='cost' className="slide" type="range" 
-						min="10" max="1000" value={this.state.formData.rangeInput.cost} 
+					<input name='cost' className="slide" type="range"
+						min="10" max="1000" value={this.state.formData.rangeInput.cost}
 						onChange={this.onChangeFormData}></input>
 				</div>
 				)
@@ -666,12 +665,12 @@ export default class BecomeHostMainPage extends React.Component {
 			return (
 				<div>
 					Starting Bid: <b>${this.state.formData.rangeInput.cost}</b>
-					<input name='cost' className="slide" type="range" 
-						min="10" max="1000" value={this.state.formData.rangeInput.cost} 
+					<input name='cost' className="slide" type="range"
+						min="10" max="1000" value={this.state.formData.rangeInput.cost}
 						onChange={this.onChangeFormData}></input>
 					<br/>
-					Auction End Date<input name='end_auction_time' type="date" 
-															defaultValue={this.state.formData.dateInput.end_auction_time} 
+					Auction End Date<input name='end_auction_time' type="date"
+															defaultValue={this.state.formData.dateInput.end_auction_time}
 															onChange={this.onChangeFormData}></input>
 				</div>
 				)
@@ -679,8 +678,8 @@ export default class BecomeHostMainPage extends React.Component {
 			return (
 				<div>
 					Cost per night: <b>${this.state.formData.rangeInput.cost}</b>
-					<input name='cost' className="slide" type="range" 
-						min="10" max="1000" value={this.state.formData.rangeInput.cost} 
+					<input name='cost' className="slide" type="range"
+						min="10" max="1000" value={this.state.formData.rangeInput.cost}
 						onChange={this.onChangeFormData}></input>
 				</div>
 				)
@@ -688,14 +687,14 @@ export default class BecomeHostMainPage extends React.Component {
 			return (
 				<div>
 					Cost per night: <b>${this.state.formData.rangeInput.cost}</b>
-					<input name='cost' className="slide" type="range" 
-						min="10" max="1000" value={this.state.formData.rangeInput.cost} 
+					<input name='cost' className="slide" type="range"
+						min="10" max="1000" value={this.state.formData.rangeInput.cost}
 						onChange={this.onChangeFormData}></input>
 					<br/>
 					How long will you need to response to user requests? : <b>
 					{this.state.formData.rangeInput.response_time} days</b>
-					<input name='response_time' className="slide" type="range" 
-						min="0" max="14" value={this.state.formData.rangeInput.response_time} 
+					<input name='response_time' className="slide" type="range"
+						min="0" max="14" value={this.state.formData.rangeInput.response_time}
 						onChange={this.onChangeFormData}></input>
 				</div>
 				)
@@ -711,14 +710,14 @@ export default class BecomeHostMainPage extends React.Component {
     this.setState({locationLatLng: latlng});
   }
 
-  
+
 
 	onDrop(acceptedFiles, rejectedFiles) {
 		console.log('Accepted files: ', acceptedFiles);
 		console.log('Rejected files: ', rejectedFiles);
 	}
 
-	
+
 	insertNewPlace() {
 
     var roomtype_id = null;
@@ -732,7 +731,7 @@ export default class BecomeHostMainPage extends React.Component {
 		});
 
 		// let thing = {
-			
+
 		// };
 		// console.log(thing);
 
@@ -764,8 +763,8 @@ export default class BecomeHostMainPage extends React.Component {
       'is_booking_active': this.state.formData.checkboxInput.booking_active,
       'paidExtras': this.state.paidExtras,
       'end_auction_time': this.state.formData.dateInput.end_auction_time
-			
-      
+
+
 		}, (data, status) => {
 			if(data.query_success === false) {
 				console.log('Trip details query not successful');
@@ -782,7 +781,7 @@ export default class BecomeHostMainPage extends React.Component {
 					var p = new Promise((resolve, reject) => {
 						let postData = this.context.userSessionHandler.getSessionAuthValues();
 						postData.imgData = this.state.imagesUploadedToBrowser[i];
-						postData.place_id = data.place_id;  
+						postData.place_id = data.place_id;
 						$.post('/api/upload_place_image', postData, (data, status) => {
 							if(data.success === false) {
 								console.log('Image Upload Not Successful');
@@ -797,8 +796,8 @@ export default class BecomeHostMainPage extends React.Component {
 				}
 
 				Promise.all(promises).then(values => {
-					console.log('Done Uploading'); 
-					console.log(values); 
+					console.log('Done Uploading');
+					console.log(values);
 				});
 			}
 
@@ -870,8 +869,8 @@ export default class BecomeHostMainPage extends React.Component {
 
 	loadTestingData() {
 		let newState = this.state;
-		
-		newState.formData.dateInput.date_start = '2016-12-30'; 
+
+		newState.formData.dateInput.date_start = '2016-12-30';
 		newState.formData.dateInput.date_end = '2017-01-25';
 
 		newState.formData.checkboxInput.roomtype['Entire home'] = {checked: true, id: 2};
