@@ -22,6 +22,8 @@ export default class RoomPage extends React.Component {
 		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
 		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
 		this.state = {
+			reqOK: true,
+			reservedOK: true,
 			bid_update : false,
 			payMethod: 'credit',
 			jumpToPay: false,
@@ -74,7 +76,7 @@ export default class RoomPage extends React.Component {
 			starting_price: -1,//auction
 			current_price: -1,//auction
 			sold_price: -1,//auction
-			payment_type_id: -1, //for insertion into reservation
+			payment_type_id: 3, //for insertion into reservation
 			bid_amount: 0,
 			bid_amount_ok: false,
 
@@ -145,6 +147,8 @@ export default class RoomPage extends React.Component {
 		}, (data, status) => {
 			console.log("user_id" + data.user_id);
 			this.state.clientID = data.user_id;
+			this.initialCheckClientReq(data.user_id, this.state.placeID);
+			this.initialCheckReservation(data.user_id, this.state.placeID);
 		});
 
 
@@ -181,43 +185,7 @@ export default class RoomPage extends React.Component {
 	getRoomDetailsQuery(placeID) {
 		$.post('/api/getRoomDetailsQuery', {
 			//General place information
-			'placeID' : this.state.placeID,
-			'hostID': this.state.hostID,
-			'host_name': this.state.host_name,
-			'roomtype_id': this.state.roomtype_id,
-			'roomtype_name': this.state.roomtype_name,
-			'room_title': this.state.name,
-			'description': this.state.description,
-			'cost_per_night': this.state.cost_per_night,//This is the same as ask_amount in hostplacelisting?
-			'cost': this.state.cost_per_night,
-			'rating': this.state.rating,
-			'max_people': this.state.max_people,
-			'bedroomsize': this.state.bedroomsize,
-			'bathroomsize': this.state.bathroomsize,
-			'numofbeds': this.state.numofbeds,
-			'pictures': this.state.pictures,
-			//address
-			'street': this.state.address,
-			'city': this.state.city,
-			'state': this.state.state,
-			'zip': this.state.zip,
-			'country': this.state.country,
-			'bookingtype_id': this.state.bookingtype_id,//hostplacelisting
-			'bookingtype_name': this.state.bookingtype_name,//bookingtype
-			//for all types of booking (date availabilities)
-			'date_range_start': this.state.date_range_start,//hostplacelisting
-			'date_range_end': this.state.date_range_end,//hostplacelisting
-			'booked_dates': this.state.booked_dates,//hostplacelisting
-			//if host-set time frame
-			'response_time': this.state.response_time,//place
-			//if instant book, user-set/host-set time frame
-			'ask_amount': this.state.ask_amount,//hostplacelisting
-			//if not auction, create html components for date_start and date_end to insert into clientplacerequest. additionally, if user-set time frame, create html components for resp_time as well.
-			//if auction
-			'auction_id': this.state.auction_id,//auction
-			'starting_price': this.state.starting_price,//auction
-			'current_price': this.state.current_price,//auction
-			'sold_price': this.state.sold_price,//auction
+			'placeID' : this.state.placeID
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('Place details query not successful');
@@ -225,6 +193,7 @@ export default class RoomPage extends React.Component {
 				console.log('Place details query successful');
 				this.setState({result: data.result});
 				this.setState({cost: data.result[0].cost_per_night});
+				this.initialCheckClientBid(this.context.userSessionHandler.getUserID(), data.result[0].auction_id, data.result);
 			}
   		});
 	}
@@ -260,6 +229,7 @@ export default class RoomPage extends React.Component {
 		$.post('/api/addbid', {
 			'auction_id' : this.state.result[0].auction_id,
 			'client_id' : this.state.clientID,
+			'payment_type_id' : this.state.payment_type_id,
 			'bid_price' : this.state.bid_amount,
   		}, (data, status) => {
   			if(data.query_success === false) {
@@ -270,6 +240,184 @@ export default class RoomPage extends React.Component {
 					// let url = `/trips`;
 					// browserHistory.push(url);
 				// }
+			}
+  		});
+	}
+
+	UserInsertClientRequestPlace() {
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
+		console.log('client_id : ' + this.state.clientID);
+		console.log('place_id : ' + this.state.placeID);
+		console.log('ask_amount : ' + this.state.cost);
+		console.log('payment_type_id : ' + this.state.payment_type_id);
+		console.log('resp_time : ' + this.state.response_time);
+		console.log('date_start : ' + this.state.bookCheckinTime);
+		console.log('date_end : ' + this.state.bookCheckoutTime);
+		console.log('date_req : ' + datetime);
+		console.log('date_resp : ' + 'NULL');
+		console.log('status : ' + 'pending');
+		$.post('/api/addclientplacereq', {
+			'client_id' : this.state.clientID,
+			'place_id' : this.state.placeID,
+			'ask_amount' : this.state.cost,
+			'payment_type_id' : this.state.payment_type_id,
+			'resp_time' : this.state.response_time,
+			'date_start' : this.state.bookCheckinTime,
+			'date_end' : this.state.bookCheckoutTime,
+			'date_req' : datetime,
+			'date_resp' : 'NULL',
+			'status' : 'pending'
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('user set frame insert ClientRequest not successful');
+			} else {
+				console.log('user set frame insert ClientRequest successful');
+				// if (this.state.result[0].bookingtype_id == "2") {
+					// let url = `/trips`;
+					// browserHistory.push(url);
+				// }
+			}
+  		});
+	}
+
+	HostInsertClientRequestPlace() {
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
+		console.log('client_id : ' + this.state.clientID);
+		console.log('place_id : ' + this.state.placeID);
+		console.log('ask_amount : ' + this.state.cost);
+		console.log('payment_type_id : ' + this.state.payment_type_id);
+		console.log('resp_time : ' + this.state.result[0].response_time);
+		console.log('date_start : ' + this.state.bookCheckinTime);
+		console.log('date_end : ' + this.state.bookCheckoutTime);
+		console.log('date_req : ' + datetime);
+		console.log('date_resp : ' + 'NULL');
+		console.log('status : ' + 'pending');
+		$.post('/api/addclientplacereq', {
+			'client_id' : this.state.clientID,
+			'place_id' : this.state.placeID,
+			'ask_amount' : this.state.cost,
+			'payment_type_id' : this.state.payment_type_id,
+			'resp_time' : this.state.result[0].response_time,
+			'date_start' : this.state.bookCheckinTime,
+			'date_end' : this.state.bookCheckoutTime,
+			'date_req' : datetime,
+			'date_resp' : 'NULL',
+			'status' : 'pending'
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('host set frame insert ClientRequest not successful');
+			} else {
+				console.log('host set frame insert ClientRequest successful');
+				// if (this.state.result[0].bookingtype_id == "2") {
+					// let url = `/trips`;
+					// browserHistory.push(url);
+				// }
+			}
+  		});
+	}
+
+	initialCheckClientReq(client_id, place_id) {
+		$.post('/api/checkclientplacereq', {
+			'client_id' : client_id,
+			'place_id' : place_id
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('initial Check ClientReq not successful');
+			} else {
+				console.log('initial Check ClientReq successful');
+				if (data.result.length >= 1) {
+					console.log('already has a request');
+					if (data.result[data.result.length - 1].status == 'rejected') {
+						this.setState({reqOK : true});
+					} else if (data.result[data.result.length - 1].status == 'accept') {
+						this.setState({reqOK : false});
+						this.setState({reservedOK : false});
+					} else if (data.result[data.result.length - 1].status == 'pending') {
+						this.setState({reqOK : false});
+					} else {
+						this.setState({reqOK : true});
+					}
+				}
+			}
+  		});
+	}
+
+	initialCheckReservation(client_id, place_id) {
+		$.post('/api/checkreservation', {
+			'client_id' : client_id,
+			'place_id' : place_id
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('initial Check reservation  not successful');
+			} else {
+				console.log('initial Check reservation  successful');
+				if (data.result.length >= 1) {
+					console.log('already has a reservation');
+					var book_date_end = new Date(data.result[data.result.length - 1].booked_date_end);
+					var today = new Date();
+					var timeDiff = book_date_end.getTime() - today.getTime();
+					console.log("book_date_end = " + book_date_end);
+					console.log("today = " + today);
+					console.log("timeDiff = " + timeDiff);
+					if (timeDiff >= 0) {
+						this.setState({reservedOK : false});
+					} else {
+						this.setState({reservedOK : true});
+					}
+				}
+			}
+  		});
+	}
+
+	initialCheckClientBid(client_id, auction_id, result) {
+		$.post('/api/checkclientbid', {
+			'client_id' : client_id,
+			'auction_id' : auction_id
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('initial Check ClientBid  not successful');
+			} else {
+				console.log('bookingtype = ', result[0].bookingtype_name);
+				if (data.result.length >= 1) {
+					console.log('already have bid');
+					var end_auction_time = new Date(data.result[data.result.length - 1].end_auction_time);
+					var today = new Date();
+					var timeDiff = end_auction_time.getTime() - today.getTime();
+					console.log("end_auction_time = " + end_auction_time);
+					console.log("today = " + today);
+					console.log("timeDiff = " + timeDiff);
+					if (timeDiff > 0) {
+						this.setState({reservedOK : true});
+					} else if (timeDiff <= 0 && data.result[data.result.length - 1].bid_price == data.result[data.result.length - 1].current_price){
+						this.setState({reservedOK : false});
+						var currentdate = new Date(); 
+						var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
+						console.log("current day : " + datetime);
+						$.post('/api/addreservation', {
+							'bookingtype' : result[0].bookingtype_name,
+							'place_id' : this.state.placeID,
+							'host_id' : result[0].host_id,
+							'client_id' : client_id,
+							'payment_type_id' : data.result[data.result.length - 1].payment_type_id,
+							'booked_date_start' : data.result[data.result.length - 1].end_auction_time,
+							'booked_date_end' : data.result[data.result.length - 1].end_auction_time,
+							'amt_paid' : data.result[data.result.length - 1].bid_price,
+							'paid_date' : datetime
+						}, (data, status) => {
+							if(data.query_success === false) {
+								console.log('bid insert reservation not successful');
+							} else {
+								console.log('bid insert reservation successful');
+								// if (this.state.result[0].bookingtype_id == "1") {
+									// let url = `/trips`;
+									// browserHistory.push(url);
+								// }
+							}
+						});
+					}
+				}
 			}
   		});
 	}
@@ -314,13 +462,35 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				<br></br>
 				Booking type ({this.state.result[0].bookingtype_name})
-				{!(this.state.jumpToPay)? this.renderBooking(): null}
-				{(this.state.jumpToPay)? this.renderPayment() : null}
+				{(this.state.reqOK && this.state.reservedOK)? this.bookingSection() : this.bookingStatus()}
 
 				{/* Disqus example start */}
 				<div id="disqus_thread"></div>
 				<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 				{/* Disqus example end */}
+			</div>
+		);
+	}
+
+	bookingStatus() {
+		var word = ""
+		if (!this.state.reservedOK) {
+			word = "You already have reservation on this room"
+		} else if (!this.state.reqOK) {
+			word = "Your request is pending"
+		}
+		return (
+			<div>
+				{word}
+			</div>
+		);
+	}
+
+	bookingSection() {
+		return (
+			<div>
+				{!(this.state.jumpToPay)? this.renderBooking(): null}
+				{(this.state.jumpToPay)? this.renderPayment() : null}
 			</div>
 		);
 	}
@@ -335,11 +505,18 @@ export default class RoomPage extends React.Component {
 					<input type="radio" name="paypal" value="paypal" checked={this.state.payMethod === 'paypal'} onChange={this.onChange.bind(this)}/>Paypal
 					<input type="radio" name="other" value="other" checked={this.state.payMethod === 'other'} onChange={this.onChange.bind(this)}/>Other
 				</div>
-				<button type="button" onClick={this.onClickPay.bind(this)}>Pay!!</button>
+				{this.renderPayButton()}
 			</div>
 		);
 	}
-	
+
+	renderPayButton() {
+		if (this.state.result[0].bookingtype_id == "1") {
+			return (<button type="button" onClick={this.onClickPay.bind(this)}>Pay now</button>);
+		} else {
+			return (<button type="button" onClick={this.onClickPay.bind(this)}>Set payment type</button>);
+		}
+	}
 
 	renderBooking() {
 		if (this.state.result[0].bookingtype_id == "1") {
@@ -377,7 +554,15 @@ export default class RoomPage extends React.Component {
 	renderingUserSetTimeFrameBookingButton() {
 		return (
 			<div>
-				<button type="button">Set!!</button>
+				<button name='user_set_fram' type="button" onClick={this.onClickUserSetFrame.bind(this)}>Set!!</button>
+			</div>
+		);
+	}
+
+	renderingHostSetTimeFrameBookingButton() {
+		return (
+			<div>
+				<button name='host_set_fram' type="button" onClick={this.onClickHostSetFrame.bind(this)}>Set!!</button>
 			</div>
 		);
 	}
@@ -416,6 +601,7 @@ export default class RoomPage extends React.Component {
 			<div>
 				How much do you want to pay?: <b>${this.state.cost}</b> <input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
 				How long will you give the host to respond?: <b> {this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
+				<br></br>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
@@ -434,7 +620,7 @@ export default class RoomPage extends React.Component {
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
-				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
+				{(this.state.bookButtonOK)? this.renderingHostSetTimeFrameBookingButton() : "please select dates in correct range!"}
 			</div>
 		);
 	}
@@ -557,10 +743,32 @@ export default class RoomPage extends React.Component {
 		var g = new String(this.state.bid_amount);
 		newResult[0].current_price = g;
 		this.setState({result: newResult});
-		this.insertClientAuctionBids();
+		this.setState({jumpToPay: true});
 	}
 
 	onClickPay() {
-		this.insertReservationQuery();
+		if (this.state.result[0].bookingtype_id == "1") {
+			this.insertReservationQuery();
+			this.setState({reservedOK: false});
+		} else if (this.state.result[0].bookingtype_id == "2") {
+			this.insertClientAuctionBids();
+			this.setState({jumpToPay: false});
+		} else if (this.state.result[0].bookingtype_id == "3") {
+			this.UserInsertClientRequestPlace();
+			this.setState({reqOK: false});
+		} else if (this.state.result[0].bookingtype_id == "4") {
+			this.HostInsertClientRequestPlace();
+			this.setState({reqOK: false});
+		}
+	}
+
+	onClickUserSetFrame() {
+		console.log("user ser frame set!!");
+		this.setState({jumpToPay: true});
+	}
+
+	onClickHostSetFrame() {
+		console.log("host ser frame set!!");
+		this.setState({jumpToPay: true});
 	}
 }
