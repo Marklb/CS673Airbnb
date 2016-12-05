@@ -4,7 +4,13 @@ import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
+
+import GoogleMapsSearchPlaces from '../google-components/google-maps-search-places';
+
 require("./filter-form.scss");
+
+
+
 export default class FilterForm extends React.Component {
 
 	constructor(props) {
@@ -272,15 +278,24 @@ export default class FilterForm extends React.Component {
 
 	renderResult(result) {
 		var rows = [];
+		let gMapsDataList = [];
 		for (var i=0; i < result.length; i++) {
 			rows.push(<MyResult key={i} name={result[i].name} />);
+			gMapsDataList.push({
+				lat: result[i].latitude,
+				lng: result[i].longitude,
+				price: result[i].cost_per_night
+			});
 		}
+		console.log(gMapsDataList);
 		return (
 			<form className="f">
 				-----Filter Result-----
 				<br></br>
 				{rows.length === 0 ? 'None' : rows}
 				{this.renderPicture()}
+				{(gMapsDataList.length > 0) ? 
+					<GoogleMapsSearchPlaces placeMarkersData={gMapsDataList} /> : null}
 			</form>
 		);
 	}
