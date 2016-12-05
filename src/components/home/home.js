@@ -10,6 +10,11 @@ import MapsDemo from '../google-components/maps-demo';
 import ListingImageUploaderDemo from '../listing-image-uploader/listing-image-uploader-demo';
 
 
+let MbNotifications = require('../../mblibs/mb-notifications');
+console.log(MbNotifications);
+let notif = document.createElement('mb-notifications');
+document.body.appendChild(notif);
+
 require("./home.scss");
 require("../top-header/top-header.scss");
 
@@ -34,11 +39,11 @@ export default class Home extends React.Component {
       <div>
         <center><h1>Live There</h1></center>
 
-        <MapsDemo />
+        {/*<MapsDemo />
 
         <br/><br/>
 
-        <ListingImageUploaderDemo />
+        <ListingImageUploaderDemo />*/}
 
                 Welcome to mokbnb, a 12-week project where a group of 4 graduate students going for Computer Science at NJIT learn to build a Javascript, ReactJS, and MySQL website. This website is a non-functional imitation of airbnb for educational purposes. We have currently achieved the following features listed below:
                 <ul>

@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS `Address` (
   `state` VARCHAR(45) NULL,
   `zip` VARCHAR(10) NULL,
   `country` VARCHAR(45) NULL,
+  `latitude` DOUBLE NULL,
+  `longitude` DOUBLE NULL,
   PRIMARY KEY (`addr_id`))
 ENGINE = InnoDB;
 
@@ -254,6 +256,21 @@ CREATE TABLE IF NOT EXISTS `PlaceAmenity` (
   `place_id` INT NOT NULL,
   `amenity_id` INT NOT NULL,
   PRIMARY KEY (`place_id`,`amenity_id`))
+ENGINE = InnoDB;
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `PlaceExtraAmenity`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PlaceExtraAmenity` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `PlaceExtraAmenity` (
+  `place_extra_amenity_id` INT NOT NULL AUTO_INCREMENT,
+  `place_id` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `cost` NUMERIC(7,2) NULL,
+  PRIMARY KEY (`place_extra_amenity_id`))
 ENGINE = InnoDB;
 SHOW WARNINGS;
 

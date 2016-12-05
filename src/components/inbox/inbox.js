@@ -49,9 +49,9 @@ export default class Inbox extends React.Component {
     // Get the users messages
     let sendData = this.context.userSessionHandler.getSessionAuthValues();
     $.get('/api/get_user_messages', sendData, (data, status) => {
-      // console.log('Mesages:');
-      // console.log(status);
-      // console.log(data);
+      console.log('Mesages:');
+      console.log(status);
+      console.log(data);
       this.setState({msgs: data.msgs});
     });
   }
@@ -69,7 +69,7 @@ export default class Inbox extends React.Component {
   }
 
   render() {
-    // console.log(this.state);
+    console.log(this.state);
     return (
       <DashboardContainer headerTab='inbox' >
         <div className='inbox-container'>

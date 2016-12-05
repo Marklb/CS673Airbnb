@@ -1,11 +1,12 @@
 @import "../../common.scss";
 
 .google-maps-location-selector {
-
+  // height: 400px;
   .map{
     // position: relative;
-    width: 250px;
-    height: 250px;
+    width: 400px;
+    height: 400px;
+    // height: 100%;
     border: 2px solid rgba(60,40,120,1);
     // background-color: rgba(20,60,90,1);
 
@@ -21,5 +22,50 @@
     //   background-size: 22px 40px; /* Since I used the HiDPI marker version this compensates for the 2x size */
     //   pointer-events: none; /* This disables clicks on the marker. Not fully supported by all major browsers, though */
     // }
+  }
+
+  .controls {
+    margin-top: 10px;
+    border: 1px solid transparent;
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  #pac-input {
+    background-color: #fff;
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 12px;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+    width: 300px;
+  }
+
+  #pac-input:focus {
+    border-color: #4d90fe;
+  }
+
+  .pac-container {
+    font-family: Roboto;
+  }
+
+  #type-selector {
+    color: #fff;
+    background-color: #4d90fe;
+    padding: 5px 11px 0px 11px;
+  }
+
+  #type-selector label {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 300;
+  }
+  #target {
+    width: 345px;
   }
 }

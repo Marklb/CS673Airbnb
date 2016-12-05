@@ -1,3 +1,5 @@
+@import "../common.scss";
+
 .becomeHost {
 	padding : 30px;
 	.t {
@@ -57,6 +59,220 @@
 
 
 }
+
+.listing-group {
+	@include box-sizing(border-box);
+	border: 2px solid rgba(200,200,200,1);
+	padding: 5px;
+	margin-bottom: 5px;
+
+	&:last-child {
+		margin-bottom: 0px;
+	}
+
+	.listing-sub-group {
+		@include box-sizing(border-box);
+		border: 2px solid rgba(200,200,200,1);
+		padding: 5px;
+		margin-bottom: 5px;
+
+		&:last-child {
+			margin-bottom: 0px;
+		}	
+	}
+}
+
+.listing-dates-calendar {
+	
+}
+
+.listing-type-container {
+	
+	// ul {
+	// 		margin: 0;
+	// 		list-style: none;
+	// 		float: left;
+	// }
+
+	.roomtype-table {
+
+		overflow: hidden;
+		
+		label {
+			display: block;
+			// float: left;
+			// padding-right: 10px;
+			white-space: nowrap;
+			
+			span {
+				padding-left: 5px;
+				vertical-align: middle;
+			}
+		}
+
+		input {
+			vertical-align: middle;
+		}
+	}
+
+}
+
+.listing-limits-container {
+
+	select.mokbnb-input {
+		// height: auto;
+		padding: 4px 2em 4px 5px;
+	}
+	
+
+	label {
+		// margin-left: 5px;
+		@include box-sizing(border-box);
+		border: 2px solid rgba(200,200,200,1);
+		padding: 3px 0px 5px 5px;
+		margin-right: 4px;
+
+		&:last-child {
+			margin-right: 0px;
+		}
+
+		span {
+			padding-right: 2px;
+		} 
+	}
+}
+
+.listing-amenities-container {
+
+	.amenities-table {
+		
+		overflow: hidden;
+
+		.amenities-column {
+			display: inline-block;
+			padding: 5px;
+			padding-right: 10px;
+
+			&:last-child {
+				padding-right: 5px;
+			}
+		}
+
+		label {
+			display: block;
+			// float: left;
+			// padding-right: 10px;
+			white-space: nowrap;
+			
+			span {
+				padding-left: 5px;
+				vertical-align: middle;
+			}
+		}
+
+		input {
+			vertical-align: middle;
+		}
+	}
+}
+
+.listing-photos-container {
+
+}
+
+.address-container {
+	
+	input[type="text"].address-input {
+		height: auto;
+		margin-bottom: 5px;
+	}
+}
+
+.listing-name-desc-container {
+	input[type="text"].place-name-input {
+		height: auto;
+		margin-bottom: 5px;
+	}
+
+	textarea.place-description-input {
+		height: auto;
+		margin-bottom: 5px;
+		min-height: 200px;
+	}
+}
+
+.listing-booking-type-container {
+
+	table {
+		text-align: left;
+		
+		td,th { 
+			padding-left: 5px;
+
+			&:first-child {
+				padding-left: 0px;
+			}
+		}
+	}
+
+	.new-paid-extra-input-box {
+		@include box-sizing(border-box);
+		border: 2px solid rgba(200,200,200,1);
+		padding: 5px 5px 5px 5px;
+		margin-top: 2px;
+
+
+		.input-wrapper {
+			// border: 2px solid rgba(100,200,200,1);
+			padding: 0;
+			padding-bottom: -10px;
+			margin: 0;
+			margin-bottom: -15px;
+		}
+
+		label {
+			// margin-left: 5px;
+			// @include box-sizing(border-box);
+			// border: 2px solid rgba(200,200,200,1);
+			// padding: 3px 0px 5px 5px;
+			padding: 3px 0px 2px 2px;
+			margin-right: 4px;
+			margin-bottom: 0px;
+
+			&:last-child {
+				margin-right: 0px;
+			}
+
+			span {
+				padding-right: 2px;
+				margin-bottom: 0px;
+			} 
+
+			input[type="text"].mokbnb-input {
+				height: auto;
+				// margin-bottom: 5px;
+				// margin-left: 2px;
+				// width: 500px;
+				// left: 0px;
+				// right: 0px;
+				padding: 3px 0px 2px 2px;
+				margin-bottom: 0px;
+			}
+		}
+	}	
+
+}
+
+.listing-bottom-opts-container {
+	
+}
+
+
+
+
+
+
+
 .example-enter {
  opacity: 0.01;
 }

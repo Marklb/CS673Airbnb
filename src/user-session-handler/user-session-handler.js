@@ -101,6 +101,13 @@ export default class userSessionHandler {
     browserHistory.push('/');
   }
 
+  redirectIfNotAuthenticated() {
+    // Doesn't always work right now'
+    if(!this.isLoggedIn()){
+      browserHistory.push('/');
+    }
+  }
+
   /*
 
   */
