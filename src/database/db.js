@@ -18,6 +18,7 @@ var db = function(app){
 		host     : 'localhost',
 		user     : 'root',
 		password : '',
+		// password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -1289,14 +1290,16 @@ var db = function(app){
 	app.post("/api/addbid",function(req,res){
 		var auction_id = req.body.auction_id;
 		var client_id = req.body.client_id;
+		var payment_type_id = req.body.payment_type_id;
 		var bid_price = req.body.bid_price;
 		console.log("auction_id : ", auction_id);
 		console.log("client_id : ", client_id);
+		console.log("payment_type_id : ", payment_type_id);
 		console.log("bid_price : ", bid_price);
 		conn.query("INSERT INTO ClientAuctionBids" +
-					" (auction_id, client_id, bid_price)" +
-					" VALUES (?, ?, ?)",
-					[auction_id, client_id, bid_price],
+					" (auction_id, client_id, payment_type_id, bid_price)" +
+					" VALUES (?, ?, ?, ?)",
+					[auction_id, client_id, payment_type_id, bid_price],
 		function(err, rows, fields){
 			if (!err) {
 				res.json({'query_success': true});
@@ -1313,6 +1316,102 @@ var db = function(app){
 				// res.json({'update_success': true});
 			} else {
 				// res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Add a ClientPlaceRequest
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/addclientplacereq",function(req,res){
+		var client_id = req.body.client_id;
+		var place_id = req.body.place_id;
+		var ask_amount = req.body.ask_amount;
+		var payment_type_id = req.body.payment_type_id;
+		var resp_time = req.body.resp_time;
+		var date_start = req.body.date_start;
+		var date_end = req.body.date_end;
+		var date_req = req.body.date_req;
+		var date_resp = req.body.date_resp;
+		var status = req.body.status;
+		console.log("client_id : ", client_id);
+		console.log("place_id : ", place_id);
+		console.log("ask_amount : ", ask_amount);
+		console.log("resp_time : ", resp_time);
+		console.log("payment_type_id : ", payment_type_id);
+		console.log("date_start : ", date_start);
+		console.log("date_end : ", date_end);
+		console.log("date_req : ", date_req);
+		console.log("date_resp : ", date_resp);
+		console.log("status : ", status);
+		conn.query("INSERT INTO ClientPlaceRequest" +
+					" (client_id,place_id,ask_amount,payment_type_id,resp_time,date_start,date_end,date_req,date_resp,status)" +
+					" VALUES (?,?,?,?,?,?,?,?,?,?)",
+					[client_id,place_id,ask_amount,payment_type_id,resp_time,date_start,date_end,date_req,date_resp,status],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true});
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+	
+	/////////////////////////////////////////////////////////////////////////////
+	// Check client req
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/checkclientplacereq",function(req,res){
+		var client_id = req.body.client_id;
+		var place_id = req.body.place_id;
+		console.log("client_id : ", client_id);
+		console.log("place_id : ", place_id);
+		conn.query("SELECT * FROM ClientPlaceRequest WHERE client_id=? AND place_id=?",[client_id, place_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Check client req
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/checkreservation",function(req,res){
+		var client_id = req.body.client_id;
+		var place_id = req.body.place_id;
+		console.log("client_id : ", client_id);
+		console.log("place_id : ", place_id);
+		conn.query("SELECT * FROM Reservation WHERE client_id=? AND place_id=?",[client_id, place_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Check bid status
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/checkclientbid",function(req,res){
+		var client_id = req.body.client_id;
+		var auction_id = req.body.auction_id;
+		console.log("client_id : ", client_id);
+		console.log("auction_id : ", auction_id);
+		conn.query("SELECT Auction.auction_id, Users.user_id, Auction.current_price, ClientAuctionBids.payment_type_id, ClientAuctionBids.bid_price, Auction.end_auction_time FROM Users join ClientAuctionBids on Users.user_id=ClientAuctionBids.client_id join Auction on Auction.auction_id=ClientAuctionBids.auction_id WHERE Users.user_id=? AND Auction.auction_id=? AND Auction.active=?",[client_id, auction_id, 'yes'],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+				console.log(rows);
+			} else {
+				res.json({'query_success': false});
 				console.log(err);
 			}
 		});
