@@ -1001,10 +1001,18 @@ var db = function(app){
   /////////////////////////////////////////////////////////////////////////////
 	// Get user reservations
 	/////////////////////////////////////////////////////////////////////////////
-	app.get("/api/get_user_reservations",function(req,res){
+	app.post("/api/get_user_reservations",function(req,res){
 		dbNoRequireCache.api_get_user_reservations(req,res,conn);
 	});
-
+	app.post("/api/get_user_reservations2",function(req,res){
+		dbNoRequireCache.api_get_user_reservations2(req,res,conn);
+	});
+	app.post("/api/get_user_income",function(req,res){
+		dbNoRequireCache.api_get_user_income(req,res,conn);
+	});
+	app.post("/api/get_user_expense",function(req,res){
+		dbNoRequireCache.api_get_user_expense(req,res,conn);
+	});
 	/////////////////////////////////////////////////////////////////////////////
 	// If the api route is requested with no api call then maybe we could
 	// list the available api calls

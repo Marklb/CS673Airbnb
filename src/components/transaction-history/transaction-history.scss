@@ -1,0 +1,26 @@
+@import "../common.scss";
+@import "../dashboard/dashboard-like.scss";
+
+.transaction-panels {
+
+  .Transaction-group {
+    margin: 15px 0 15px 0;
+    display: block;
+
+    .Transaction-group-title {
+      @include box-sizing(border-box);
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 1.1;
+      color: #484848;
+      padding-bottom: 15px;
+    }
+
+    .Transaction-subgroup-title {
+      font-size: 18px;
+      padding-bottom: 10px;
+      @include box-sizing(border-box);
+      display: block;
+    }
+  }
+}

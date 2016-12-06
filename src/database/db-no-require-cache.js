@@ -324,13 +324,45 @@ module.exports.api_get_user_reservations = function(req,res,conn){
   // console.log('/api/get_user_reservations');
   var authToken = req.query.authToken;
   var authType = req.query.authType;
-
+  var user_id = req.body.user_id;
+  console.log(req.body.user_id+"---------");
   var query_str = `
-  SELECT *
-  FROM Reservation
-  WHERE host_id = (SELECT user_id
+  SELECT place_id, place.name as room_name, host_id, U.name as host_name, client_id, S.name as client_name, booked_date_start, booked_date_end, amt_paid, paid_date
+  FROM ((place NATURAL JOIN Reservation)  JOIN Users U ON host_id = U.user_id) JOIN Users S ON client_id = S.user_id
+  WHERE host_id = (SELECT DISTINCT user_id
                    FROM UserSession
-                   WHERE auth_type = ? AND session_auth_id = ?)
+                   ORDER by 'date' desc
+                   LIMIT 0,1
+                   )
+  `;
+
+  conn.query(query_str, [authType, authToken],
+    function (err, rows, fields) {
+      if (err) {
+        console.log(err);
+        res.json({ 'success': false });
+      } else {
+        console.log(rows);
+        //var reservations = [];
+        //for (var i = 0; i < rows.length; i++) {
+        // reservations.push(rows[0]);
+        //}
+        res.json({ 'success': true, result: rows });
+      }
+    });
+}
+
+module.exports.api_get_user_reservations2 = function(req,res,conn){
+  // console.log('/api/get_user_reservations');
+  var authToken = req.query.authToken;
+  var authType = req.query.authType;
+  var query_str = `
+  SELECT place_id, place.name as room_name, host_id, U.name as host_name, client_id, S.name as client_name, booked_date_start, booked_date_end, amt_paid, paid_date
+  FROM ((place NATURAL JOIN Reservation)  JOIN Users U ON host_id = U.user_id) JOIN Users S ON client_id = S.user_id
+  WHERE client_id = (SELECT user_id
+                   FROM UserSession
+                   ORDER by 'date' desc
+                   LIMIT 0,1)
 
   `;
 
@@ -341,14 +373,72 @@ module.exports.api_get_user_reservations = function(req,res,conn){
         res.json({ 'success': false });
       } else {
         console.log(rows);
-        var reservations = [];
-        for (var i = 0; i < rows.length; i++) {
-          var reservations = reservations[i];
-          msgs.push({
+        //var reservations = [];
+        //for (var i = 0; i < rows.length; i++) {
+        // reservations.push(rows[0]);
+        //}
+        res.json({ 'success': true, result: rows });
+      }
+    });
+}
 
-          });
-        }
-        res.json({ 'success': true, msgs: msgs });
+module.exports.api_get_user_income = function(req,res,conn){
+  // console.log('/api/get_user_reservations');
+  var authToken = req.query.authToken;
+  var authType = req.query.authType;
+
+  var query_str = `
+  SELECT SUM(amt_paid) AS income
+  FROM Reservation
+  WHERE host_id = (SELECT user_id
+                   FROM UserSession
+                   ORDER by 'date' desc
+                   LIMIT 0,1)
+
+  `;
+
+  conn.query(query_str, [authType, authToken],
+    function (err, rows, fields) {
+      if (err) {
+        console.log(err);
+        res.json({ 'success': false });
+      } else {
+        console.log(rows);
+        //var reservations = [];
+        //for (var i = 0; i < rows.length; i++) {
+        // reservations.push(rows[0]);
+        //}
+        res.json({ 'success': true, result: rows });
+      }
+    });
+}
+
+module.exports.api_get_user_expense = function(req,res,conn){
+  // console.log('/api/get_user_reservations');
+  var authToken = req.query.authToken;
+  var authType = req.query.authType;
+
+  var query_str = `
+  SELECT SUM(amt_paid) AS expense
+  FROM Reservation
+  WHERE client_id = (SELECT user_id
+                   FROM UserSession
+                   LIMIT 0,1)
+
+  `;
+
+  conn.query(query_str, [authType, authToken],
+    function (err, rows, fields) {
+      if (err) {
+        console.log(err);
+        res.json({ 'success': false });
+      } else {
+        console.log(rows);
+        //var reservations = [];
+        //for (var i = 0; i < rows.length; i++) {
+        // reservations.push(rows[0]);
+        //}
+        res.json({ 'success': true, result: rows });
       }
     });
 }
