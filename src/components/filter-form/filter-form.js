@@ -4,7 +4,14 @@ import _ from 'lodash';
 import $ from 'jquery';
 import MyCheckBox from './mycheckbox';
 import MyResult from './myresult';
+
+import GoogleMapsSearchPlaces from '../google-components/google-maps-search-places';
+import Rater from 'react-rater';
+
 require("./filter-form.scss");
+
+
+
 export default class FilterForm extends React.Component {
 
 	constructor(props) {
@@ -22,9 +29,9 @@ export default class FilterForm extends React.Component {
 			longitude: this.props.location.query.lng || 0,
 			neighborhoods : [],
 			result : [],
-			date_start : 'N/A',
-			date_end : 'N/A',
-			numofguest: -1,
+			date_start : '2016-12-09',
+			date_end : '2016-12-12',
+			numofguest: 1,
 			rating: -1,
 			min_cost : 10,
 			max_cost : 1000,
@@ -262,7 +269,7 @@ export default class FilterForm extends React.Component {
 			rows.push(<MyCheckBox street={neighbor[i].street} />);
 		}
 		return (
-			<form className="f">
+			<form>
 				Neighborhoods
 				<br></br>
 				{rows.length === 0 ? 'None' : rows}
@@ -272,15 +279,22 @@ export default class FilterForm extends React.Component {
 
 	renderResult(result) {
 		var rows = [];
+		let gMapsDataList = [];
 		for (var i=0; i < result.length; i++) {
 			rows.push(<MyResult key={i} name={result[i].name} />);
+			gMapsDataList.push({
+				lat: result[i].latitude,
+				lng: result[i].longitude,
+				price: result[i].cost_per_night
+			});
 		}
+		console.log(gMapsDataList);
 		return (
 			<form className="f">
-				-----Filter Result-----
-				<br></br>
-				{rows.length === 0 ? 'None' : rows}
+				<center><h1>-----Filter Result-----</h1></center>
 				{this.renderPicture()}
+				{(gMapsDataList.length > 0) ? 
+					<GoogleMapsSearchPlaces placeMarkersData={gMapsDataList} /> : null}
 			</form>
 		);
 	}
@@ -291,10 +305,10 @@ export default class FilterForm extends React.Component {
 				<div className="filter">
 					<form className="f">
 						Dates
-						<input name='date_start' defaultValue='2016-12-04' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
-						<input name='date_end' defaultValue='2016-12-05' onChange={this.onChange.bind(this)} className="t" type="date"></input>
+						<input name='date_start' defaultValue='2016-12-09' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
+						<input name='date_end' defaultValue='2016-12-12' onChange={this.onChange.bind(this)} className="t" type="date"></input>
 						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
-							<option>Number of guest</option>
+							<option>Number of guest(default 1)</option>
 							{this.numofpeople.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
@@ -309,10 +323,10 @@ export default class FilterForm extends React.Component {
 					</form>
 
 					<form className="f">
-						Price min: <b>${this.state.min_cost}</b> 
+						Price min: <b>${this.state.min_cost}</b>
 						<input name='min_cost' className="slide" type="range" min="10" max="1000" defaultValue="10" onChange={this.onChange.bind(this)}></input>
 						<br></br>
-						Price max: <b>${this.state.max_cost}</b> 
+						Price max: <b>${this.state.max_cost}</b>
 						<input name='max_cost' className="slide" type="range" min="10" max="1000" defaultValue="1000" onChange={this.onChange.bind(this)}></input>
 					</form>
 
@@ -337,8 +351,6 @@ export default class FilterForm extends React.Component {
 							})}
 						</select>
 					</form>
-
-					{this.renderCheckBox(this.state.neighborhoods)}
 
 					<form className="f">
 						Booking Type
@@ -365,8 +377,6 @@ export default class FilterForm extends React.Component {
 
 					{this.renderResult(this.state.result)}
 
-
-
 				</div>
 			</div>
 
@@ -377,22 +387,21 @@ export default class FilterForm extends React.Component {
 		return (
 			<div>
 				<div className="filterResult">
-					<div>
-						<div onClick={this.onClickShowFilters.bind(this)}>filters</div>
-					</div>
-
-					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
-
 					{this.state.result.map((val, i) => {
 						return (
 							<div key={i} className="f">
 								<img className="pic" src={val.pictures} onClick={this.onClickShowRoom.bind(this, i)} />
 								<br></br>
 								Title<input className="r1" type="text" placeholder={val.name}></input>
+								<br></br>
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
+								<br></br>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
+								<br></br>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-								Rating<input className="r3" type="text" placeholder={`${val.rating}/5`}></input>
+								<br></br>
+								Rating <Rater interactive={false} rating={val.rating}/>
+								<br></br>
 							</div>
 						);
 					})}

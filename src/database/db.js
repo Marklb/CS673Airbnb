@@ -10,14 +10,15 @@ Object.defineProperty(global, 'dbNoRequireCache', {get: function() {
 
 const TOKEN_SECRET = 'mkokbnbteam2project';
 
-var mysql      = require('mysql');
+var mysql = require('mysql');
 var db = function(app){
 	console.log('Loading db');
 
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : 'd927392316',
+		// password : '9993kuo',
+		password : '',
 		database : 'mokbnb'
 	});
 
@@ -63,8 +64,11 @@ var db = function(app){
 	// Login
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/verifyLogin",function(req,res){
+		console.log('verifyLogin');
 		var email = req.body.email;
 		var password = req.body.password;
+		console.log(email);
+		console.log(password);
 
 		conn.query('SELECT * from Users WHERE email = ? AND password = ? AND ' +
 									'disabled = 0',
@@ -85,9 +89,9 @@ var db = function(app){
 															'`session_auth_id`) VALUES (?, ?, ?)';
 					conn.query(query_str, [user_id, auth_type, auth_token],
 						function(err, result) {
-								console.log(err);
-								console.log(result);
-						if (err) console.log(err);
+							console.log(err);
+							console.log(result);
+							if (err) console.log(err);
 							res.json({
 								'veri_success': true,
 								'user_id': user_id,
@@ -288,15 +292,16 @@ var db = function(app){
 		});
 	});
 
-	/////////////////////////////////////////////////////////////////////////////
-	// Get User Trips
+    ///////////////////////////////////////////////////////////////////////////
+	// Get Client Trips
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/getUserTrips",function(req,res){
 			var clientID = req.body.clientID;
 			//Returns place_id, room_name, pictures, booked_date_start, booked_date_end
-			var placeQuerySQL = "SELECT place_id, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
+			var placeQuerySQL = "SELECT reservation.place_id, IFNULL(ratings.rating, 0) as rating, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
 			" NATURAL JOIN hostplacelisting"+
 			" NATURAL JOIN place"+
+            " LEFT JOIN ratings ON ratings.user_id = reservation.client_id AND ratings.place_id = reservation.place_id" +
 			" WHERE client_id = " + clientID;
 			console.log(placeQuerySQL);
 			conn.query(placeQuerySQL,
@@ -311,35 +316,50 @@ var db = function(app){
 			});
 	});
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Get Client Reservations
+    /////////////////////////////////////////////////////////////////////////////
+    app.post("/api/getUserReservations",function(req,res){
+            var host_id = req.body.host_id;
+            //Returns paid_date, booked_date_start, booked_date_end, client_name, room_name
+            var placeQuerySQL = "SELECT paid_date, booked_date_start, booked_date_end, users.name as client_name, place.name as room_name FROM reservation"+
+            " NATURAL JOIN hostplacelisting"+
+            " NATURAL JOIN place"+
+            " JOIN users ON users.user_id = reservation.client_id"+
+            " WHERE reservation.host_id = " + host_id;
+            console.log(placeQuerySQL);
+            conn.query(placeQuerySQL,
+            function(err, rows, fields){
+                    if (!err) {
+                            console.log(rows);
+                            res.json({'query_success': true, 'result': rows});
+                    } else {
+                            console.log('Error while performing Query.');
+                            res.json({'query_success': false});
+                    }
+            });
+    });
+
 	/////////////////////////////////////////////////////////////////////////////
-	// Update Request
+	// Reject/Cancel Request
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/updateRequest",function(req,res) {
-			var currentdate = new Date();
-			var currentDateMySQLFormat = (currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate());
-			var req_id = req.body.id;
-			var status = req.body.val;
-			if (status === "reject") {
+			var req_id = req.body.req_id;
+			var val = req.body.val;
+			var today = req.body.todays_date;
+			if (val === "reject") {
 			var handleRequestSQL = "UPDATE clientplacerequest" +
-								" SET status = 'rejected', date_resp = ?"
-								" WHERE req_id = ?",
-								[currentDateMySQLFormat, req_id];
-			} else if (status === accept) {
+								" SET status = 'rejected', date_resp = ?" +
+								" WHERE req_id = ?";
+			} else if (val === "cancel") {
 			var handleRequestSQL = "UPDATE clientplacerequest" +
-								" SET status = 'accepted', date_resp = ?"
-								" WHERE req_id = ?",
-								[currentDateMySQLFormat, req_id];
-
-			} else if (status === cancel) {
-			var handleRequestSQL = "UPDATE clientplacerequest" +
-								" SET status = 'cancelled'"
-								" WHERE req_id = ?",
-								[req_id];
+								" SET status = 'cancelled', date_resp = ?" +
+								" WHERE req_id = ?";
 			}
 			//Update req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
 
-			console.log(placeQuerySQL);
-			conn.query(placeQuerySQL,
+			console.log(handleRequestSQL);
+			conn.query(handleRequestSQL, [today, req_id],
 			function(err, rows, fields){
 					if (!err) {
 							console.log(rows);
@@ -356,7 +376,7 @@ var db = function(app){
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/clientPendingRequests",function(req,res) {
 			var client_id = req.body.user_id;
-			//Returns req_id, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			//Returns req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
 			var placeQuerySQL = "SELECT req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
 			" NATURAL JOIN place" +
 			" NATURAL JOIN hostplacelisting" +
@@ -380,10 +400,11 @@ var db = function(app){
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/hostPendingRequests",function(req,res) {
 			var host_id = req.body.user_id;
-			//Returns req_id, place_id, client_id, client_name, ask_amount, resp_time, date_start, date_end, date_req, room_name
-			var placeQuerySQL = "SELECT req_id, place_id, client_id, users.name as client_name, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
+			//Returns req_id, place_id, host_id, bookingtype_name, payment_type_id, client_id, client_name, ask_amount, payment_type_id, resp_time, date_start, date_end, date_req, room_name
+			var placeQuerySQL = "SELECT req_id, place_id, host_id, client_id, payment_type_id, bookingtype_name, users.name as client_name, ask_amount, resp_time, date_start, date_end, date_req, place.name as room_name FROM clientplacerequest" +
 			" NATURAL JOIN place" +
 			" NATURAL JOIN hostplacelisting" +
+			" NATURAL JOIN bookingtype" +
 			" JOIN users ON users.user_id = clientplacerequest.client_id" +
 			" WHERE host_id = " + host_id + " AND status = 'pending'";
 			console.log(placeQuerySQL);
@@ -399,8 +420,50 @@ var db = function(app){
 			});
 	});
 
-	/////////////////////////////////////////////////////////////////////////////
-	// Get Host Place Listings
+    ///////////////////////////////////////////////////////////////////////////
+    // Insert into Rating
+    /////////////////////////////////////////////////////////////////////////////
+    app.post("/api/rateTrip",function(req,res){
+            var user_id = req.body.user_id;
+            var place_id = req.body.place_id;
+            var rating = req.body.rating;
+            var insert_rating_str = `
+            INSERT INTO Ratings (place_id, user_id, rating)
+            VALUES (?,?,?)
+            `;
+            insert_rating_str = mysql.format(insert_rating_str, [place_id, user_id, rating]);
+            console.log(insert_rating_str);
+
+            conn.query(insert_rating_str, function(err, rows, fields){
+                    if (!err) {
+                            console.log(rows);
+                            res.json({'query_success': true, 'result': rows});
+                    } else {
+                            console.log('Rating exists.');
+                            update_rating_str = `
+                            UPDATE Ratings
+                            SET rating = ?
+                            WHERE place_id = ? AND user_id = ?
+                            `;
+                            update_rating_str = mysql.format(update_rating_str, [rating, place_id, user_id]);
+                            console.log(update_rating_str);
+
+                            conn.query(update_rating_str, function(err, rows, fields){
+                                    if (!err) {
+                                            console.log(rows);
+                                            res.json({'query_success': true, 'result': rows});
+                                    } else {
+                                            console.log('Rating exists.');
+
+                                            res.json({'query_success': false});
+                                    }
+                                });
+                            }
+                        });
+    });
+
+    ///////////////////////////////////////////////////////////////////////////
+	// Get Host Places
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/getUserListings",function(req,res){
 			var host_id = req.body.host_id;
@@ -439,7 +502,7 @@ var db = function(app){
 							" JOIN userlanguage WHERE place.host_id=userlanguage.user_id) AS B"+
 			" JOIN (SELECT GROUP_CONCAT(DISTINCT amenity_name) AS amenities FROM place, amenity"+
 							" JOIN placeamenity WHERE placeamenity.place_id=place.place_id) AS C)"+
-			" WHERE place.place_id = " + placeID + " AND auction.active = 'yes' GROUP BY place.place_id"
+			" WHERE place.place_id = " + placeID + " AND (auction.active = 'yes' OR auction.active IS NULL) GROUP BY place.place_id"
 			console.log(placeQuerySQL);
 			conn.query(placeQuerySQL,
 			function(err, rows, fields){
@@ -457,12 +520,206 @@ var db = function(app){
 	// Insert hostplacelisting information
 	/////////////////////////////////////////////////////////////////////////////
 	app.post("/api/insertNewPlace", function(req,res){
-		try{
-			dbNoRequireCache.api_insert_listing(req,res,conn);
-		}catch(err){
-			console.log('[ERROR THOWN]:');
-			console.log(err);
+		// console.log(req.body);
+		var street = req.body.street;
+		var city = req.body.city;
+		var state = req.body.state;
+		var zip = req.body.zip;
+		var country = req.body.country;
+
+		var room_name = req.body.room_title;
+		var room_description = req.body.description;
+		var date_start = req.body.date_start;
+		var date_end = req.body.date_end;
+		var locationLatLng = req.body.locationLatLng;
+
+		var max_people = req.body.max_people;
+		var cost_per_night = req.body.cost_per_night;
+		var response_time = req.body.response_time;
+		var bedroomsize = req.body.bedroomsize;
+		var bathroomsize = req.body.bathroomsize;
+		var numofbeds = req.body.numofbeds;
+		var roomtype_id = req.body.roomtype_id;
+		var bookingtype_id = req.body.bookingtype_id;
+		var amenity_ids = (req.body.amenity_ids+'').split(',');
+		var is_booking_active = req.body.is_booking_active;
+		var paidExtras = req.body.paidExtras;
+		var end_auction_time = req.body.end_auction_time;
+
+
+		var address_query_str = `INSERT INTO address SET ?`;
+
+		address_query_str = mysql.format(address_query_str, {
+			street: street,
+			city: city,
+			state: state,
+			zip: zip,
+			country: country,
+			latitude: locationLatLng.lat,
+			longitude: locationLatLng.lng
+		});
+		console.log(address_query_str);
+
+
+		function doAuctionQuery(args){
+			var auction_query_str = `
+			INSERT INTO Auction SET ?
+			`;
+
+			auction_query_str = mysql.format(auction_query_str, {
+				place_id: args.place_id,
+				starting_price: cost_per_night,
+				current_price: cost_per_night,
+				end_auction_time: end_auction_time,
+				active: (is_booking_active == 'true')? 'yes' : 'no' // Not sure if this is how this should be set
+			});
+			console.log(auction_query_str);
+			// res.json({'query_success': true});return;
+			conn.query(auction_query_str, function(err, result){
+				if (!err) {
+					console.log('RESULT');
+					console.log(args.place_id);
+					// doHostPlaceListingQuery({place_id: result.insertId});
+					res.json({
+						'query_success': true,
+						'place_id': args.place_id
+					});
+				} else {
+					console.log('Error while performing Query.');
+					res.json({'query_success': false});
+				}
+			});
 		}
+
+		function doPlaceExtraAmenitysQuery(args){
+
+			if(paidExtras == undefined){
+				 res.json({'query_success': true});
+				 return;
+			}	
+
+			var place_extra_amenitys_query_str = `
+			INSERT INTO PlaceExtraAmenity (place_id, name, cost)
+			VALUES
+			`;
+			var paidExtraValues = [];
+			for(var i = 0; i < paidExtras.length; i++){
+				if(i != 0) place_extra_amenitys_query_str += ',';
+				place_extra_amenitys_query_str += '(?)';
+				paidExtraValues.push([args.place_id, paidExtras[i].name, paidExtras[i].cost]);
+			}
+
+			place_extra_amenitys_query_str = mysql.format(place_extra_amenitys_query_str, paidExtraValues);
+			console.log(place_extra_amenitys_query_str);
+			// res.json({'query_success': true});return;
+			conn.query(place_extra_amenitys_query_str, function(err, result){
+				if (!err) {
+					// console.log(`bookingtype_id: ${bookingtype_id}`);
+					if(bookingtype_id == 2){
+						doAuctionQuery({place_id: args.place_id});
+					}else{
+						res.json({
+							'query_success': true,
+							'place_id': args.place_id
+						});
+					}
+				} else {
+					console.log('Error while performing Query.');
+					res.json({'query_success': false});
+				}
+			});
+		}
+
+		function doPlaceAmenitysQuery(args){
+			var place_amenity_query_str = `
+			INSERT INTO PlaceAmenity (place_id, amenity_id)
+			VALUES
+			`;
+			var placeValues = [];
+			for(var i = 0; i < amenity_ids.length; i++){
+				if(i != 0) place_amenity_query_str += ',';
+				place_amenity_query_str += '(?)';
+				placeValues.push([args.place_id, amenity_ids[i]]);
+			}
+
+			place_amenity_query_str = mysql.format(place_amenity_query_str, placeValues);
+			console.log(place_amenity_query_str);
+
+			conn.query(place_amenity_query_str, function(err, result){
+				if (!err) {
+					console.log(result.insertId);
+					doPlaceExtraAmenitysQuery({place_id: args.place_id});
+					// res.json({'query_success': true});
+				} else {
+					console.log('Error while performing Query.');
+					res.json({'query_success': false});
+				}
+			});
+		}
+
+		function doHostPlaceListingQuery(args) {
+			var hpl_query_str = `
+			INSERT INTO HostPlaceListing (place_id, host_id, bookingtype_id,
+				date_range_start, date_range_end, active)
+			VALUES (?,
+				(SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?)
+				,?,?,?,?)
+			`;
+
+			hpl_query_str = mysql.format(hpl_query_str, [
+				args.place_id,
+				req.body.authType, req.body.authToken,
+				bookingtype_id, date_start, date_end,
+				(is_booking_active == 'true')? 'yes' : 'no']);
+			console.log(hpl_query_str);
+
+			conn.query(hpl_query_str, function(err, result){
+				if (!err) {
+					console.log(result.insertId);
+					doPlaceAmenitysQuery({place_id: args.place_id});
+					// res.json({'query_success': true});
+				} else {
+					console.log('Error while performing Query.');
+					res.json({'query_success': false});
+				}
+			});
+		}
+
+		function doPlaceQuery(args) {
+			var place_query_str = `
+			INSERT INTO Place (host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds)
+			VALUES ((SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?),?,?,?,?,?,?,?,?,?)
+			`;
+			place_query_str = mysql.format(place_query_str, [
+				req.body.authType, req.body.authToken,
+				args.addr_id, roomtype_id, room_name, room_description, cost_per_night,
+				max_people, bedroomsize, bathroomsize, numofbeds]);
+			console.log(place_query_str);
+
+			conn.query(place_query_str, function(err, result){
+				if (!err) {
+					console.log(result.insertId);
+					doHostPlaceListingQuery({place_id: result.insertId});
+					// res.json({'query_success': true});
+				} else {
+					console.log('Error while performing Query.');
+					res.json({'query_success': false});
+				}
+			});
+
+		}
+
+
+		conn.query(address_query_str, function(err, result){
+			if (!err) {
+				console.log(result.insertId);
+				doPlaceQuery({addr_id: result.insertId});
+				// res.json({'query_success': true});
+			} else {
+				console.log('Error while performing Query.');
+				res.json({'query_success': false});
+			}
+		});
 
 
 
@@ -626,6 +883,128 @@ var db = function(app){
 				res.json({'query_success': false});
 			}
 		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Get edit listing data
+	////////////////////////////////////////////////////////////////////////////
+	app.post("/api/get_edit_listing_data",function(req,res){
+		var auth_type = req.body.auth_type;
+		var auth_token = req.body.auth_token;
+		var place_id = req.body.place_id;
+		// console.log(auth_token);
+		// console.log(auth_type);
+		// console.log(place_id);
+
+		var get_user_id_query_str = `
+		(SELECT USES.user_id
+		FROM UserSession AS USES
+		WHERE USES.auth_type = ? AND USES.session_auth_id = ?)`;
+
+		get_user_id_query_str = mysql.format(get_user_id_query_str, [
+			auth_type, auth_token]);
+		// console.log(get_user_id_query_str);
+
+		var query_str1 = `
+		SELECT * 
+		FROM HostPlaceListing NATURAL JOIN Address NATURAL JOIN Place 
+			NATURAL JOIN BookingType NATURAL JOIN RoomType
+			WHERE host_id = @authed_user_id AND Place.place_id = ?;
+		`;
+		query_str1 = query_str1.replace('@authed_user_id', get_user_id_query_str)
+		query_str1 = mysql.format(query_str1, [place_id]);
+		// console.log(query_str1);
+		var p1 = new Promise(function(resolve, reject) {
+			conn.query(query_str1, function(err, result){
+				if (!err) {
+					// resolve("[query_str1]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str1]It broke1"));
+				}
+			});
+		});
+
+		var query_str2 = `
+		SELECT *
+		FROM PlaceAmenity NATURAL JOIN Amenity
+		WHERE place_id = ?;
+		`;
+		query_str2 = mysql.format(query_str2, [place_id]);
+		// console.log(query_str2);
+		var p2 = new Promise(function(resolve, reject) {
+			conn.query(query_str2, function(err, result){
+				if (!err) {
+					// resolve("[query_str2]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str2]It broke"));
+				}
+			});
+		});
+
+		var query_str3 = `
+		SELECT *
+		FROM PlaceExtraAmenity
+		WHERE place_id = ?;
+		`;
+		query_str3 = mysql.format(query_str3, [place_id]);
+		// console.log(query_str3);
+		var p3 = new Promise(function(resolve, reject) {
+			conn.query(query_str3, function(err, result){
+				if (!err) {
+					// resolve("[query_str3]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str3]It broke"));
+				}
+			});
+		});
+		// .then(values => {
+
+		// }, reason => {
+
+		// });
+
+		var query_str4 = `
+		SELECT *
+		FROM Auction
+		WHERE place_id = ?;
+		`;
+		query_str4 = mysql.format(query_str4, [place_id]);
+		// console.log('------');
+		// console.log(query_str4);
+		// console.log('------');
+		var p4 = new Promise(function(resolve, reject) {
+			conn.query(query_str4, function(err, result){
+				if (!err) {
+					// resolve("[query_str4]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str4]It broke"));
+				}
+			});
+		});
+
+		Promise.all([p1, p2, p3, p4]).then(values => {
+		// Promise.all([p1, p2, p3]).then(values => {
+		// Promise.all([p1, p2]).then(values => {
+		// Promise.all([p1]).then(values => {
+			// console.log('success');
+			// console.log(values);
+			res.json({ 'success': true, 'response': values });
+		}, reason => {
+			// console.log('failed');
+			// console.log(reason);
+			res.json({ 'success': false });
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Update listing data
+	////////////////////////////////////////////////////////////////////////////
+	app.post("/api/update_listing_data",function(req,res){
+		dbNoRequireCache.update_listing_data(req,res,conn);
 	});
 
 	////////////////////////////////////////////////////////////////////////////
@@ -802,7 +1181,7 @@ var db = function(app){
 			USENDER.email AS sender_email,
 			M.receiver_id, URECEIVER.first_name AS receiver_fname,
 			URECEIVER.email AS receiver_email,
-			M.send_date, M.title, M.body, M.is_read, M.is_stared, M.is_archived,
+			M.timestamp_sent, M.title, M.body, M.is_read, M.is_stared, M.is_archived,
 			S.user_id AS session_user_id
 
 		FROM Message AS M, Users AS USENDER, Users AS URECEIVER,
@@ -842,7 +1221,8 @@ var db = function(app){
 								fname: row.receiver_fname,
 								email: row.receiver_email,
 							},
-							send_date: row.send_date,
+							// send_date: row.send_date,
+							timestamp_sent: row.timestamp_sent,
 							title: row.title,
 							body: row.body,
 							is_read: row.is_read.lastIndexOf(1) !== -1,
@@ -1035,7 +1415,7 @@ var db = function(app){
 	/////////////////////////////////////////////////////////////////////////////
 	// Add a reservation
 	/////////////////////////////////////////////////////////////////////////////
-	app.post("/api/addreservation",function(req,res){
+	app.post("/api/addreservation",function(req,res) {
 		var bookingtype = req.body.bookingtype;
 		var place_id = req.body.place_id;
 		var host_id = req.body.host_id;
@@ -1045,7 +1425,10 @@ var db = function(app){
 		var booked_date_end = req.body.booked_date_end;
 		var amt_paid = req.body.amt_paid;
 		var paid_date = req.body.paid_date;
-		var sold_price = req.body.sold_price;
+		// extra array
+		var extraIdArray = req.body.extraIdArray;
+		console.log('**** Debug api addreservation query variables ****');
+		console.log('**** Start line ****');
 		console.log("bookingtype : ", bookingtype);
 		console.log("place_id : ", place_id);
 		console.log("host_id : ", host_id);
@@ -1056,28 +1439,46 @@ var db = function(app){
 		console.log("amt_paid : ", amt_paid);
 		console.log("paid_date : ", paid_date);
 		console.log("sold_price : ", sold_price);
+		console.log("extraIdArray : ", extraIdArray);
+		console.log('**** End line ****');
 		conn.query("INSERT INTO Reservation" +
 					" (place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date)" +
 					" VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 					[place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date],
 		function(err, rows, fields){
 			if (!err) {
-				res.json({'query_success': true});
+				console.log('Insert reservation sucessfully');
+				console.log(rows);
+				res.json({'resId': rows.insertId});
 			} else {
-				res.json({'query_success': false});
 				console.log(err);
 			}
 		});
 		if (bookingtype === "Auction") {
-			conn.query("UPDATE auction" +
-						"SET (active='no', sold_price = (SELECT current_price FROM auction WHERE place_id = ? AND active='yes')" +
-						"WHERE place_id = ? AND active='yes'",
-						[place_id, place_id],
-			function(err, rows, fields){
+			var sold_price = req.body.sold_price;
+			conn.query("UPDATE auction SET active='no', sold_price = ? WHERE place_id = ? AND active='yes'", [amt_paid, place_id],
+			function(err, rows, fields) {
 				if (!err) {
-					res.json({'query_success': true});
+					console.log('**** update auction sucessfully****');
 				} else {
-					res.json({'query_success': false});
+					console.log('**** update auction failed****');
+					console.log(err);
+				}
+			});
+		} else if (bookingtype === "User-Set Response Time Frame" || bookingtype === "Host-Set Response Time Frame") {
+			var currentdate = new Date();
+			var currentDateMySQLFormat = (currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate());
+			var req_id = req.body.req_id;
+			conn.query("UPDATE clientplacerequest" +
+						" SET status = 'accepted', date_resp = ?" +
+						" WHERE req_id = ?",
+						[currentDateMySQLFormat, req_id],
+			function(err, rows, fields) {
+				if (!err) {
+					console.log('**** update clientplacerequest sucessfully****');
+				} else {
+					console.log('**** update clientplacerequest sucessfully****');
+					console.log(err);
 				}
 			});
 		}
@@ -1089,14 +1490,18 @@ var db = function(app){
 	app.post("/api/addbid",function(req,res){
 		var auction_id = req.body.auction_id;
 		var client_id = req.body.client_id;
+		var payment_type_id = req.body.payment_type_id;
 		var bid_price = req.body.bid_price;
+		var checkin_date = req.body.checkin_date;
+		var checkout_date = req.body.checkout_date;
 		console.log("auction_id : ", auction_id);
 		console.log("client_id : ", client_id);
+		console.log("payment_type_id : ", payment_type_id);
 		console.log("bid_price : ", bid_price);
 		conn.query("INSERT INTO ClientAuctionBids" +
-					" (auction_id, client_id, bid_price)" +
-					" VALUES (?, ?, ?)",
-					[auction_id, client_id, bid_price],
+					" (auction_id, client_id, payment_type_id, bid_price, checkin_date, checkout_date)" +
+					" VALUES (?, ?, ?, ?, ?, ?)",
+					[auction_id, client_id, payment_type_id, bid_price, checkin_date, checkout_date],
 		function(err, rows, fields){
 			if (!err) {
 				res.json({'query_success': true});
@@ -1113,6 +1518,140 @@ var db = function(app){
 				// res.json({'update_success': true});
 			} else {
 				// res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Add a ClientPlaceRequest
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/addclientplacereq",function(req,res){
+		var client_id = req.body.client_id;
+		var place_id = req.body.place_id;
+		var ask_amount = req.body.ask_amount;
+		var payment_type_id = req.body.payment_type_id;
+		var resp_time = req.body.resp_time;
+		var date_start = req.body.date_start;
+		var date_end = req.body.date_end;
+		var date_req = req.body.date_req;
+		var date_resp = req.body.date_resp;
+		var status = req.body.status;
+		console.log("client_id : ", client_id);
+		console.log("place_id : ", place_id);
+		console.log("ask_amount : ", ask_amount);
+		console.log("resp_time : ", resp_time);
+		console.log("payment_type_id : ", payment_type_id);
+		console.log("date_start : ", date_start);
+		console.log("date_end : ", date_end);
+		console.log("date_req : ", date_req);
+		console.log("date_resp : ", date_resp);
+		console.log("status : ", status);
+		conn.query("INSERT INTO ClientPlaceRequest" +
+					" (client_id,place_id,ask_amount,payment_type_id,resp_time,date_start,date_end,date_req,date_resp,status)" +
+					" VALUES (?,?,?,?,?,?,?,?,?,?)",
+					[client_id,place_id,ask_amount,payment_type_id,resp_time,date_start,date_end,date_req,date_resp,status],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true});
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Check client req
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/checkclientplacereq",function(req,res){
+		var client_id = req.body.client_id;
+		var place_id = req.body.place_id;
+		console.log("client_id : ", client_id);
+		console.log("place_id : ", place_id);
+		conn.query("SELECT * FROM ClientPlaceRequest WHERE client_id=? AND place_id=?",[client_id, place_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Check client req
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/checkreservation",function(req,res){
+		var client_id = req.body.client_id;
+		var place_id = req.body.place_id;
+		console.log("client_id : ", client_id);
+		console.log("place_id : ", place_id);
+		conn.query("SELECT * FROM Reservation WHERE client_id=? AND place_id=?",[client_id, place_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Check bid status
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/checkclientbid",function(req,res){
+		var client_id = req.body.client_id;
+		var auction_id = req.body.auction_id;
+		console.log("client_id : ", client_id);
+		console.log("auction_id : ", auction_id);
+		conn.query("SELECT Auction.auction_id, Users.user_id, Auction.current_price, ClientAuctionBids.payment_type_id, ClientAuctionBids.bid_price, Auction.end_auction_time FROM Users join ClientAuctionBids on Users.user_id=ClientAuctionBids.client_id join Auction on Auction.auction_id=ClientAuctionBids.auction_id WHERE Users.user_id=? AND Auction.auction_id=? AND Auction.active=?",[client_id, auction_id, 'yes'],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+				console.log(rows);
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Get amenity extras
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getamenityextras",function(req,res){
+		var place_id = req.body.place_id;
+		console.log("place_id : ", place_id);
+		conn.query("SELECT place_extra_amenity_id, name, cost FROM PlaceExtraAmenity WHERE place_id = ?",[place_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+				console.log(rows);
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+	
+	/////////////////////////////////////////////////////////////////////////////
+	// Add amenity extras for reservation
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/addextrasforreservation",function(req,res){
+		var reservation_id = req.body.reservation_id;
+		var place_extra_amenity_id = req.body.place_extra_amenity_id;
+		console.log("reservation_id : ", reservation_id);
+		console.log("place_extra_amenity_id : ", place_extra_amenity_id);
+		conn.query("INSERT INTO ReservationExtras (reservation_id,place_extra_amenity_id) VALUES (?,?)",[reservation_id, place_extra_amenity_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows.insertId});
+				console.log(rows);
+			} else {
+				res.json({'query_success': false});
 				console.log(err);
 			}
 		});

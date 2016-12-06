@@ -1,0 +1,14 @@
+{
+  "name": "mb-notifications",
+  "version": "0.0.1",
+  "main": "mb-notifications.js",
+  "scripts": {
+
+  },
+  "devDependencies": {
+
+  },
+  "dependencies": {
+
+  }
+}

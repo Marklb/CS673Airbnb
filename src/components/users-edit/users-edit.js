@@ -44,24 +44,25 @@ export default class UsersEdit extends React.Component {
       },
       {
         name: 'photo_symbols_video',
-        text: 'Photos, Symbols, and Video',
+        // text: 'Photos, Symbols, and Video',
+        text: 'Photo',
         renderFn: this.renderMainPanelPhotosSymbolsAndVideo
       },
-      {
-        name: 'trust_verification',
-        text: 'Trust and Verification',
-        renderFn: this.renderMainPanelTrustAndVerification
-      },
-      {
-        name: 'reviews',
-        text: 'Reviews',
-        renderFn: this.renderMainPanelReviews
-      },
-      {
-        name: 'references',
-        text: 'References',
-        renderFn: this.renderMainPanelReferences
-      }
+      // {
+      //   name: 'trust_verification',
+      //   text: 'Trust and Verification',
+      //   renderFn: this.renderMainPanelTrustAndVerification
+      // },
+      // {
+      //   name: 'reviews',
+      //   text: 'Reviews',
+      //   renderFn: this.renderMainPanelReviews
+      // },
+      // {
+      //   name: 'references',
+      //   text: 'References',
+      //   renderFn: this.renderMainPanelReferences
+      // }
     ];
   }
 
@@ -87,7 +88,7 @@ export default class UsersEdit extends React.Component {
           </ul>
         </div>
 
-        <Link to={`/users/show/${tempUserId}`} className="left-panel-btn">View Profile</Link>
+        {/*<Link to={`/users/show/${tempUserId}`} className="left-panel-btn">View Profile</Link>*/}
       </div>
     );
   }

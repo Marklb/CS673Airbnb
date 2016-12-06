@@ -25,12 +25,14 @@ export default class TopHeaderProfileBtn extends TopHeaderDropdownButton {
   renderDropdownContent() {
     return (
       <div className="drop-btns">
-        <div className="drop-btn">Edit Profile</div>
-        <div className="drop-btn">Travel Credit</div>
-        <div className="drop-btn">Gift Cards</div>
-        <div className="drop-btn">Account Settings</div>
-        <div className="drop-btn">Business Travel</div>
-        <div className="drop-btn">My Guidebook</div>
+        <div className="drop-btn"><Link to="/dashboard">Dashboard</Link></div>
+        <div className="drop-btn"><Link to="/inbox">Inbox</Link></div>
+        <div className="drop-btn"><Link to="/rooms">Your Listings</Link></div>
+        <div className="drop-btn"><Link to="/reservations">Your Reservations</Link></div>
+        <div className="drop-btn"><Link to="/trips">Your Trips</Link></div>
+        <div className="drop-btn"><Link to="/users/transaction_history">Your Transactions</Link></div>
+        <div className="drop-btn"><Link to="/users/edit">Your Profile</Link></div>
+        <div className="drop-btn"><Link to="/users/notifications">Account</Link></div>
         <div className="drop-btn" onClick={this.onClickLogoutBtn}>Logout</div>
       </div>
     );

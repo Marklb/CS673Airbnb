@@ -443,10 +443,16 @@ module.exports.api_get_user_expense = function(req,res,conn){
     });
 }
 
-module.exports.api_insert_listing = function(req,res,conn){
-try{
+module.exports.update_listing_data = function(req,res,conn){
+  console.log('\n\n\n\n\n\n\n\n\nupdate_listing_data');
+  var auth_type = req.body.auth_type;
+  var auth_token = req.body.auth_token;
+  var place_id = parseInt(req.body.place_id);
+  console.log(auth_token);
+  console.log(auth_type);
+  console.log(place_id);
 
-  // console.log(req.body);
+  console.log(req.body);
   var street = req.body.street;
   var city = req.body.city;
   var state = req.body.state;
@@ -457,118 +463,284 @@ try{
   var room_description = req.body.description;
   var date_start = req.body.date_start;
   var date_end = req.body.date_end;
+  var locationLatLng = req.body.locationLatLng;
+
   var max_people = req.body.max_people;
   var cost_per_night = req.body.cost_per_night;
   var response_time = req.body.response_time;
   var bedroomsize = req.body.bedroomsize;
   var bathroomsize = req.body.bathroomsize;
   var numofbeds = req.body.numofbeds;
-  var roomtype_id = req.body.roomtype_id;
+  var roomtype_id = parseInt(req.body.roomtype_id);
   var bookingtype_id = req.body.bookingtype_id;
+  // var amenity_ids = req.body.amenity_id;
+  // var amenity_ids_to_add = req.body.amenity_ids_to_add;
+  // var amenity_ids_to_del = req.body.amenity_ids_to_del;
   var amenity_ids = (req.body.amenity_ids+'').split(',');
-  var hostlanguage_id = req.body.hostlanguage_id;
-  var isBookingActive = req.body.isBookingActive;
+  var amenity_ids_to_add = (req.body.amenity_ids_to_add+'').split(',');
+  var amenity_ids_to_del = (req.body.amenity_ids_to_del+'').split(',');
+  if(amenity_ids == undefined || amenity_ids == "undefined"){amenity_ids = [];}
+  if(amenity_ids_to_add == undefined || amenity_ids_to_add == "undefined"){amenity_ids_to_add = [];}
+  if(amenity_ids_to_add == undefined || amenity_ids_to_add == "undefined"){amenity_ids_to_add = [];}
 
-  var address_query_str = `
-  INSERT INTO address (street, city, state, zip, country)
-  VALUES (?,?,?,?,?)
+  var paidExtrasToAdd = req.body.paidExtrasToAdd;
+  var paidExtrasToDel = req.body.paidExtrasToDel;
+  console.log(paidExtrasToAdd);
+  console.log(paidExtrasToDel);
+  // console.log(paidExtrasToDel.length);
+
+  var is_booking_active = req.body.is_booking_active;
+  var paidExtras = req.body.paidExtras;
+  var end_auction_time = req.body.end_auction_time;
+  console.dir(roomtype_id);
+
+  var promises = [];
+
+
+  var get_user_id_query_str = `
+  (SELECT USES.user_id
+  FROM UserSession AS USES
+  WHERE USES.auth_type = ? AND USES.session_auth_id = ?)`;
+
+  get_user_id_query_str = mysql.format(get_user_id_query_str, [
+  auth_type, auth_token]);
+  console.log('----------------1-------------------');
+  console.log(get_user_id_query_str);
+  console.log('----------------2-------------------');
+  var query_str1 = `
+  Update HostPlaceListing SET ?
+  WHERE 
+    host_id = @authed_user_id 
+  AND 
+    place_id = ?
   `;
-
-  address_query_str = mysql.format(address_query_str, [street, city, state, zip, country]);
-  console.log(address_query_str);
-
-  function doPlaceAmenitysQuery(args){
-    var place_amenity_query_str = `
-    INSERT INTO PlaceAmenity (place_id, amenity_id)
-    VALUES
-    `;
-    var placeValues = [];
-    for(var i = 0; i < amenity_ids.length; i++){
-      if(i != 0) place_amenity_query_str += ',';
-      place_amenity_query_str += '(?)';
-      placeValues.push([args.place_id, amenity_ids[i]]);
-    }
-
-    place_amenity_query_str = mysql.format(place_amenity_query_str, placeValues);
-
-    conn.query(place_amenity_query_str, function(err, result){
+  var vals1 = {};
+  if(bookingtype_id !== undefined)vals1['bookingtype_id'] = parseInt(bookingtype_id);
+  if(date_start !== undefined)vals1['date_range_start'] = date_start;
+  if(date_end !== undefined)vals1['date_range_end'] = date_end;
+  if(is_booking_active != undefined){
+    vals1['active'] = (is_booking_active == true || is_booking_active == 'true') ? 'yes' : 'no';
+  }
+  console.log('----------------3-------------------');
+  console.log(vals1);
+  console.log('----------------4-------------------');  
+  query_str1 = query_str1.replace('@authed_user_id', get_user_id_query_str)
+  console.log(query_str1);
+  console.log('----------------5-------------------');
+  query_str1 = mysql.format(query_str1, [vals1, place_id]);
+  console.log('----------------7-------------------');
+  console.log(query_str1);
+  console.log('----------------8-------------------');
+  var p1 = new Promise(function(resolve, reject) {
+    conn.query(query_str1, function(err, result){
       if (!err) {
-        console.log(result.insertId);
-        // doHostPlaceListingQuery({place_id: result.insertId});
-        res.json({'query_success': true});
+        // resolve("[query_str1]Stuff worked!");
+        resolve(result);
+        // console.log(result);
+        // res.json({ 'success': true });
       } else {
-        console.log('Error while performing Query.');
-        res.json({'query_success': false});
+        reject(Error("[query_str1]It broke1"));
+        // res.json({ 'success': false });
       }
     });
-  }
-
-  function doHostPlaceListingQuery(args) {
-    var hpl_query_str = `
-    INSERT INTO HostPlaceListing (place_id, host_id, bookingtype_id,
-      ask_amount, date_range_start, date_range_end, response_time, active)
-    VALUES (?,
-      (SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?)
-      ,?,?,?,?,?,?)
-    `;
-
-    hpl_query_str = mysql.format(hpl_query_str, [
-      args.place_id,
-      req.body.authType, req.body.authToken,
-      bookingtype_id, cost_per_night, date_start, date_end, response_time,
-      (isBookingActive == 'true')? 'yes' : 'no']);
-    console.log(hpl_query_str);
-
-    conn.query(hpl_query_str, function(err, result){
-      if (!err) {
-        console.log(result.insertId);
-        doPlaceAmenitysQuery({place_id: args.place_id});
-        // res.json({'query_success': true});
-      } else {
-        console.log('Error while performing Query.');
-        res.json({'query_success': false});
-      }
-    });
-  }
-
-  function doPlaceQuery(args) {
-    var place_query_str = `
-    INSERT INTO Place (host_id, addr_id, roomtype_id, name, description, cost_per_night, max_people, bedroomsize, bathroomsize, numofbeds)
-    VALUES ((SELECT user_id FROM UserSession WHERE auth_type = ? AND session_auth_id = ?),?,?,?,?,?,?,?,?,?)
-    `;
-    place_query_str = mysql.format(place_query_str, [
-      req.body.authType, req.body.authToken,
-      args.addr_id, roomtype_id, room_name, room_description, cost_per_night,
-      max_people, bedroomsize, bathroomsize, numofbeds]);
-    console.log(place_query_str);
-
-    conn.query(place_query_str, function(err, result){
-      if (!err) {
-        console.log(result.insertId);
-        doHostPlaceListingQuery({place_id: result.insertId});
-        // res.json({'query_success': true});
-      } else {
-        console.log('Error while performing Query.');
-        res.json({'query_success': false});
-      }
-    });
-
-  }
-
-
-  conn.query(address_query_str, function(err, result){
-    if (!err) {
-      console.log(result.insertId);
-      doPlaceQuery({addr_id: result.insertId});
-      // res.json({'query_success': true});
-    } else {
-      console.log('Error while performing Query.');
-      res.json({'query_success': false});
-    }
   });
+  promises.push(p1);
 
-}catch(err){
-  console.log('[ERROR THOWN]:');
-  console.log(err);
-}
+
+
+  var query_str2 = `
+  Update Place SET ?
+  WHERE place_id = ?
+  `;
+  var vals2 = {}; 
+  if(roomtype_id !== undefined)vals2['roomtype_id'] = parseInt(roomtype_id);
+  if(room_name !== undefined)vals2['name'] = room_name;
+  if(room_description !== undefined)vals2['description'] = room_description;
+  if(response_time !== undefined)vals2['response_time'] = parseInt(response_time);
+  if(cost_per_night !== undefined)vals2['cost_per_night'] = parseFloat(cost_per_night);
+  if(max_people !== undefined)vals2['max_people'] = parseInt(max_people);
+  if(bedroomsize !== undefined)vals2['bedroomsize'] = parseFloat(bedroomsize);
+  if(bathroomsize !== undefined)vals2['bathroomsize'] = parseInt(bathroomsize);
+  if(numofbeds !== undefined)vals2['numofbeds'] = parseInt(numofbeds);
+  query_str2 = mysql.format(query_str2, [vals2, parseInt(place_id)]);
+  console.log(query_str2);
+  var p2 = new Promise(function(resolve, reject) {
+  	conn.query(query_str2, function(err, result){
+  		if (!err) {
+  			// resolve("[query_str2]Stuff worked!");
+  			resolve(result);
+  		} else {
+  			reject(Error("[query_str2]It broke"));
+  		}
+  	});
+  });
+  promises.push(p2);
+
+
+
+
+  var query_str3 = `
+  Update Address SET ?
+  WHERE addr_id = (SELECT P.addr_id FROM Place AS P WHERE P.place_id = ?)
+  `;
+  var vals3 = {}; 
+  if(street !== undefined)vals3['street'] = street;
+  if(city !== undefined)vals3['city'] = city;
+  if(state !== undefined)vals3['state'] = state;
+  if(zip !== undefined)vals3['zip'] = zip;
+  if(country !== undefined)vals3['country'] = country;
+  console.log(locationLatLng);
+  if(locationLatLng !== undefined){
+    console.log('-----');
+    if(locationLatLng.lng !== undefined)vals3['latitude'] = parseFloat(locationLatLng.lat);
+    if(locationLatLng.lng !== undefined)vals3['longitude'] = parseFloat(locationLatLng.lng);
+  }
+  console.log(vals3);
+  query_str3 = mysql.format(query_str3, [vals3, parseInt(place_id)]);
+  console.log(query_str3);
+  var p3 = new Promise(function(resolve, reject) {
+  	conn.query(query_str3, function(err, result){
+  		if (!err) {
+  			// resolve("[query_str3]Stuff worked!");
+  			resolve(result);
+  		} else {
+  			reject(Error("[query_str3]It broke"));
+  		}
+  	});
+  });
+  promises.push(p3);
+
+
+
+  if(req.body.amenity_ids_to_add !== undefined){
+    var query_str4 = `
+    INSERT INTO PlaceAmenity (place_id, amenity_id)
+    VALUES ?
+    `;
+    
+    let vals4 = [];
+    if(amenity_ids_to_add !== undefined){
+      console.log(amenity_ids_to_add);
+      for(var i = 0; i < amenity_ids_to_add.length; i++){
+        if(amenity_ids_to_add[i] != undefined  && amenity_ids_to_add[i] != "undefined"){
+          vals4.push([parseInt(place_id), parseInt(amenity_ids_to_add[i])]);
+        }
+      }
+    }
+    query_str4 = mysql.format(query_str4, [vals4]);
+    console.log('------==');
+    console.log(query_str4);
+    console.log('------==');
+    var p4 = new Promise(function(resolve, reject) {
+      conn.query(query_str4, function(err, result){
+        if (!err) {
+          // resolve("[query_str4]Stuff worked!");
+          resolve(result);
+        } else {
+          reject(Error("[query_str4]It broke"));
+        }
+      });
+    });
+    promises.push(p4);
+  }
+
+  // if(amenity_ids_to_del.length > 0){
+  if(req.body.paidExtrasToDel !== undefined){
+    var query_str5 = `
+    DELETE FROM PlaceExtraAmenity
+    WHERE  
+    `;
+    // place_id = ? AND name = ? AND cost = ?
+    var s = [];
+    for(var i = 0; i < req.body.paidExtrasToDel.length; i++){
+      s.push(`(place_id = ${parseInt(place_id)} AND name = '${req.body.paidExtrasToDel[i].name}' AND cost = ${req.body.paidExtrasToDel[i].cost})`);
+    }
+    s = s.join(' OR ');
+    console.log(s);
+    query_str5 += s;
+
+    // let vals5 = [];
+    // if(amenity_ids_to_del !== undefined){
+    //   console.log(amenity_ids_to_del);
+    //   for(var i = 0; i < amenity_ids_to_del.length; i++){
+    //     if(amenity_ids_to_del[i] != undefined  && amenity_ids_to_del[i] != "undefined"){
+    //       vals5.push([parseInt(place_id), parseInt(amenity_ids_to_del[i])]);
+    //     }
+    //   }
+    // }
+    // query_str5 = mysql.format(query_str5, [parseInt(place_id), amenity_ids_to_del]);
+    console.log('------==');
+    console.log(query_str5);
+    console.log('------==');
+    var p5 = new Promise(function(resolve, reject) {
+      conn.query(query_str5, function(err, result){
+        if (!err) {
+          // resolve("[query_str4]Stuff worked!");
+          resolve(result);
+        } else {
+          reject(Error("[query_str5]It broke"));
+        }
+      });
+    });
+    promises.push(p5);
+  }
+  
+  if(req.body.paidExtrasToAdd !== undefined){
+    console.log(req.body.paidExtrasToAdd);
+    var query_str6 = `
+    INSERT INTO PlaceExtraAmenity (place_id, name, cost)
+    VALUES  
+    `;
+    
+    var s = [];
+    for(var i = 0; i < req.body.paidExtrasToAdd.length; i++){
+      s.push(`(place_id = ${parseInt(place_id)}, name = '${req.body.paidExtrasToAdd[i].name}', cost = ${req.body.paidExtrasToAdd[i].cost})`);
+    }
+    s = s.join(', ');
+    console.log(s);
+    query_str6 += s;
+    // let vals5 = [];
+    // if(amenity_ids_to_del !== undefined){
+    //   console.log(amenity_ids_to_del);
+    //   for(var i = 0; i < amenity_ids_to_del.length; i++){
+    //     if(amenity_ids_to_del[i] != undefined  && amenity_ids_to_del[i] != "undefined"){
+    //       vals5.push([parseInt(place_id), parseInt(amenity_ids_to_del[i])]);
+    //     }
+    //   }
+    // }
+    // query_str6 = mysql.format(query_str6, [parseInt(place_id), amenity_ids_to_del]);
+    console.log('------==');
+    console.log(query_str6);
+    console.log('------==');
+    var p6 = new Promise(function(resolve, reject) {
+      conn.query(query_str6, function(err, result){
+        if (!err) {
+          // resolve("[query_str4]Stuff worked!");
+          resolve(result);
+        } else {
+          reject(Error("[query_str6]It broke"));
+        }
+      });
+    });
+    promises.push(p6);
+  }
+
+
+
+
+
+  // Promise.all([p1, p2, p3, p4]).then(values => {
+  // Promise.all([p1, p2, p3]).then(values => {
+  // Promise.all([p1, p2]).then(values => {
+  Promise.all(promises).then(values => {
+  	console.log('success');
+  	console.log(values);
+  	res.json({ 'success': true, 'response': values });
+  }, reason => {
+  	console.log('failed');
+  	console.log(reason);
+  	res.json({ 'success': false });
+  });
+  // res.json({ 'success': false });
+
 }

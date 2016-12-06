@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS `Address` (
   `state` VARCHAR(45) NULL,
   `zip` VARCHAR(10) NULL,
   `country` VARCHAR(45) NULL,
+  `latitude` DOUBLE NULL,
+  `longitude` DOUBLE NULL,
   PRIMARY KEY (`addr_id`))
 ENGINE = InnoDB;
 
@@ -258,6 +260,35 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
+-- Table `PlaceExtraAmenity`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PlaceExtraAmenity` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `PlaceExtraAmenity` (
+  `place_extra_amenity_id` INT NOT NULL AUTO_INCREMENT,
+  `place_id` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `cost` NUMERIC(7,2) NULL,
+  PRIMARY KEY (`place_extra_amenity_id`))
+ENGINE = InnoDB;
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `ReservationExtras`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ReservationExtras` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `ReservationExtras` (
+  `reservation_extra_id` INT NOT NULL AUTO_INCREMENT,
+  `reservation_id` INT NOT NULL,
+  `place_extra_amenity_id` INT NOT NULL,
+  PRIMARY KEY (`reservation_extra_id`))
+ENGINE = InnoDB;
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
 -- Table `UserLanguage`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `UserLanguage` ;
@@ -318,6 +349,7 @@ CREATE TABLE IF NOT EXISTS `ClientPlaceRequest` (
   `client_id` INT NOT NULL,
   `place_id` INT NOT NULL,
   `ask_amount` VARCHAR(8) NOT NULL,
+  `payment_type_id` INT NULL,
   `resp_time` INT(2) NULL,
   `date_start` VARCHAR(45) NULL,
   `date_end` VARCHAR(45) NULL,
@@ -343,7 +375,7 @@ CREATE TABLE IF NOT EXISTS `Auction` (
   `starting_price` VARCHAR(10) NOT NULL,
   `current_price` VARCHAR(10) NULL,
   `sold_price` VARCHAR(10) NULL,
-  `end_auction_time` TIMESTAMP NOT NULL,
+  `end_auction_time` VARCHAR(45) NOT NULL,
   `active` VARCHAR(3) NOT NULL,
   PRIMARY KEY (`auction_id`))
 ENGINE = InnoDB;
@@ -362,7 +394,10 @@ CREATE TABLE IF NOT EXISTS `ClientAuctionBids` (
   `bid_id` INT NOT NULL AUTO_INCREMENT,
   `auction_id` INT NOT NULL,
   `client_id` INT NOT NULL,
+  `payment_type_id` INT NOT NULL,
   `bid_price` VARCHAR(10) NOT NULL,
+  `checkin_date` VARCHAR(10) NOT NULL,
+  `checkout_date` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`bid_id`))
 ENGINE = InnoDB;
 
@@ -463,7 +498,8 @@ INSERT INTO Users (
    ('JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','1998-04-09'),
    ('JamesBond@Agent.com', 'test', 'James', 'Bond', 'M','1992-08-16'),
    ('JaneDoe@VIP.com', 'test', 'Jane', 'Doe', 'F','2000-08-14'),
-   ('JaclynBond@Agent.com', 'test', 'Jaclyn', 'Bond', 'F','1996-02-26')
+   ('JaclynBond@Agent.com', 'test', 'Jaclyn', 'Bond', 'F','1996-02-26'),
+   ('william@cool.com', 'test', 'William', 'Kuo', 'M','1991-03-21')
 ;
 
 INSERT INTO address (
@@ -509,57 +545,57 @@ INSERT INTO auction (
    (1, "80.00", "193.00", "193.00", "2016-10-18", "no"),
    (5, "200.00", "278.00", "278.00", "2016-11-26", "no"),
    (1, "80.00", "99.00", "99.00", "2016-12-01", "no"),
-   (1, "80.00", "278.00", NULL, "2016-11-24", "yes"),
-   (5, "200.00", "243.00", NULL, "2016-12-06", "yes")
+   (1, "80.00", "278.00", NULL, "2016-12-30", "yes"),
+   (5, "200.00", "243.00", NULL, "2016-12-30", "yes")
 ;
 
 INSERT INTO ClientAuctionBids (
-	auction_id, client_id, bid_price
+	auction_id, client_id, payment_type_id, bid_price, checkin_date, checkout_date
 ) VALUES
-	(1, 2, "90.00"), 
-	(1, 4, "100.00"),
-	(1, 2, "125.00"),
-	(1, 3, "150.00"),
-	(2, 1, "89.00"),
-	(2, 3, "92.00"),
-	(2, 4, "98.00"),
-	(2, 2, "105.00"),
-	(3, 4, "95.00"),
-	(3, 2, "102.48"),
-	(3, 1, "149.98"),
-	(3, 3, "165.00"),
-	(4, 3, "125.00"),
-	(4, 2, "210.00"),
-	(4, 1, "292.00"),
-	(4, 4, "316.00"),
-	(5, 3, "242.00"),
-	(5, 4, "265.00"),
-	(5, 3, "280.00"),
-	(5, 4, "290.00"),
-	(6, 2, "99.00"),
-	(6, 1, "119.00"),
-	(6, 3, "143.00"),
-	(6, 2, "175.00"),
-	(7, 3, "212.00"),
-	(7, 2, "214.00"),
-	(7, 3, "228.00"),
-	(7, 4, "259.00"),
-	(8, 1, "119.00"),
-	(8, 2, "137.00"),
-	(8, 3, "168.00"),
-	(8, 2, "193.00"),
-	(9, 2, "210.00"),
-	(9, 3, "230.00"),
-	(9, 4, "260.00"),
-	(9, 3, "278.00"),
-	(10, 1, "110.00"),
-	(10, 3, "140.00"),
-	(10, 4, "169.00"),
-	(10, 2, "199.00"),
-	(11, 2, "199.00"),
-	(11, 3, "278.00"),
-	(12, 3, "224.00"),
-	(12, 4, "243.00")
+	(1, 2, 1, "90.00", "2016-06-01", "2016-06-18"),
+	(1, 4, 1, "100.00", "2016-06-01", "2016-06-18"),
+	(1, 2, 1, "125.00", "2016-06-01", "2016-06-18"),
+	(1, 3, 1, "150.00", "2016-06-01", "2016-06-18"),
+	(2, 1, 1, "89.00", "2016-07-02", "2016-07-07"),
+	(2, 3, 1, "92.00", "2016-07-02", "2016-07-07"),
+	(2, 4, 1, "98.00", "2016-07-02", "2016-07-07"),
+	(2, 2, 1, "105.00", "2016-07-02", "2016-07-07"),
+	(3, 4, 1, "95.00", "2016-07-22", "2016-08-04"),
+	(3, 2, 1, "102.48", "2016-07-22", "2016-08-04"),
+	(3, 1, 1, "149.98", "2016-07-22", "2016-08-04"),
+	(3, 3, 1, "165.00", "2016-07-22", "2016-08-04"),
+	(4, 3, 1, "125.00", "2016-07-24", "2016-08-04"),
+	(4, 2, 1, "210.00", "2016-07-24", "2016-08-04"),
+	(4, 1, 1, "292.00", "2016-07-24", "2016-08-04"),
+	(4, 4, 1, "316.00", "2016-07-24", "2016-08-04"),
+	(5, 3, 1, "242.00", "2016-08-11", "2016-08-04"),
+	(5, 4, 1, "265.00", "2016-08-11", "2016-08-04"),
+	(5, 3, 1, "280.00", "2016-08-11", "2016-08-04"),
+	(5, 4, 1, "290.00", "2016-08-11", "2016-08-04"),
+	(6, 2, 1, "99.00", "2016-08-11", "2016-08-04"),
+	(6, 1, 1, "119.00", "2016-08-11", "2016-08-04"),
+	(6, 3, 1, "143.00", "2016-08-11", "2016-08-04"),
+	(6, 2, 1, "175.00", "2016-08-11", "2016-08-04"),
+	(7, 3, 1, "212.00", "2016-10-03", "2016-10-07"),
+	(7, 2, 1, "214.00", "2016-10-03", "2016-10-07"),
+	(7, 3, 1, "228.00", "2016-10-03", "2016-10-07"),
+	(7, 4, 1, "259.00", "2016-10-03", "2016-10-07"),
+	(8, 1, 1, "119.00", "2016-10-19", "2016-10-22"),
+	(8, 2, 1, "137.00", "2016-10-19", "2016-10-22"),
+	(8, 3, 1, "168.00", "2016-10-19", "2016-10-22"),
+	(8, 2, 1, "193.00", "2016-10-19", "2016-10-22"),
+	(9, 2, 1, "210.00", "2016-11-28", "2016-12-04"),
+	(9, 3, 1, "230.00", "2016-11-28", "2016-12-04"),
+	(9, 4, 1, "260.00", "2016-11-28", "2016-12-04"),
+	(9, 3, 1, "278.00", "2016-11-28", "2016-12-04"),
+	(10, 1, 1, "110.00", "2016-12-03", "2016-12-09"),
+	(10, 3, 1, "140.00", "2016-12-03", "2016-12-09"),
+	(10, 4, 1, "169.00", "2016-12-03", "2016-12-09"),
+	(10, 2, 1, "199.00", "2016-12-03", "2016-12-09"),
+	(11, 2, 1, "199.00", "2017-01-03", "2017-01-04"),
+	(11, 3, 1, "278.00", "2017-01-03", "2017-01-04"),
+	(12, 3, 1, "224.00", "2016-12-31", "2017-01-01"),
+	(12, 4, 1, "243.00", "2016-12-31", "2017-01-01")
 ;
 
 INSERT INTO Ratings (
@@ -597,14 +633,14 @@ INSERT INTO UserLanguage (
 ;
 
 INSERT INTO ClientPlaceRequest (
-	place_id, client_id, ask_amount, resp_time, date_start, date_end, date_req, date_resp, status
+	place_id, client_id, ask_amount, payment_type_id, resp_time, date_start, date_end, date_req, date_resp, status
 ) VALUES
-	(3, 5, "79.99", 2, "2016-07-07", "2016-07-10",  "2016-07-01", "2016-07-02", "accepted"),
-	(4, 5, "60.00", 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "rejected"),
-	(4, 5, "62.00", 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "accepted"),
-    (3, 2, "82.50", 1, "2016-07-17", "2016-07-20",  "2016-07-14", NULL, "failed"),
-	(3, 2, "82.50", 1, "2016-07-17", "2016-07-20",  "2016-07-15", "2016-07-16", "accepted"),
-    (3, 1, "83.00", 5, "2016-12-07", "2016-12-09", "2016-12-01", NULL, "pending")
+	(3, 1, "79.99", 1, 2, "2016-07-07", "2016-07-10",  "2016-07-01", "2016-07-02", "accepted"),
+	(4, 1, "60.00", 2, 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "rejected"),
+	(4, 5, "62.00", 3, 3, "2016-07-13", "2016-07-15",  "2016-07-10", "2016-07-10", "accepted"),
+    (3, 2, "82.50", 2, 1, "2016-07-17", "2016-07-20",  "2016-07-14", NULL, "failed"),
+	(3, 2, "82.50", 4, 1, "2016-07-17", "2016-07-20",  "2016-07-15", "2016-07-16", "accepted"),
+    (3, 1, "83.00", 5, 5, "2016-12-07", "2016-12-09", "2016-12-01", NULL, "pending")
 ;
 
 INSERT INTO Reservation (
@@ -627,4 +663,28 @@ INSERT INTO Reservation (
    (5, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
    (1, 1, 2, 2, "2016-12-06", "2016-12-08", "99.00", "2016-12-01"),
    (2, 2, 1, 1, "2016-12-05", "2016-12-07", "666.00", "2016-12-01")
+;
+
+INSERT INTO PlaceExtraAmenity (
+	place_id, name, cost) VALUES
+	(1, 'Pepsi', 2.5),
+	(1, 'Lays', 3.5),
+	(1, 'Bottle Water', 1.5),
+	(1, 'Juice', 3.5),
+	(2, 'Coffee', 10.5),
+	(2, 'Cake', 6.5),
+	(2, 'Cigar', 9.5),
+	(2, 'Cigarette', 7.5),
+	(3, 'Cusion', 4.4),
+	(3, 'Samsung Note 7', 1),
+	(3, 'Red Bull', 2.7),
+	(3, 'Coke', 1.4),
+	(4, 'PS4', 600),
+	(4, 'XBOX', 100),
+	(4, 'XBOX ONE', 700),
+	(4, 'Umbrella', 5.5),
+	(5, 'Comic', 10),
+	(5, 'Instant noodle', 4),
+	(5, 'Bubble tea', 7),
+	(5, 'Green tea', 4)
 ;

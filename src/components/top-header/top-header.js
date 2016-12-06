@@ -35,7 +35,7 @@ export default class TopHeader extends React.Component {
       return (
         <div>
           <TopHeaderProfileBtn className="profile-btn" />
-          <TopHeaderMessagesBtn />
+          <Link to="/inbox"><TopHeaderMessagesBtn /></Link>
           <Link to="/trips"><TopHeaderTripsBtn /></Link>
           <Link to="/become-host/0"><TopHeaderBecomeAHostBtn className="become-a-host" /></Link>
         </div>

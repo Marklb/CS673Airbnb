@@ -46,6 +46,10 @@ export default class DashboardPagesHeader extends React.Component {
             <div>Your Listings</div>
           </Link>
 
+          <Link to="/reservations" className={(this.props.headerTab == 'your-reservations') ? "active" : null}>
+            <div>Your Reservations</div>
+          </Link>
+
           <Link to="/trips" className={(this.props.headerTab == 'your-trips') ? "active" : null}>
             <div>Your Trips</div>
           </Link>
@@ -53,7 +57,7 @@ export default class DashboardPagesHeader extends React.Component {
 		  <Link to="/users/transaction_history" className={(this.props.headerTab == 'your-transactions') ? "active" : null}>
             <div>Your Transactions</div>
           </Link>
-		  
+
           <Link to="/users/edit" className={(this.props.headerTab == 'profile') ? "active" : null}>
             <div>Profile</div>
           </Link>

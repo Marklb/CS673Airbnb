@@ -34,7 +34,7 @@ export default class ListingImageUploader extends React.Component {
 
 
   renderImportedImagesContainerContent() {
-
+    console.log('renderImportedImagesContainerContent');
     if(this.state.imagesList.length > 0){
       return (
         <div>

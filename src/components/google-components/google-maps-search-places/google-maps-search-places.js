@@ -30,9 +30,17 @@ export default class GoogleMapsSearchPlaces extends React.Component {
   componentDidMount() {
     console.log(this.props);
     if(this.props.placeMarkersData.length == 0) return;
+    let list = [];
+    for(let i = 0; i < this.props.placeMarkersData.length; i++){
+      if(this.props.placeMarkersData[i].lat 
+        || this.props.placeMarkersData[i].lng){
+        list.push(this.props.placeMarkersData[i]);
+      }
+    }
+    if(list.length <= 0) return;
 
-    let latArr = this.props.placeMarkersData.map((val) => val.lat);
-    let lngArr = this.props.placeMarkersData.map((val) => val.lng);
+    let latArr = list.map((val) => val.lat);
+    let lngArr = list.map((val) => val.lng);
     let center = {
       lat: latArr.reduce((a, b) => a + b, 0)/latArr.length,
       lng: lngArr.reduce((a, b) => a + b, 0)/lngArr.length
@@ -58,17 +66,17 @@ export default class GoogleMapsSearchPlaces extends React.Component {
       // anchor: new google.maps.Point(0, 25)
       scaledSize: new google.maps.Size(45, 18)
     };
-    for(let i = 0; i < this.props.placeMarkersData.length; i++){
+    for(let i = 0; i < list.length; i++){
       let marker = new google.maps.Marker({
         position: {
-          lat: this.props.placeMarkersData[i].lat, 
-          lng: this.props.placeMarkersData[i].lng
+          lat: list[i].lat, 
+          lng: list[i].lng
         },
         map: this.map,
         label: {
           color: 'rgba(230,230,230,1)',
           fontSize: '10px',
-          text: `$${this.props.placeMarkersData[i].price}`
+          text: `$${list[i].price}`
         },
         icon: image
       });
@@ -76,10 +84,10 @@ export default class GoogleMapsSearchPlaces extends React.Component {
     }
 
     this.map.fitBounds({
-      west: Math.min.apply(null, this.props.placeMarkersData.map((val) => val.lng)),
-      north: Math.max.apply(null, this.props.placeMarkersData.map((val) => val.lat)),
-      east: Math.max.apply(null, this.props.placeMarkersData.map((val) => val.lng)),
-      south: Math.min.apply(null, this.props.placeMarkersData.map((val) => val.lat))
+      west: Math.min.apply(null, list.map((val) => val.lng)),
+      north: Math.max.apply(null, list.map((val) => val.lat)),
+      east: Math.max.apply(null, list.map((val) => val.lng)),
+      south: Math.min.apply(null, list.map((val) => val.lat))
     });
 
   }
