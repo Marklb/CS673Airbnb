@@ -498,7 +498,8 @@ INSERT INTO Users (
    ('JohnDoe@VIP.com', 'test', 'John', 'Doe', 'M','1998-04-09'),
    ('JamesBond@Agent.com', 'test', 'James', 'Bond', 'M','1992-08-16'),
    ('JaneDoe@VIP.com', 'test', 'Jane', 'Doe', 'F','2000-08-14'),
-   ('JaclynBond@Agent.com', 'test', 'Jaclyn', 'Bond', 'F','1996-02-26')
+   ('JaclynBond@Agent.com', 'test', 'Jaclyn', 'Bond', 'F','1996-02-26'),
+   ('william@cool.com', 'test', 'William', 'Kuo', 'M','1991-03-21')
 ;
 
 INSERT INTO address (

@@ -264,7 +264,7 @@ export default class FilterForm extends React.Component {
 			rows.push(<MyCheckBox street={neighbor[i].street} />);
 		}
 		return (
-			<form className="f">
+			<form>
 				Neighborhoods
 				<br></br>
 				{rows.length === 0 ? 'None' : rows}
@@ -279,9 +279,7 @@ export default class FilterForm extends React.Component {
 		}
 		return (
 			<form className="f">
-				-----Filter Result-----
-				<br></br>
-				{rows.length === 0 ? 'None' : rows}
+				<center><h1>-----Filter Result-----</h1></center>
 				{this.renderPicture()}
 			</form>
 		);
@@ -340,8 +338,6 @@ export default class FilterForm extends React.Component {
 						</select>
 					</form>
 
-					{this.renderCheckBox(this.state.neighborhoods)}
-
 					<form className="f">
 						Booking Type
 						{this.state.checkbox.bookingtype.map((val, i) => {
@@ -367,8 +363,6 @@ export default class FilterForm extends React.Component {
 
 					{this.renderResult(this.state.result)}
 
-
-
 				</div>
 			</div>
 
@@ -379,22 +373,21 @@ export default class FilterForm extends React.Component {
 		return (
 			<div>
 				<div className="filterResult">
-					<div>
-						<div onClick={this.onClickShowFilters.bind(this)}>filters</div>
-					</div>
-
-					{(this.state.isFiltersVisible === true) ? this.renderFilter() : null}
-
 					{this.state.result.map((val, i) => {
 						return (
 							<div key={i} className="f">
 								<img className="pic" src={val.pictures} onClick={this.onClickShowRoom.bind(this, i)} />
 								<br></br>
 								Title<input className="r1" type="text" placeholder={val.name}></input>
+								<br></br>
 								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
+								<br></br>
 								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
+								<br></br>
 								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
+								<br></br>
 								Rating <Rater interactive={false} rating={val.rating}/>
+								<br></br>
 							</div>
 						);
 					})}

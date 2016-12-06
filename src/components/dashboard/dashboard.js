@@ -56,34 +56,28 @@ export default class Dashboard extends React.Component {
   };
 
 	componentDidMount() {
-	  	$.get('/api/getUserInfo', {
-			authType: this.context.userSessionHandler.getAuthType(),
-			authToken: this.context.userSessionHandler.getAuthToken()
+		this.state.user_id = this.context.userSessionHandler.getUserID();
+		$.post('/api/hostPendingRequests', { //req_id, bookingtype_name, place_id, host_id, client_id, client_name, ask_amount,  payment_type_id, resp_time, date_start, date_end, date_req, room_name
+			'user_id' : this.state.user_id
 		}, (data, status) => {
-			console.log("data:" + data);
-			this.state.user_id = data.user_id;
-			$.post('/api/hostPendingRequests', { //req_id, bookingtype_name, place_id, host_id, client_id, client_name, ask_amount,  payment_type_id, resp_time, date_start, date_end, date_req, room_name
-				'user_id' : this.state.user_id
-			}, (data, status) => {
-				if(data.query_success === false) {
-					console.log('get Dashboard Info query not successful');
-				} else {
-					console.log('get Dashboard Info details query successful');
-					this.setState({hostPendingRequestResults: data.result});
-					console.log("hostPendingRequestResults[0].req_id = " + data.hostPendingRequestResults[0].req_id);
-				}
-			});
-			$.post('/api/clientPendingRequests', { //req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
-				'user_id' : this.state.user_id
-			}, (data, status) => {
-				if(data.query_success === false) {
-					console.log('get Dashboard Info query not successful');
-				} else {
-					console.log('get Dashboard Info details query successful');
-					this.setState({yourPendingRequestResults: data.result});
-					console.log("yourPendingRequestResults[0].req_id = " + data.yourPendingRequestResults[0].req_id);
-				}
-			});
+			if(data.query_success === false) {
+				console.log('get Dashboard Info query not successful');
+			} else {
+				console.log('get Dashboard Info details query successful');
+				this.setState({hostPendingRequestResults: data.result});
+				console.log("hostPendingRequestResults[0].req_id = " + data.hostPendingRequestResults[0].req_id);
+			}
+		});
+		$.post('/api/clientPendingRequests', { //req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			'user_id' : this.state.user_id
+		}, (data, status) => {
+			if(data.query_success === false) {
+				console.log('get Dashboard Info query not successful');
+			} else {
+				console.log('get Dashboard Info details query successful');
+				this.setState({yourPendingRequestResults: data.result});
+				console.log("yourPendingRequestResults[0].req_id = " + data.yourPendingRequestResults[0].req_id);
+			}
 		});
 	}
 

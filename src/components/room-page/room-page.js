@@ -146,13 +146,15 @@ export default class RoomPage extends React.Component {
 	}
 
 	componentDidMount() {
-	  	$.get('/api/getUserInfo', {
-			authType: this.context.userSessionHandler.getAuthType(),
-			authToken: this.context.userSessionHandler.getAuthToken()
-		}, (data, status) => {
-			console.log("user_id" + data.user_id);
-			this.state.clientID = data.user_id;
-		});
+	  	// $.get('/api/getUserInfo', {
+			// authType: this.context.userSessionHandler.getAuthType(),
+			// authToken: this.context.userSessionHandler.getAuthToken()
+		// }, (data, status) => {
+			// console.log("user_id" + data.user_id);
+			// this.state.clientID = data.user_id;
+		// });
+		this.state.clientID = this.context.userSessionHandler.getUserID();
+		console.log("user_id" + this.state.clientID);
 
 		//----------------------------
 		// Disqus script start
@@ -513,7 +515,7 @@ export default class RoomPage extends React.Component {
 			<div className="roompage">
 				<h1>Room { this.state.placeID } display page</h1>
 				<br></br>
-				<img src={this.state.result[0].pictures} />
+				<img className='pic' src={this.state.result[0].pictures} />
 				<br></br>
 				Title : {this.state.result[0].name}
 				<br></br>
@@ -621,6 +623,7 @@ export default class RoomPage extends React.Component {
 		return (
 			<div>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				<br></br>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
 				{this.state.extras.length !== 0 ? this.renderExtras() : null}
@@ -635,7 +638,7 @@ export default class RoomPage extends React.Component {
 			<div>
 				Extras : 
 				{this.state.extras.map((val, i) => {
-					return <label key={i}><br></br><input name='extras' value={i} type="checkbox" onChange={this.onChange.bind(this)}/>{val.name}</label>;
+					return <label key={i}><br></br><input name='extras' value={i} type="checkbox" onChange={this.onChange.bind(this)}/>{val.name + '($' + val.cost+ ')'}</label>;
 				})}
 			</div>
 		);
@@ -701,10 +704,16 @@ export default class RoomPage extends React.Component {
 	userSetTimeFrameBooking() {
 		return (
 			<div>
-				How much do you want to pay?: <b>${this.state.cost}</b> <input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
-				How long will you give the host to respond?: <b> {this.state.response_time} days</b><input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
+				How much do you want to pay?
+				<br></br>
+				<b>${this.state.cost}</b> <input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
+				<br></br>
+				How long will you give the host to respond?
+				<br></br>
+				<b>{this.state.response_time} days</b> <input name='response_time' className="slide" type="range" min="0" max="14" value={this.state.response_time} onChange={this.onChange.bind(this)}></input>
 				<br></br>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				<br></br>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
 				{(this.state.bookButtonOK)? this.renderingUserSetTimeFrameBookingButton() : "please select dates in correct range!"}
@@ -715,11 +724,14 @@ export default class RoomPage extends React.Component {
 	hostSetTimeFrameBooking() {
 		return (
 			<div>
-				Response Time for host to get back to you : {this.state.result[0].response_time}
-				<br/>
-				How much do you want to pay? <b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
-				<br/>
+				Response Time for host to get back to you : <b>{this.state.result[0].response_time} days</b>
+				<br></br>
+				How much do you want to pay?
+				<br></br>
+				<b>${this.state.cost}</b><input name='cost' className="slide" type="range" min="0" max={parseInt(this.state.result[0].cost_per_night) + 100} defaultValue={this.state.result[0].cost_per_night} onChange={this.onChange.bind(this)}></input>
+				<br></br>
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
+				<br></br>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
 				{(this.state.bookButtonOK)? this.renderingHostSetTimeFrameBookingButton() : "please select dates in correct range!"}
