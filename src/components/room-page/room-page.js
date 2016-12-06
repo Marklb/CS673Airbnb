@@ -130,6 +130,9 @@ export default class RoomPage extends React.Component {
 				}
 			],
 
+			// extras
+			extras: [],
+
 			bookCheckinRangeOK : true,
 			bookCheckinTime : d_date_check_in,
 			bookCheckoutRangeOK : true,
@@ -139,6 +142,7 @@ export default class RoomPage extends React.Component {
 			bookButtonOK : true
 		};
 		this.getRoomDetailsQuery(this.state.placeID);
+		this.getAmenityExtras(this.state.placeID);
 	}
 
 	componentDidMount() {
@@ -229,6 +233,23 @@ export default class RoomPage extends React.Component {
 		var currentdate = new Date();
 		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
 		console.log("current day : " + datetime);
+
+		var extrasAmt = 0;
+		var extraAmenityIdArray = [];
+		if (this.state.result[0].bookingtype_id == '1') {
+			console
+			for (var i = 0 ; i < this.state.extras.length; i++) {
+				if (this.state.extras[i].checked === true) {
+					console.log("extras : " + this.state.extras[i].name + " cost : " + this.state.extras[i].cost + " extraId = " + this.state.extras[i].id);
+					extrasAmt += new Number(this.state.extras[i].cost);
+					extraAmenityIdArray.push(this.state.extras[i].id);
+				}
+			}
+		}
+		var total = new Number(this.state.cost) + extrasAmt;
+		var totalAmt = total.toString();
+		console.log('totalAmt : ' + totalAmt);
+
 		$.post('/api/addreservation', {
 			'bookingtype' : this.state.result[0].bookingtype_name,
 			'place_id' : this.state.placeID,
@@ -237,18 +258,24 @@ export default class RoomPage extends React.Component {
 			'payment_type_id' : this.state.payment_type_id,
 			'booked_date_start' : this.state.bookCheckinTime,
 			'booked_date_end' : this.state.bookCheckoutTime,
-			'amt_paid' : this.state.cost,
-			'paid_date' : datetime
+			'amt_paid' : totalAmt,
+			'paid_date' : datetime,
+			'extraIdArray' : extraAmenityIdArray
   		}, (data, status) => {
-  			if(data.query_success === false) {
-				console.log('insert reservation not successful');
-			} else {
-				console.log('insert reservation successful');
-				if (this.state.result[0].bookingtype_id == "1") {
-					let url = `/trips`;
-					browserHistory.push(url);
-				}
+			var resId = data.resId;
+			for (var i = 0 ; i < extraAmenityIdArray.length ; i++) {
+				$.post('/api/addextrasforreservation', {
+					'reservation_id' : resId,
+					'place_extra_amenity_id' : extraAmenityIdArray[i]
+				}, (data, status) => {
+					if(data.query_success === false) {
+						console.log('add extras for reservation not successful');
+					} else {
+						console.log('add extra in ' + data.result);
+					}
+				});
 			}
+			
   		});
 	}
 
@@ -447,6 +474,24 @@ export default class RoomPage extends React.Component {
   		});
 	}
 
+	getAmenityExtras(place_id) {
+		$.post('/api/getamenityextras', {
+			'place_id' : place_id
+  		}, (data, status) => {
+  			if(data.query_success === false) {
+				console.log('get Amenity extras not successful');
+			} else {
+				
+				var extraWeGot = [];
+				for (var i = 0 ; i < data.result.length ; i++) {
+					extraWeGot.push({id: data.result[i].place_extra_amenity_id, name: data.result[i].name, cost: data.result[i].cost, checked: false})
+				}
+				this.setState({extras : extraWeGot})
+				console.log('get Amenity extras successful');
+			}
+  		});
+	}
+
 	render() {
 		return (
 			<div>
@@ -578,7 +623,20 @@ export default class RoomPage extends React.Component {
 				Check in<input name='book_check_in' type="date" defaultValue={this.state.default_check_in_date} onChange={this.onChange.bind(this)}></input>
 				Check out<input name='book_check_out' type="date" defaultValue={this.state.default_check_out_date} onChange={this.onChange.bind(this)}></input>
 				<br></br>
+				{this.state.extras.length !== 0 ? this.renderExtras() : null}
+				<br></br>
 				{(this.state.bookButtonOK)? this.renderingInstantBookingButton() : "please select dates in correct range!"}
+			</div>
+		);
+	}
+
+	renderExtras() {
+		return (
+			<div>
+				Extras : 
+				{this.state.extras.map((val, i) => {
+					return <label key={i}><br></br><input name='extras' value={i} type="checkbox" onChange={this.onChange.bind(this)}/>{val.name}</label>;
+				})}
 			</div>
 		);
 	}
@@ -713,6 +771,14 @@ export default class RoomPage extends React.Component {
 			} else {
 				this.setState({bid_amount_ok: true});
 			}
+		} else if (name === 'extras') {
+			var checked = e.target.checked;
+			console.log(checked);
+			console.log(val);
+			var newState = this.state;
+			console.log(newState.extras);
+			newState.extras[val].checked = checked;
+			this.setState(newState);
 		}
 	}
 

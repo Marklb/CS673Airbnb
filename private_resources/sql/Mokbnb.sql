@@ -275,6 +275,20 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
+-- Table `ReservationExtras`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ReservationExtras` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `ReservationExtras` (
+  `reservation_extra_id` INT NOT NULL AUTO_INCREMENT,
+  `reservation_id` INT NOT NULL,
+  `place_extra_amenity_id` INT NOT NULL,
+  PRIMARY KEY (`reservation_extra_id`))
+ENGINE = InnoDB;
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
 -- Table `UserLanguage`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `UserLanguage` ;
@@ -648,4 +662,28 @@ INSERT INTO Reservation (
    (5, 1, 3, 3, "2016-12-02", "2016-12-05", "278.00", "2016-11-26"),
    (1, 1, 2, 2, "2016-12-06", "2016-12-08", "99.00", "2016-12-01"),
    (2, 2, 1, 1, "2016-12-05", "2016-12-07", "666.00", "2016-12-01")
+;
+
+INSERT INTO PlaceExtraAmenity (
+	place_id, name, cost) VALUES
+	(1, 'Pepsi', 2.5),
+	(1, 'Lays', 3.5),
+	(1, 'Bottle Water', 1.5),
+	(1, 'Juice', 3.5),
+	(2, 'Coffee', 10.5),
+	(2, 'Cake', 6.5),
+	(2, 'Cigar', 9.5),
+	(2, 'Cigarette', 7.5),
+	(3, 'Cusion', 4.4),
+	(3, 'Samsung Note 7', 1),
+	(3, 'Red Bull', 2.7),
+	(3, 'Coke', 1.4),
+	(4, 'PS4', 600),
+	(4, 'XBOX', 100),
+	(4, 'XBOX ONE', 700),
+	(4, 'Umbrella', 5.5),
+	(5, 'Comic', 10),
+	(5, 'Instant noodle', 4),
+	(5, 'Bubble tea', 7),
+	(5, 'Green tea', 4)
 ;

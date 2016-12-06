@@ -1295,6 +1295,8 @@ var db = function(app){
 		var booked_date_end = req.body.booked_date_end;
 		var amt_paid = req.body.amt_paid;
 		var paid_date = req.body.paid_date;
+		// extra array
+		var extraIdArray = req.body.extraIdArray;
 		console.log('**** Debug api addreservation query variables ****');
 		console.log('**** Start line ****');
 		console.log("bookingtype : ", bookingtype);
@@ -1307,6 +1309,7 @@ var db = function(app){
 		console.log("amt_paid : ", amt_paid);
 		console.log("paid_date : ", paid_date);
 		console.log("sold_price : ", sold_price);
+		console.log("extraIdArray : ", extraIdArray);
 		console.log('**** End line ****');
 		conn.query("INSERT INTO Reservation" +
 					" (place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date)" +
@@ -1315,6 +1318,8 @@ var db = function(app){
 		function(err, rows, fields){
 			if (!err) {
 				console.log('Insert reservation sucessfully');
+				console.log(rows);
+				res.json({'resId': rows.insertId});
 			} else {
 				console.log(err);
 			}
@@ -1476,6 +1481,44 @@ var db = function(app){
 		function(err, rows, fields){
 			if (!err) {
 				res.json({'query_success': true, 'result': rows});
+				console.log(rows);
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Get amenity extras
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/getamenityextras",function(req,res){
+		var place_id = req.body.place_id;
+		console.log("place_id : ", place_id);
+		conn.query("SELECT place_extra_amenity_id, name, cost FROM PlaceExtraAmenity WHERE place_id = ?",[place_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows});
+				console.log(rows);
+			} else {
+				res.json({'query_success': false});
+				console.log(err);
+			}
+		});
+	});
+	
+	/////////////////////////////////////////////////////////////////////////////
+	// Add amenity extras for reservation
+	/////////////////////////////////////////////////////////////////////////////
+	app.post("/api/addextrasforreservation",function(req,res){
+		var reservation_id = req.body.reservation_id;
+		var place_extra_amenity_id = req.body.place_extra_amenity_id;
+		console.log("reservation_id : ", reservation_id);
+		console.log("place_extra_amenity_id : ", place_extra_amenity_id);
+		conn.query("INSERT INTO ReservationExtras (reservation_id,place_extra_amenity_id) VALUES (?,?)",[reservation_id, place_extra_amenity_id],
+		function(err, rows, fields){
+			if (!err) {
+				res.json({'query_success': true, 'result': rows.insertId});
 				console.log(rows);
 			} else {
 				res.json({'query_success': false});
