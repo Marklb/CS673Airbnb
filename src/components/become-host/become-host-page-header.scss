@@ -60,6 +60,18 @@
 
 }
 
+.overlay-states {
+  position: fixed;
+	// position: absolute;
+  top: 0;
+  right: 0;
+	// left: 500px;
+  // opacity: 0.7;
+  z-index: 100;
+	background-color: rgba(30,30,30,0.7);
+	color: rgba(230,230,230,1);
+}
+
 .listing-group {
 	@include box-sizing(border-box);
 	border: 2px solid rgba(200,200,200,1);

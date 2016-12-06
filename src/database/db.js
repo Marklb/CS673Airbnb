@@ -814,10 +814,124 @@ var db = function(app){
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Get edit listing data
-	// NOTE: May not be needed
 	////////////////////////////////////////////////////////////////////////////
 	app.post("/api/get_edit_listing_data",function(req,res){
-		dbNoRequireCache.get_edit_listing_data(req,res,conn);
+		var auth_type = req.body.auth_type;
+		var auth_token = req.body.auth_token;
+		var place_id = req.body.place_id;
+		// console.log(auth_token);
+		// console.log(auth_type);
+		// console.log(place_id);
+
+		var get_user_id_query_str = `
+		(SELECT USES.user_id
+		FROM UserSession AS USES
+		WHERE USES.auth_type = ? AND USES.session_auth_id = ?)`;
+
+		get_user_id_query_str = mysql.format(get_user_id_query_str, [
+			auth_type, auth_token]);
+		// console.log(get_user_id_query_str);
+
+		var query_str1 = `
+		SELECT * 
+		FROM HostPlaceListing NATURAL JOIN Address NATURAL JOIN Place 
+			NATURAL JOIN BookingType NATURAL JOIN RoomType
+			WHERE host_id = @authed_user_id AND Place.place_id = ?;
+		`;
+		query_str1 = query_str1.replace('@authed_user_id', get_user_id_query_str)
+		query_str1 = mysql.format(query_str1, [place_id]);
+		// console.log(query_str1);
+		var p1 = new Promise(function(resolve, reject) {
+			conn.query(query_str1, function(err, result){
+				if (!err) {
+					// resolve("[query_str1]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str1]It broke1"));
+				}
+			});
+		});
+
+		var query_str2 = `
+		SELECT *
+		FROM PlaceAmenity NATURAL JOIN Amenity
+		WHERE place_id = ?;
+		`;
+		query_str2 = mysql.format(query_str2, [place_id]);
+		// console.log(query_str2);
+		var p2 = new Promise(function(resolve, reject) {
+			conn.query(query_str2, function(err, result){
+				if (!err) {
+					// resolve("[query_str2]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str2]It broke"));
+				}
+			});
+		});
+
+		var query_str3 = `
+		SELECT *
+		FROM PlaceExtraAmenity
+		WHERE place_id = ?;
+		`;
+		query_str3 = mysql.format(query_str3, [place_id]);
+		// console.log(query_str3);
+		var p3 = new Promise(function(resolve, reject) {
+			conn.query(query_str3, function(err, result){
+				if (!err) {
+					// resolve("[query_str3]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str3]It broke"));
+				}
+			});
+		});
+		// .then(values => {
+
+		// }, reason => {
+
+		// });
+
+		var query_str4 = `
+		SELECT *
+		FROM Auction
+		WHERE place_id = ?;
+		`;
+		query_str4 = mysql.format(query_str4, [place_id]);
+		// console.log('------');
+		// console.log(query_str4);
+		// console.log('------');
+		var p4 = new Promise(function(resolve, reject) {
+			conn.query(query_str4, function(err, result){
+				if (!err) {
+					// resolve("[query_str4]Stuff worked!");
+					resolve(result);
+				} else {
+					reject(Error("[query_str4]It broke"));
+				}
+			});
+		});
+
+		Promise.all([p1, p2, p3, p4]).then(values => {
+		// Promise.all([p1, p2, p3]).then(values => {
+		// Promise.all([p1, p2]).then(values => {
+		// Promise.all([p1]).then(values => {
+			// console.log('success');
+			// console.log(values);
+			res.json({ 'success': true, 'response': values });
+		}, reason => {
+			// console.log('failed');
+			// console.log(reason);
+			res.json({ 'success': false });
+		});
+	});
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Update listing data
+	////////////////////////////////////////////////////////////////////////////
+	app.post("/api/update_listing_data",function(req,res){
+		dbNoRequireCache.update_listing_data(req,res,conn);
 	});
 
 	////////////////////////////////////////////////////////////////////////////

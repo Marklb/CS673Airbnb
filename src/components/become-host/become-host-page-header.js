@@ -27,6 +27,7 @@ export default class BecomeHostMainPage extends React.Component {
   
  	constructor(props) {
 		super(props)
+		
 
 		var place_id = this.props.params.place_id;
 
@@ -101,11 +102,22 @@ export default class BecomeHostMainPage extends React.Component {
 		];
 
 		this.state = {
+			// Form input control states
+			fd_booking_active: false,
+			fd_date_start: '',
+			fd_date_end: '',
+			fd_booking_type: {},
+			fd_room_type_id: -1,
+
+
+
+
 			// imageFiles: [],
 			inputLocation : this.props.params.place_id,
 
 			// items: [],
-      imagesUploadedToBrowser:[],
+      imagesUploadedToBrowser: [],
+			imagesOnServer: [],
       locationLatLng: null,
 
 			showNewPaidExtraInputBox: false,
@@ -120,6 +132,8 @@ export default class BecomeHostMainPage extends React.Component {
 				name: '',
 				cost: ''
 			},
+			paidExtrasToAdd: [],
+			paidExtrasToDel: [],
 
 			error_message: {
 				place_description: ''
@@ -143,8 +157,6 @@ export default class BecomeHostMainPage extends React.Component {
 					bathroomsize: -1
 				},
 				dateInput: {
-					date_start: '',
-					date_end: '',
 					end_auction_time: ''
 				},
 				rangeInput: {
@@ -152,25 +164,27 @@ export default class BecomeHostMainPage extends React.Component {
 					response_time: 3
 				},
 				checkboxInput: {
-					booking_active: true,
+					// booking_active: true,
 				}
-			}
-		};
-		this.state.formData.checkboxInput.roomtype = {};
-		_.each(this.roomTypes, (val,key) => {
-			this.state.formData.checkboxInput.roomtype[val.name] = {
-				checked: (val.checkedDefault == true) ? true : false,
-				id: val.id
-			};
-		});
 
-		this.state.formData.checkboxInput.bookingType = {};
-		_.each(this.bookingTypes, (val,key) => {
-			this.state.formData.checkboxInput.bookingType[val.name] = {
-				checked: (val.checkedDefault == true) ? true : false,
-				id: val.id
-			};
-		});
+			}
+
+			
+		};
+		// this.state.formData.checkboxInput.roomtype = {};
+		// _.each(this.roomTypes, (val,key) => {
+		// 	this.state.formData.checkboxInput.roomtype[val.name] = {
+		// 		checked: (val.checkedDefault == true) ? true : false,
+		// 		id: val.id
+		// 	};
+		// });
+
+		// _.each(this.bookingTypes, (val,key) => {
+		// 	this.state.fd_booking_type[val.name] = {
+		// 		checked: (val.checkedDefault == true) ? true : false,
+		// 		id: val.id
+		// 	};
+		// });
 
 		this.state.formData.checkboxInput.amenity = {};
 		_.each(this.amenities, (val,key) => {
@@ -306,7 +320,7 @@ export default class BecomeHostMainPage extends React.Component {
 					<label>Country: {this.renderTextInput('address_country', {className: 'mokbnb-input address-input'})}</label>
 				</div>
 				<div>
-					<GoogleMapsLocationSelector onCoordinatesChanged={this.onMapCoordsChange.bind(this)} />
+					<GoogleMapsLocationSelector latLngCoords={this.state.locationLatLng} onCoordinatesChanged={this.onMapCoordsChange.bind(this)} />
 				</div>
 			</div>
 		);
@@ -358,25 +372,30 @@ export default class BecomeHostMainPage extends React.Component {
 	render() {
 		return (
 			<div>
-
+				<pre className="overlay-states">{JSON.stringify(this.state, null, 2)}</pre>
 				<div className="filter">
 					<div className="listing-group listing-dates-calendar">
 						{/*Update your calendar*/}
 						<h2>Set your listings availability dates (Start, End)</h2>
 						<div> 
-							<input name='date_start' className="mokbnb-input" 
+							<input name='fd_date_start' className="mokbnb-input" 
 								onChange={this.onChangeFormData} type="date" 
-								value={this.state.formData.dateInput.date_start}></input>
-							<input name='date_end' className="mokbnb-input" 
+								value={this.state.fd_date_start}></input>
+							<input name='fd_date_end' className="mokbnb-input" 
 								onChange={this.onChangeFormData} type="date" 
-								value={this.state.formData.dateInput.date_end}></input>
+								value={this.state.fd_date_end}></input>
 						</div>
 					</div>
 					
 					<div className="listing-group listing-type-container">
 						<h2>What kind of place are you listing?</h2>
 						<div className="roomtype-table">
-							{_.map(this.state.formData.checkboxInput.roomtype, (val, key) => {
+							<radiogroup>
+								<input type="radio" name="fd_room_type_id" data-room-id={1} onChange={this.onChangeFormData} checked={parseInt(this.state.fd_room_type_id) === 1} value="Entire home"/> Entire home<br/>
+								<input type="radio" name="fd_room_type_id" data-room-id={2} onChange={this.onChangeFormData} checked={parseInt(this.state.fd_room_type_id) === 2} value="Private room"/> Private room<br/>
+								<input type="radio" name="fd_room_type_id" data-room-id={3} onChange={this.onChangeFormData} checked={parseInt(this.state.fd_room_type_id) === 3} value="Shared room"/> Shared room<br/>
+							</radiogroup>
+							{/*{_.map(this.state.formData.checkboxInput.roomtype, (val, key) => {
 								return (
 										<label key={key}>
 											{this.renderCheckboxInput(key, {
@@ -385,7 +404,7 @@ export default class BecomeHostMainPage extends React.Component {
 											<span>{key}</span>
 										</label>
 								);
-							})}
+							})}*/}
 						</div>
 					</div>
 					
@@ -470,10 +489,10 @@ export default class BecomeHostMainPage extends React.Component {
 						<h2>Booking Type</h2>
 						<div>
 							<radiogroup>
-								<input type="radio" name="bookingType" data-booking-id={1} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.formData.bookingType] === "Instant Book"} value="Instant Book"/> Instant Book<br/>
-								<input type="radio" name="bookingType" data-booking-id={2} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.formData.bookingType] === "Auction"} value="Auction"/> Auction<br/>
-								<input type="radio" name="bookingType" data-booking-id={3} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.formData.bookingType] === "User-Set Time Frame"} value="User-Set Time Frame"/> User-Set Time Frame<br/>
-								<input type="radio" name="bookingType" data-booking-id={4} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.formData.bookingType] === "Host-Set Time Frame"} value="Host-Set Time Frame"/> Host-Set Time Frame<br/>
+								<input type="radio" name="fd_booking_type" data-booking-id={1} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.fd_booking_type] === "Instant Book"} value="Instant Book"/> Instant Book<br/>
+								<input type="radio" name="fd_booking_type" data-booking-id={2} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.fd_booking_type] === "Auction"} value="Auction"/> Auction<br/>
+								<input type="radio" name="fd_booking_type" data-booking-id={3} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.fd_booking_type] === "User-Set Time Frame"} value="User-Set Time Frame"/> User-Set Time Frame<br/>
+								<input type="radio" name="fd_booking_type" data-booking-id={4} onChange={this.onChangeFormData} checked={this.bookingTypesLOOKUP_NAME[this.state.fd_booking_type] === "Host-Set Time Frame"} value="Host-Set Time Frame"/> Host-Set Time Frame<br/>
 							</radiogroup>
 
 							<div className="listing-sub-group">
@@ -493,7 +512,10 @@ export default class BecomeHostMainPage extends React.Component {
 					</div>
 
 					<div className="listing-group listing-bottom-opts-container">
-						{this.renderCheckboxInput('booking_active', {className: ''})}Booking Active<br/>
+						<input type="checkbox" 
+							name="fd_booking_active"
+							checked={this.state.fd_booking_active}
+							onChange={this.onChangeFormData} />Booking Active<br/>
 					</div>
 					<button name='save' type="button" onClick={this.onClickSave.bind(this)}>Save</button>
 
@@ -519,9 +541,9 @@ export default class BecomeHostMainPage extends React.Component {
 					newState.error_message[e.target.name] = errorMsg;
 				}
 			}break;
-			case 'date': {
-				newState.formData.dateInput[e.target.name] = e.target.value;
-			}break;
+			// case 'date': {
+			// 	newState.formData.dateInput[e.target.name] = e.target.value;
+			// }break;
 			case 'range': {
 				newState.formData.rangeInput[e.target.name] = e.target.value;
 			}break;
@@ -536,14 +558,18 @@ export default class BecomeHostMainPage extends React.Component {
 					newState.formData.checkboxInput[e.target.name] = e.target.checked;
 				}
 			}break;
-			case 'radio': {
-				if(e.target.name == 'bookingType'){
-					let id = e.target.getAttribute('data-booking-id');
-					newState.formData.bookingType = id;
-					break;
-				}
-			}break;
+
 		}
+		console.log(e.target.name);
+		switch(e.target.name){
+			case 'fd_booking_active': newState.fd_booking_active = e.target.checked; break;
+			case 'fd_date_start': newState.fd_date_start = e.target.value; break;
+			case 'fd_date_end': newState.fd_date_end = e.target.value; break;
+			case 'fd_booking_type': newState.fd_booking_type = e.target.getAttribute('data-booking-id'); break;
+			case 'fd_room_type_id': newState.fd_room_type_id = e.target.getAttribute('data-room-id'); break;
+
+		};
+		
 
 		this.setState(newState);
 	}
@@ -609,7 +635,7 @@ export default class BecomeHostMainPage extends React.Component {
 						<td>${val.cost}</td>
 						<td>
 							<button className=""
-								data-key={i} data-name={val.name} data-cost={val.cost} 
+								data-key={i} data-name={val.name} data-cost={val.cost} data-indb={val.inDB}
 								onClick={this.onRemovePaidExtra}
 								>Remove</button>
 						</td>
@@ -635,6 +661,14 @@ export default class BecomeHostMainPage extends React.Component {
 
 	onRemovePaidExtra(e) {
 		let newState = this.state;
+		if(e.target.getAttribute('data-indb')){
+			newState.paidExtrasToDel.push({
+				name: e.target.getAttribute('data-name'),
+				cost: e.target.getAttribute('data-cost')
+			});
+		}
+
+		
 		newState.paidExtras.splice(e.target.getAttribute('data-key'), 1);
 		this.setState(newState);
 	}
@@ -642,17 +676,21 @@ export default class BecomeHostMainPage extends React.Component {
 	addNewPaidExtra(e) {
 		let name = this.state.paidExtraInput.name;
 		let cost = this.state.paidExtraInput.cost;
+		if(name.trim().length <= 0 || cost.trim().length <= 0) return;
 		
 		let newState = this.state;
 		newState.paidExtras.push({name: name, cost: cost});
 		newState.paidExtraInput.name = '';
 		newState.paidExtraInput.cost = '';
 		newState.showNewPaidExtraInputBox = false;
+
+		newState.paidExtrasToAdd.push({name: name, cost: cost});
+
 		this.setState(newState);
 	}
 	
 	renderBookingTypeCode() {
-		let bookingTypeName = this.bookingTypesLOOKUP_NAME[this.state.formData.bookingType];
+		let bookingTypeName = this.bookingTypesLOOKUP_NAME[this.state.fd_booking_type];
 		if (bookingTypeName == "Instant Book") {
 			return (
 				<div>
@@ -718,13 +756,134 @@ export default class BecomeHostMainPage extends React.Component {
 		console.log('Rejected files: ', rejectedFiles);
 	}
 
+	updatePlace() {
+		// console.log('updatePlace');
+		// var roomtype_id = null;
+		// _.each(this.state.formData.checkboxInput.roomtype, (val,key) => {
+		// 	// console.log(val);
+		// 	if(val.checked == true){roomtype_id = val.id;}
+		// });
+		// console.log(roomtype_id);
+    var amenity_ids = [];
+		_.each(this.state.formData.checkboxInput.amenity, (val,key) => {
+			if(val.checked == true){amenity_ids.push(val.id);}
+		});
+
+		// let thing = {
+			
+		// };
+		// console.log(thing);
+
+		console.log(amenity_ids);
+		console.log(this.amenitiesOnEditStart);
+		// let n = Math.max(amenity_ids.length, this.amenitiesOnEditStart);
+		// console.log(n);
+		
+		let amenitiesToAdd = [];
+		for(let i = 0; i < amenity_ids.length; i++){
+			if(this.amenitiesOnEditStart.indexOf(amenity_ids[i]) < 0){
+				amenitiesToAdd.push(amenity_ids[i]);
+			}
+		}
+		console.log(amenitiesToAdd);
+
+
+		let amenitiesToDel = [];
+		for(let i = 0; i < this.amenitiesOnEditStart.length; i++){
+			if(amenity_ids.indexOf(this.amenitiesOnEditStart[i]) < 0){
+				amenitiesToDel.push(this.amenitiesOnEditStart[i]);
+			}
+		}
+		console.log(amenitiesToDel);
+
+		// let paidExtrasToAdd = [];
+		// let paidExtrasToDel = [];
+
+
+		// return;
+		// console.log(this.state.formData.bookingType);
+		// console.log(this.state.formData.dateInput.end_auction_time);
+		console.log(this.state.fd_booking_active);
+		$.post('/api/update_listing_data', {
+			'place_id': this.props.params.place_id,
+			'auth_type': this.context.userSessionHandler.getAuthType(),
+      'auth_token': this.context.userSessionHandler.getAuthToken(),
+      'street': this.state.formData.textInput.address_street,
+      'city': this.state.formData.textInput.address_city,
+      'state': this.state.formData.textInput.address_state,
+      'zip': this.state.formData.textInput.address_zip,
+      'country': this.state.formData.textInput.address_country,
+      'locationLatLng': this.state.locationLatLng,
+			'room_title': this.state.formData.textInput.place_name,
+			'description': this.state.formData.textInput.place_description,
+			'date_start': this.state.fd_date_start,
+			'date_end': this.state.fd_date_end,
+			'max_people': this.state.formData.selectOneInput.numofguest,
+			'cost_per_night': this.state.formData.rangeInput.cost,
+			'response_time': this.state.formData.rangeInput.response_time,
+			'bedroomsize': this.state.formData.selectOneInput.bedroomsize,
+			'bathroomsize': this.state.formData.selectOneInput.bathroomsize,
+			'numofbeds': this.state.formData.selectOneInput.numofbeds,
+      'roomtype_id': this.state.fd_room_type_id,
+      'bookingtype_id': this.state.fd_booking_type,
+      'amenity_ids': amenity_ids,
+			'amenity_ids_to_add': this.state.amenitiesToAdd,
+			'amenity_ids_to_del': this.state.amenitiesToDel,
+      'is_booking_active': this.state.fd_booking_active,
+      'paidExtras': this.state.paidExtras,
+			'paidExtrasToAdd': this.state.paidExtrasToAdd,
+			'paidExtrasToDel': this.state.paidExtrasToDel,
+      'end_auction_time': this.state.formData.dateInput.end_auction_time
+			
+      
+		}, (data, status) => {
+			if(data.query_success === false) {
+				console.log('Trip details query not successful');
+				_gMbNotifications.addNotification('Update listing failed..', {duration: 3000, type: 'error'});
+			}else{
+				console.log('Trip details query successful');
+				// this.setState({result: data.result});
+				// console.log(data);
+				_gMbNotifications.addNotification('Update listing successful.', {duration: 3000});
+
+				// Store the pictures
+				// I do one request at a time, because the file data is to big.
+				// console.log(this.state.imagesUploadedToBrowser);
+				// let promises = [];
+				// for(let i = 0; i < this.state.imagesUploadedToBrowser.length; i++){
+				// 	var p = new Promise((resolve, reject) => {
+				// 		let postData = this.context.userSessionHandler.getSessionAuthValues();
+				// 		postData.imgData = this.state.imagesUploadedToBrowser[i];
+				// 		postData.place_id = data.place_id;  
+				// 		$.post('/api/upload_place_image', postData, (data, status) => {
+				// 			if(data.success === false) {
+				// 				console.log('Image Upload Not Successful');
+				// 				resolve('Image Upload Not Successful');
+				// 			} else {
+				// 				console.log('Image Upload Successful');
+				// 				resolve('Image Upload Successful');
+				// 			}
+				// 		});
+				// 	});
+				// 	promises.push(p);
+				// }
+
+				// Promise.all(promises).then(values => {
+				// 	console.log('Done Uploading'); 
+				// 	console.log(values); 
+				// });
+			}
+
+
+		});
+	}
 	
 	insertNewPlace() {
-
-    var roomtype_id = null;
-		_.each(this.state.formData.checkboxInput.roomtype, (val,key) => {
-			if(val.checked == true){roomtype_id = val.id;}
-		});
+		console.log('insertNewPlace');
+    // var roomtype_id = null;
+		// _.each(this.state.formData.checkboxInput.roomtype, (val,key) => {
+		// 	if(val.checked == true){roomtype_id = val.id;}
+		// });
 
     var amenity_ids = [];
 		_.each(this.state.formData.checkboxInput.amenity, (val,key) => {
@@ -737,8 +896,8 @@ export default class BecomeHostMainPage extends React.Component {
 		// console.log(thing);
 
 		// return;
-		console.log(this.state.formData.bookingType);
-		console.log(this.state.formData.dateInput.end_auction_time);
+		// console.log(this.state.formData.bookingType);
+		// console.log(this.state.formData.dateInput.end_auction_time);
 		$.post('/api/insertNewPlace', {
 			'authType': this.context.userSessionHandler.getAuthType(),
       'authToken': this.context.userSessionHandler.getAuthToken(),
@@ -750,18 +909,18 @@ export default class BecomeHostMainPage extends React.Component {
       'locationLatLng': this.state.locationLatLng,
 			'room_title': this.state.formData.textInput.place_name,
 			'description': this.state.formData.textInput.place_description,
-			'date_start': this.state.formData.dateInput.date_start,
-			'date_end': this.state.formData.dateInput.date_end,
+			'date_start': this.state.fd_date_start,
+			'date_end': this.state.fd_date_end,
 			'max_people': this.state.formData.selectOneInput.numofguest,
 			'cost_per_night': this.state.formData.rangeInput.cost,
 			'response_time': this.state.formData.rangeInput.response_time,
 			'bedroomsize': this.state.formData.selectOneInput.bedroomsize,
 			'bathroomsize': this.state.formData.selectOneInput.bathroomsize,
 			'numofbeds': this.state.formData.selectOneInput.numofbeds,
-      'roomtype_id': roomtype_id,
-      'bookingtype_id': this.state.formData.bookingType,
+      'roomtype_id': this.state.fd_room_type_id,
+      'bookingtype_id': this.state.fd_booking_type,
       'amenity_ids': amenity_ids,
-      'is_booking_active': this.state.formData.checkboxInput.booking_active,
+      'is_booking_active': this.state.fd_booking_active,
       'paidExtras': this.state.paidExtras,
       'end_auction_time': this.state.formData.dateInput.end_auction_time
 			
@@ -807,7 +966,13 @@ export default class BecomeHostMainPage extends React.Component {
 	}
 
 	onClickSave() {
-		this.insertNewPlace();
+		if(this.props.params.place_id == 0){
+			this.insertNewPlace();
+		}else{
+			this.updatePlace();
+		}
+
+
 	}
 
 
@@ -838,22 +1003,80 @@ export default class BecomeHostMainPage extends React.Component {
 
 	loadDataEditing() {
 		console.log('loadDataEditing');
+		let params = {
+			'auth_type': this.context.userSessionHandler.getAuthType(),
+      'auth_token': this.context.userSessionHandler.getAuthToken(),
+      'place_id': this.props.params.place_id
+		};
+		console.log(params);
 		// If this end up working it can be used if not I will just create a query fpr it
-		// $.post('/api/getRoomDetailsQuery', {
-		// 	// 'authType': this.context.userSessionHandler.getAuthType(),
-    //   // 'authToken': this.context.userSessionHandler.getAuthToken(),
-    //   'placeID': this.props.params.place_id
-		// }, (data, status) => {
-		// 	if(data.query_success === false) {
-		// 		console.log('Load edit data query not successful');
-		// 	}else{
-		// 		console.log('Load edit data query successful');
-		// 		// this.setState({result: data.result});
-		// 		console.log(data);
+		$.post('/api/get_edit_listing_data', params, (data, status) => {
+			if(data.query_success === false) {
+				console.log('Load edit data query not successful');
+			}else{
+				console.log('Load edit data query successful');
+				// this.setState({result: data.result});
+				console.log(data);
+
+				let newState = this.state;
+		
+				newState.fd_date_start = data.response[0][0].date_range_start.split('T')[0];
+				newState.fd_date_end = data.response[0][0].date_range_end.split('T')[0];
+				newState.formData.dateInput.end_auction_time = (data.response[0][0].end_auction_time)? 
+					data.response[0][0].end_auction_time.split('T')[0] : undefined;
+
+				newState.fd_room_type_id = data.response[0][0].roomtype_id;
+				newState.fd_booking_active = (data.response[0][0].active == 'yes')? true : false;
+
+				newState.formData.selectOneInput.bedroomsize = data.response[0][0].bedroomsize;
+				newState.formData.selectOneInput.numofbeds = data.response[0][0].numofbeds;
+				newState.formData.selectOneInput.numofguest = data.response[0][0].max_people;
+				newState.formData.selectOneInput.bathroomsize = data.response[0][0].bathroomsize;
+
+				newState.imagesOnServer = data.response[0][0].imagesOnServer;
+
+				// console.log(data.response);
+				this.amenitiesOnEditStart = [];
+				for(var i = 0; i < data.response[1].length; i++){
+					newState.formData.checkboxInput.amenity[data.response[1][i].amenity_name] = {checked: true, id: data.response[1][i].amenity_id}
+					this.amenitiesOnEditStart.push(data.response[1][i].amenity_id);
+				}
+
+				// this.paidExtrasOnEditStart = [];
+				for(var i = 0; i < data.response[2].length; i++){
+					newState.paidExtras.push({name: data.response[2][i].name, cost: data.response[2][i].cost, inDB: true});
+					// this.paidExtrasOnEditStart.push({name: data.response[2][i].name, cost: data.response[2][i].cost});
+				}
+
+				console.log(data.response[0][0]);
+				newState.formData.textInput.address_street = data.response[0][0].street;
+				newState.formData.textInput.address_city = data.response[0][0].city;
+				newState.formData.textInput.address_state = data.response[0][0].state;
+				newState.formData.textInput.address_zip = data.response[0][0].zip;
+				newState.formData.textInput.address_country = data.response[0][0].country;
+				newState.locationLatLng = {lat: data.response[0][0].latitude, lng: data.response[0][0].longitude};
+
+				newState.formData.textInput.place_name = data.response[0][0].name;
+				newState.formData.textInput.place_description = data.response[0][0].description;
+
+				newState.fd_booking_type = data.response[0][0].bookingtype_id;
+
+				newState.formData.rangeInput.cost = data.response[0][0].cost_per_night;
+				newState.formData.rangeInput.response_time = data.response[0][0].response_time;
+
+				newState.imagesUploadedToBrowser = data.response[0][0].pictures.split(',');
+
+				// console.log(this.props.params.place_id);
+				// if(this.props.params.place_id == 0){
+				// 	console.log('Create a listing');
+				// }else{
+				// 	console.log('Edit a listing');
+				// }
 
 
-		// 	}
-		// });
+				this.setState(newState);
+			}
+		});
 
 
 
@@ -871,10 +1094,10 @@ export default class BecomeHostMainPage extends React.Component {
 	loadTestingData() {
 		let newState = this.state;
 		
-		newState.formData.dateInput.date_start = '2016-12-30'; 
-		newState.formData.dateInput.date_end = '2017-01-25';
+		newState.fd_date_start = '2016-12-30'; 
+		newState.fd_date_end = '2017-01-25';
 
-		newState.formData.checkboxInput.roomtype['Entire home'] = {checked: true, id: 2};
+		newState.fd_room_type_id =  2;
 
 		newState.formData.selectOneInput.bedroomsize = 2;
 		newState.formData.selectOneInput.numofbeds = 3;
@@ -893,7 +1116,7 @@ export default class BecomeHostMainPage extends React.Component {
 		newState.formData.textInput.place_name = 'The Default Place';
 		newState.formData.textInput.place_description = 'This is a cool place';
 
-		newState.formData.bookingType = 1;
+		newState.fd_booking_type = 1;
 
 		console.log(this.props.params.place_id);
 		if(this.props.params.place_id == 0){

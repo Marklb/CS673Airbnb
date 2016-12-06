@@ -11,9 +11,9 @@ import ListingImageUploaderDemo from '../listing-image-uploader/listing-image-up
 
 
 let MbNotifications = require('../../mblibs/mb-notifications');
-console.log(MbNotifications);
-let notif = document.createElement('mb-notifications');
-document.body.appendChild(notif);
+// console.log(MbNotifications);
+window._gMbNotifications = document.createElement('mb-notifications');
+document.body.appendChild(window._gMbNotifications);
 
 require("./home.scss");
 require("../top-header/top-header.scss");
