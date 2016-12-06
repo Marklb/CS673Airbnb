@@ -16,6 +16,7 @@ import TransactionHistory from './transaction-history/transaction-history';
 import FilterForm from './filter-form/filter-form';
 import BecomeHostMainPage from './become-host/become-host-page-header';
 import UserTrips from './users-trips/users-trips';
+import UserReservations from './users-reservations/users-reservations';
 import RoomPage from './room-page/room-page';
 // Javascript Modules
 import _ from 'lodash';
@@ -51,6 +52,7 @@ export default class App extends React.Component {
           <Route path='/roomdetail/:pidanddate' component={RoomPage} />
           <Route path='/become-host/:place_id' component={BecomeHostMainPage} />
           <Route path='/trips' component={UserTrips} />
+          <Route path='/reservations' component={UserReservations} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

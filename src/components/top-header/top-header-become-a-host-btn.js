@@ -16,7 +16,7 @@ export default class TopHeaderBecomeAHostBtn extends TopHeaderDropdownButton {
 
   renderDropdownContent() {
     return (
-      <div>Create a new listing to host! You could earn $324 sharing your home in Newark in a week.	</div>
+      <div>Create a new listing to host!{/* You could earn $324 sharing your home in Newark in a week.	*/}</div>
     );
   }
 	// render() {

@@ -32,7 +32,8 @@ export default class GoogleMapsLocationSelector extends React.Component {
     if (navigator && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         let coords = pos.coords;
-        if(this.props.latLngCoords){
+        if(this.props.latLngCoords && this.props.latLngCoords.lat 
+          && this.props.latLngCoords.lng){
           coords = {
             latitude: this.props.latLngCoords.lat,
             longitude: this.props.latLngCoords.lng

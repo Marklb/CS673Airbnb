@@ -1,1 +1,31 @@
 @import '../../../node_modules/react-dates/css/styles';
+.p {
+	font-size:large;
+	padding-right : 100px;
+	padding-left : 100px;
+	padding-top : 20px;
+}
+
+.bullet {
+	font-size:large;
+	font-weight: bold;
+	padding-right : 150px;
+	padding-left : 150px;
+	padding-top : 20px;
+	padding-bottom : 50px;
+	.bullet_sub_1 {
+		font-size:medium;
+		font-weight: normal;
+		padding-left : 20px;
+		.bullet_sub_2 {
+			font-size:medium;
+			font-weight: normal;
+			padding-left : 20px;
+			.bullet_sub_3 {
+				font-size:small;
+				font-weight: normal;
+				padding-left : 20px;
+			}
+		}
+	}
+}

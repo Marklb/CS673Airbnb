@@ -124,10 +124,10 @@ export default class EditProfile extends React.Component {
                   <input type="text"
                     value={this.state.formValues.lastName}
                     onChange={this.onChangeLastName}></input>
-                  <div className="row-content-text">
+                  {/*<div className="row-content-text">
                     This is only shared once you have a confirmed booking with
                     another Mokbnb user.
-                  </div>
+                  </div>*/}
                 </div>
               </div>
 
@@ -143,10 +143,10 @@ export default class EditProfile extends React.Component {
                       <option value="other">Other</option>
                     </select>
                   </div>
-                  <div className="row-content-text">
+                  {/*<div className="row-content-text">
                     This is only shared once you have a confirmed booking with
                     another Mokbnb user.
-                  </div>
+                  </div>*/}
                 </div>
               </div>
 
@@ -178,11 +178,11 @@ export default class EditProfile extends React.Component {
                         return <option key={i} value={val}>{val}</option>})}
                     </select>
                   </div>
-                  <div className="row-content-text">
+                  {/*<div className="row-content-text">
                     The magical day you were dropped from the sky by a stork.
                     We use this data for analysis and never share it with other
                     users.
-                  </div>
+                  </div>*/}
                 </div>
               </div>
 
@@ -191,59 +191,21 @@ export default class EditProfile extends React.Component {
                 <div className="row-content">
                   <input type="text" value={this.state.formValues.email}
                     onChange={this.onChangeEmail}></input>
-                  <div className="row-content-text">
+                  {/*<div className="row-content-text">
                     We won’t share your private email address with other Mokbnb
                     users. Learn more.
-                  </div>
+                  </div>*/}
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="row-label">Phone Number</div>
-                <div className="row-content">
-                  <input type="tel"></input>
-                  <div className="row-content-text">
-                    This is only shared once you have a confirmed booking with
-                    another Mokbnb user. This is how we can all get in touch.
-                  </div>
-                </div>
-              </div>
-
-              {/*
-              <div className="form-row">
-                <div className="row-label">Preferred Language</div>
-                <div className="row-content">
-                  <div className="row-content-text">
-                    We'll send you messages in this language.
-                  </div>
-                </div>
-              </div>
-              */}
-
-              {/*
-              <div className="form-row">
-                <div className="row-label">Preffered Currency</div>
-                <div className="row-content">
-                  <div className="row-content-text">
-                    We’ll show you prices in this currency.
-                  </div>
-                </div>
-              </div>
-              */}
-
-              <div className="form-row">
-                <div className="row-label">Where You Live</div>
-                <div className="row-content">
-                  <input type="text"></input>
-                </div>
-              </div>
+              
 
               <div className="form-row">
                 <div className="row-label">Describe Yourself</div>
                 <div className="row-content">
                   <textarea cols="40" rows="5" value={this.state.formValues.bio}
                     onChange={this.onChangeBio}></textarea>
-                  <div className="row-content-text">
+                  {/*<div className="row-content-text">
                     Mokbnb is built on relationships. Help other people get to
                     know you.
                     <br/><br/>
@@ -255,7 +217,7 @@ export default class EditProfile extends React.Component {
                     What’s your style of traveling? Of Mokbnb hosting?
                     <br/><br/>
                     Tell them about you: Do you have a life motto?
-                  </div>
+                  </div>*/}
                 </div>
               </div>
 
@@ -263,69 +225,7 @@ export default class EditProfile extends React.Component {
           </div>
         </div>
 
-        <div className="dashboard-panel">
-          <div className="dashboard-panel-header">Optional</div>
-          <div className="dashboard-panel-body">
 
-            <div className="dashboard-panel-form">
-
-              <div className="form-row">
-                <div className="row-label">School</div>
-                <div className="row-content">
-                  <input type="text"></input>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="row-label">Work</div>
-                <div className="row-content">
-                  <input type="text"></input>
-                </div>
-              </div>
-
-              {/*
-              <div className="form-row">
-                <div className="row-label">Time Zone</div>
-                <div className="row-content">
-                  <div className="row-content-text">Your home time zone.</div>
-                </div>
-              </div>
-              */}
-
-              {/*
-              <div className="form-row">
-                <div className="row-label">Languages</div>
-                <div className="row-content">
-                  <div className="row-content-text">
-                    Add any languages that others can use to speak with you on
-                    Mokbnb
-                  </div>
-                </div>
-              </div>
-              */}
-
-              {/*
-              <div className="form-row">
-                <div className="row-label">Emergency contact</div>
-                <div className="row-content">
-                  <div className="row-content-text">
-                    Give our Customer Experience team a trusted contact we can
-                    alert in an urgent situation.
-                  </div>
-                </div>
-              </div>
-              */}
-
-              <div className="form-row">
-                <div className="row-label">Shipping Address</div>
-                <div className="row-content">
-
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
 
         <div className="save-profile-btn" onClick={this.onClickSaveBtn}>Save</div>
 
@@ -438,3 +338,151 @@ export default class EditProfile extends React.Component {
 
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // <div className="dashboard-panel">
+        //   <div className="dashboard-panel-header">Optional</div>
+        //   <div className="dashboard-panel-body">
+
+        //     <div className="dashboard-panel-form">
+
+        //       <div className="form-row">
+        //         <div className="row-label">School</div>
+        //         <div className="row-content">
+        //           <input type="text"></input>
+        //         </div>
+        //       </div>
+
+        //       <div className="form-row">
+        //         <div className="row-label">Work</div>
+        //         <div className="row-content">
+        //           <input type="text"></input>
+        //         </div>
+        //       </div>
+
+        //       {/*
+        //       <div className="form-row">
+        //         <div className="row-label">Time Zone</div>
+        //         <div className="row-content">
+        //           <div className="row-content-text">Your home time zone.</div>
+        //         </div>
+        //       </div>
+        //       */}
+
+        //       {/*
+        //       <div className="form-row">
+        //         <div className="row-label">Languages</div>
+        //         <div className="row-content">
+        //           <div className="row-content-text">
+        //             Add any languages that others can use to speak with you on
+        //             Mokbnb
+        //           </div>
+        //         </div>
+        //       </div>
+        //       */}
+
+        //       {/*
+        //       <div className="form-row">
+        //         <div className="row-label">Emergency contact</div>
+        //         <div className="row-content">
+        //           <div className="row-content-text">
+        //             Give our Customer Experience team a trusted contact we can
+        //             alert in an urgent situation.
+        //           </div>
+        //         </div>
+        //       </div>
+        //       */}
+
+        //       <div className="form-row">
+        //         <div className="row-label">Shipping Address</div>
+        //         <div className="row-content">
+
+        //         </div>
+        //       </div>
+
+        //     </div>
+        //   </div>
+        // </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // <div className="form-row">
+        //         <div className="row-label">Phone Number</div>
+        //         <div className="row-content">
+        //           <input type="tel"></input>
+        //           {/*<div className="row-content-text">
+        //             This is only shared once you have a confirmed booking with
+        //             another Mokbnb user. This is how we can all get in touch.
+        //           </div>*/}
+        //         </div>
+        //       </div>
+
+        //       {/*
+        //       <div className="form-row">
+        //         <div className="row-label">Preferred Language</div>
+        //         <div className="row-content">
+        //           <div className="row-content-text">
+        //             We'll send you messages in this language.
+        //           </div>
+        //         </div>
+        //       </div>
+        //       */}
+
+        //       {/*
+        //       <div className="form-row">
+        //         <div className="row-label">Preffered Currency</div>
+        //         <div className="row-content">
+        //           <div className="row-content-text">
+        //             We’ll show you prices in this currency.
+        //           </div>
+        //         </div>
+        //       </div>
+        //       */}
+
+        //       <div className="form-row">
+        //         <div className="row-label">Where You Live</div>
+        //         <div className="row-content">
+        //           <input type="text"></input>
+        //         </div>
+        //       </div>

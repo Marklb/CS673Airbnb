@@ -18,8 +18,9 @@ export default class NewMessageForm extends React.Component {
     super(props);
 
     this.state = {
-      vfMsgRecipientEmail: 'JohnDoe@VIP.com',
+      // vfMsgRecipientEmail: 'JohnDoe@VIP.com',
       // vfMsgRecipientEmail: 'JamesBond@Agent.com',
+      vfMsgRecipientEmail: '',
       fvMsgTitle: '',
       fvMsgBody: ''
     };
@@ -115,8 +116,10 @@ export default class NewMessageForm extends React.Component {
         console.log('Message Not Sent');
         console.log(data);
         console.log(status);
+        _gMbNotifications.addNotification('Message Not Sent.', {duration: 3000, type: 'error'});
       } else {
         console.log('Message Sent');
+        _gMbNotifications.addNotification('Message Sent.', {duration: 3000});
       }
     });
 

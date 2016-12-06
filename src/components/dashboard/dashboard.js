@@ -13,9 +13,9 @@ require("./dashboard.scss");
 */
 export default class Dashboard extends React.Component {
   static contextTypes = {
-	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired  
+	    userSessionHandler: React.PropTypes.instanceOf(UserSessionHandler).isRequired
   };
-  
+
   constructor(props) {
     super(props);
 
@@ -49,41 +49,35 @@ export default class Dashboard extends React.Component {
 				date_start: 'default',
 				date_end: 'default',
 				date_req: 'default',
-				room_name: 'default'			
+				room_name: 'default'
 			}
 		]
     }
   };
 
 	componentDidMount() {
-	  	$.get('/api/getUserInfo', {
-			authType: this.context.userSessionHandler.getAuthType(),
-			authToken: this.context.userSessionHandler.getAuthToken()
+		this.state.user_id = this.context.userSessionHandler.getUserID();
+		$.post('/api/hostPendingRequests', { //req_id, bookingtype_name, place_id, host_id, client_id, client_name, ask_amount,  payment_type_id, resp_time, date_start, date_end, date_req, room_name
+			'user_id' : this.state.user_id
 		}, (data, status) => {
-			console.log("data:" + data);
-			this.state.user_id = data.user_id;
-			$.post('/api/hostPendingRequests', { //req_id, bookingtype_name, place_id, host_id, client_id, client_name, ask_amount,  payment_type_id, resp_time, date_start, date_end, date_req, room_name
-				'user_id' : this.state.user_id
-			}, (data, status) => {
-				if(data.query_success === false) {
-					console.log('get Dashboard Info query not successful');
-				} else {
-					console.log('get Dashboard Info details query successful');
-					this.setState({hostPendingRequestResults: data.result});
-					console.log("hostPendingRequestResults[0].req_id = " + data.hostPendingRequestResults[0].req_id);
-				}
-			});
-			$.post('/api/clientPendingRequests', { //req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
-				'user_id' : this.state.user_id
-			}, (data, status) => {
-				if(data.query_success === false) {
-					console.log('get Dashboard Info query not successful');
-				} else {
-					console.log('get Dashboard Info details query successful');
-					this.setState({yourPendingRequestResults: data.result});
-					console.log("yourPendingRequestResults[0].req_id = " + data.yourPendingRequestResults[0].req_id);
-				}
-			});
+			if(data.query_success === false) {
+				console.log('get Dashboard Info query not successful');
+			} else {
+				console.log('get Dashboard Info details query successful');
+				this.setState({hostPendingRequestResults: data.result});
+				console.log("hostPendingRequestResults[0].req_id = " + data.hostPendingRequestResults[0].req_id);
+			}
+		});
+		$.post('/api/clientPendingRequests', { //req_id, status, place_id, ask_amount, resp_time, date_start, date_end, date_req, room_name
+			'user_id' : this.state.user_id
+		}, (data, status) => {
+			if(data.query_success === false) {
+				console.log('get Dashboard Info query not successful');
+			} else {
+				console.log('get Dashboard Info details query successful');
+				this.setState({yourPendingRequestResults: data.result});
+				console.log("yourPendingRequestResults[0].req_id = " + data.yourPendingRequestResults[0].req_id);
+			}
 		});
 	}
 
@@ -101,7 +95,7 @@ export default class Dashboard extends React.Component {
               <div className="dashboard-items-container"></div>
             </div>
 		  </div>
-		  
+
           <div className="dashboard-group">
             <div className="dashboard-group-title">Your Pending Requests for a place by another</div>
             <div className="dashboard-subgroup">
@@ -109,25 +103,13 @@ export default class Dashboard extends React.Component {
 			  {this.showPendingRequests()}
               </div>
               <div className="dashboard-items-container"></div>
-            </div>		  
+            </div>
             <div className="dashboard-subgroup">
               <div className="dashboard-subgroup-title">Alerts</div>
               <div className="dashboard-items-container"></div>
 
             </div>
           </div>
-
-          <div className="dashboard-group">
-            <div className="dashboard-group-title">Reservations</div>
-              <div className="dashboard-subgroup">
-                <div className="dashboard-subgroup-title">
-				{this.showReservations()}
-                </div>
-                <div className="dashboard-items-container"></div>
-
-              </div>
-          </div>
-		  
         </div>
       </DashboardContainer>
     );
@@ -138,7 +120,7 @@ export default class Dashboard extends React.Component {
   Event Callbacks
 
   */
-				
+
 	showHostPendingRequests() {
 		if (this.state.hostPendingRequestResults.length > 0) {
 			var today = new Date();
@@ -154,13 +136,13 @@ export default class Dashboard extends React.Component {
 					console.log("date_req after: " + date_req);
 					var days_remaining = date_req.getDate() - today.getDate();
 					console.log("days_remaining: " + days_remaining);
-					//console.log(days_remaining); 
+					//console.log(days_remaining);
 					return (
 					<div key={i} className="f">
 						Booking Request from {val.client_name} on {val.date_req}, {days_remaining} days left to respond:<br/>
 						{val.room_name} from {val.date_start} to {val.date_end} for ${val.ask_amount}.
 						<br/>
-						<button type="button" id={i} value="accept" onClick={this.runSQL.bind(this)}>Accept</button> or 
+						<button type="button" id={i} value="accept" onClick={this.runSQL.bind(this)}>Accept</button> or
 						<button type="button" id={i} value="reject" onClick={this.runSQL.bind(this)}>Reject</button>
 					</div>
 					);
@@ -191,12 +173,12 @@ export default class Dashboard extends React.Component {
 					console.log("date_req after: " + date_req);
 					var days_remaining = date_req.getDate() - today.getDate();
 					console.log("days_remaining: " + days_remaining);
-					//console.log(days_remaining); 
+					//console.log(days_remaining);
 					return (
 					<div key={i} className="f">
-						Your Request on {val.date_req} for {val.room_name} from {val.date_start} to {val.date_end} at ${val.ask_amount} 
+						Your Request on {val.date_req} for {val.room_name} from {val.date_start} to {val.date_end} at ${val.ask_amount}
 						{val.status === 'pending' ? " is pending, and has " + days_remaining + " days left for a response." : " has been " + val.status + "."}
-						<br/> 
+						<br/>
 						{val.status === 'pending' ? <button type="button" id={i} value="cancel" onClick={this.runSQL.bind(this)}>Cancel</button> : ""}
 					</div>
 					);
@@ -211,12 +193,12 @@ export default class Dashboard extends React.Component {
 			);
 		}
 	}
-	
+
 	runSQL(e) {
 		var i = e.target.id;
 		var val = e.target.value;
 		console.log(val);
-		var currentdate = new Date(); 
+		var currentdate = new Date();
 		var datetime = currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate();
 		if (val === "accept") {
 			$.post('/api/addreservation', {
@@ -266,19 +248,10 @@ export default class Dashboard extends React.Component {
 					let newState = this.state;
 					newState.hostPendingRequestResults[i].splice(i,1);
 					this.setState(newState);
-				
+
 				}
 			});
 		}
-	}
-  
-	showReservations() {
-		
-		return (
-			<div>
-				You have no reservations at this time.
-			</div>
-		);
 	}
 
 };
