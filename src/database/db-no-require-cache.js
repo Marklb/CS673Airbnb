@@ -356,14 +356,14 @@ module.exports.api_get_user_reservations = function(req,res,conn){
 module.exports.get_edit_listing_data = function(req,res,conn){
   var authToken = req.query.authToken;
   var authType = req.query.authType;
-  let place_id = req.query.place_id;
+  var place_id = req.query.place_id;
 
-  let get_user_id_query_str = `
+  var get_user_id_query_str = `
   (SELECT USES.user_id
    FROM UserSession AS USES
    WHERE USES.auth_type = ? AND USES.session_auth_id = ?`;
 
-  let query_str = `
+  var query_str = `
   
   `;
 

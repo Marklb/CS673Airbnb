@@ -24,9 +24,9 @@ export default class FilterForm extends React.Component {
 			longitude: this.props.location.query.lng || 0,
 			neighborhoods : [],
 			result : [],
-			date_start : '2016-12-04',
-			date_end : '2016-12-05',
-			numofguest: -1,
+			date_start : '2016-12-09',
+			date_end : '2016-12-12',
+			numofguest: 1,
 			rating: -1,
 			min_cost : 10,
 			max_cost : 1000,
@@ -293,10 +293,10 @@ export default class FilterForm extends React.Component {
 				<div className="filter">
 					<form className="f">
 						Dates
-						<input name='date_start' defaultValue='2016-12-04' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
-						<input name='date_end' defaultValue='2016-12-05' onChange={this.onChange.bind(this)} className="t" type="date"></input>
+						<input name='date_start' defaultValue='2016-12-09' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
+						<input name='date_end' defaultValue='2016-12-12' onChange={this.onChange.bind(this)} className="t" type="date"></input>
 						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
-							<option>Number of guest</option>
+							<option>Number of guest(default 1)</option>
 							{this.numofpeople.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}

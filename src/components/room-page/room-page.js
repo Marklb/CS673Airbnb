@@ -23,6 +23,7 @@ export default class RoomPage extends React.Component {
 		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
 		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
 		this.state = {
+			bidSiteActive: true,
 			reqOK: true,
 			reservedOK: true,
 			bid_update : false,
@@ -147,10 +148,7 @@ export default class RoomPage extends React.Component {
 		}, (data, status) => {
 			console.log("user_id" + data.user_id);
 			this.state.clientID = data.user_id;
-			this.initialCheckClientReq(data.user_id, this.state.placeID);
-			this.initialCheckReservation(data.user_id, this.state.placeID);
 		});
-
 
 		//----------------------------
 		// Disqus script start
@@ -191,9 +189,27 @@ export default class RoomPage extends React.Component {
 				console.log('Place details query not successful');
 			} else {
 				console.log('Place details query successful');
-				this.setState({result: data.result});
-				this.setState({cost: data.result[0].cost_per_night});
-				this.initialCheckClientBid(this.context.userSessionHandler.getUserID(), data.result[0].auction_id, data.result);
+				console.log('data = ' + data.result.length);
+				//No data return, set it overdue
+				if (data.result.length === 0) {
+					this.setState({bidSiteActive : false});
+				} else {
+					this.setState({result: data.result});
+					this.setState({cost: data.result[0].cost_per_night});
+					
+					if (data.result[0].bookingtype_id == "1") {
+						this.initialCheckReservation(this.context.userSessionHandler.getUserID(), this.state.placeID);
+					} else if (data.result[0].bookingtype_id == "2") {
+						if (data.result[0].active == 'yes') {
+							this.initialCheckClientBid(this.context.userSessionHandler.getUserID(), data.result[0].auction_id, data.result);
+						} else {
+							this.setState({bidSiteActive : false});
+						}
+					} else if (data.result[0].bookingtype_id == "3" || data.result[0].bookingtype_id == "4") {
+						this.initialCheckClientReq(this.context.userSessionHandler.getUserID(), this.state.placeID);
+						this.initialCheckReservation(this.context.userSessionHandler.getUserID(), this.state.placeID);
+					}
+				}
 			}
   		});
 	}
@@ -231,6 +247,8 @@ export default class RoomPage extends React.Component {
 			'client_id' : this.state.clientID,
 			'payment_type_id' : this.state.payment_type_id,
 			'bid_price' : this.state.bid_amount,
+			'checkin_date' : this.state.bookCheckinTime,
+			'checkout_date' : this.state.bookCheckoutTime
   		}, (data, status) => {
   			if(data.query_success === false) {
 				console.log('insert ClientAuctionBids not successful');
@@ -401,8 +419,8 @@ export default class RoomPage extends React.Component {
 							'host_id' : result[0].host_id,
 							'client_id' : client_id,
 							'payment_type_id' : data.result[data.result.length - 1].payment_type_id,
-							'booked_date_start' : data.result[data.result.length - 1].end_auction_time,
-							'booked_date_end' : data.result[data.result.length - 1].end_auction_time,
+							'booked_date_start' : data.result[data.result.length - 1].checkin_date,
+							'booked_date_end' : data.result[data.result.length - 1].checkout_date,
 							'amt_paid' : data.result[data.result.length - 1].bid_price,
 							'paid_date' : datetime
 						}, (data, status) => {
@@ -410,10 +428,6 @@ export default class RoomPage extends React.Component {
 								console.log('bid insert reservation not successful');
 							} else {
 								console.log('bid insert reservation successful');
-								// if (this.state.result[0].bookingtype_id == "1") {
-									// let url = `/trips`;
-									// browserHistory.push(url);
-								// }
 							}
 						});
 					}
@@ -423,8 +437,23 @@ export default class RoomPage extends React.Component {
 	}
 
 	render() {
-    // this.ref.roomElem
 		return (
+			<div>
+				{this.state.bidSiteActive ? this.mainBody() : this.bidOverDue()}
+			</div>
+
+		);
+	}
+
+	bidOverDue() {
+		return (
+			<div>This site is overdue</div>
+		);
+	}
+
+	mainBody() {
+		return (
+		    // this.ref.roomElem
 			<div className="roompage">
 				<h1>Room { this.state.placeID } display page</h1>
 				<br></br>
@@ -471,7 +500,7 @@ export default class RoomPage extends React.Component {
 			</div>
 		);
 	}
-
+	
 	bookingStatus() {
 		var word = ""
 		if (!this.state.reservedOK) {

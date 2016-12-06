@@ -17,8 +17,7 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		password : '',
-		// password : '9993kuo',
+		password : '9993kuo',
 		database : 'mokbnb'
 	});
 
@@ -1286,7 +1285,7 @@ var db = function(app){
 	/////////////////////////////////////////////////////////////////////////////
 	// Add a reservation
 	/////////////////////////////////////////////////////////////////////////////
-	app.post("/api/addreservation",function(req,res){
+	app.post("/api/addreservation",function(req,res) {
 		var bookingtype = req.body.bookingtype;
 		var place_id = req.body.place_id;
 		var host_id = req.body.host_id;
@@ -1296,6 +1295,8 @@ var db = function(app){
 		var booked_date_end = req.body.booked_date_end;
 		var amt_paid = req.body.amt_paid;
 		var paid_date = req.body.paid_date;
+		console.log('**** Debug api addreservation query variables ****');
+		console.log('**** Start line ****');
 		console.log("bookingtype : ", bookingtype);
 		console.log("place_id : ", place_id);
 		console.log("host_id : ", host_id);
@@ -1306,46 +1307,43 @@ var db = function(app){
 		console.log("amt_paid : ", amt_paid);
 		console.log("paid_date : ", paid_date);
 		console.log("sold_price : ", sold_price);
+		console.log('**** End line ****');
 		conn.query("INSERT INTO Reservation" +
 					" (place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date)" +
 					" VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 					[place_id, host_id, client_id, payment_type_id, booked_date_start, booked_date_end, amt_paid, paid_date],
 		function(err, rows, fields){
-			// if (!err) {
-				// res.json({'query_success': true});
-			// } else {
-				// res.json({'query_success': false});
-				// console.log(err);
-			// }
+			if (!err) {
+				console.log('Insert reservation sucessfully');
+			} else {
+				console.log(err);
+			}
 		});
 		if (bookingtype === "Auction") {
 			var sold_price = req.body.sold_price;
-			conn.query("UPDATE auction" +
-						"SET (active='no', sold_price = (SELECT current_price FROM auction WHERE place_id = ? AND active='yes')" +
-						"WHERE place_id = ? AND active='yes'",
-						[place_id, place_id],
+			conn.query("UPDATE auction SET active='no', sold_price = ? WHERE place_id = ? AND active='yes'", [amt_paid, place_id],
 			function(err, rows, fields) {
-				// if (!err) {
-					// res.json({'query_success': true});
-				// } else {
-					// res.json({'query_success': false});
-				// }
+				if (!err) {
+					console.log('**** update auction sucessfully****');
+				} else {
+					console.log('**** update auction failed****');
+					console.log(err);
+				}
 			});
-		}
-		if (bookingtype === "User-Set Response Time Frame" || bookingtype === "Host-Set Response Time Frame") {
+		} else if (bookingtype === "User-Set Response Time Frame" || bookingtype === "Host-Set Response Time Frame") {
 			var currentdate = new Date();
 			var currentDateMySQLFormat = (currentdate.getFullYear() + "-" + (((currentdate.getMonth()+1) < 10)?"0":"") + (currentdate.getMonth()+1)  + "-" + ((currentdate.getDate() < 10)?"0":"") + currentdate.getDate());
 			var req_id = req.body.req_id;
-
 			conn.query("UPDATE clientplacerequest" +
 						" SET status = 'accepted', date_resp = ?" +
 						" WHERE req_id = ?",
 						[currentDateMySQLFormat, req_id],
 			function(err, rows, fields) {
 				if (!err) {
-					res.json({'query_success': true});
+					console.log('**** update clientplacerequest sucessfully****');
 				} else {
-					res.json({'query_success': false});
+					console.log('**** update clientplacerequest sucessfully****');
+					console.log(err);
 				}
 			});
 		}
@@ -1359,14 +1357,16 @@ var db = function(app){
 		var client_id = req.body.client_id;
 		var payment_type_id = req.body.payment_type_id;
 		var bid_price = req.body.bid_price;
+		var checkin_date = req.body.checkin_date;
+		var checkout_date = req.body.checkout_date;
 		console.log("auction_id : ", auction_id);
 		console.log("client_id : ", client_id);
 		console.log("payment_type_id : ", payment_type_id);
 		console.log("bid_price : ", bid_price);
 		conn.query("INSERT INTO ClientAuctionBids" +
-					" (auction_id, client_id, payment_type_id, bid_price)" +
-					" VALUES (?, ?, ?, ?)",
-					[auction_id, client_id, payment_type_id, bid_price],
+					" (auction_id, client_id, payment_type_id, bid_price, checkin_date, checkout_date)" +
+					" VALUES (?, ?, ?, ?, ?, ?)",
+					[auction_id, client_id, payment_type_id, bid_price, checkin_date, checkout_date],
 		function(err, rows, fields){
 			if (!err) {
 				res.json({'query_success': true});
