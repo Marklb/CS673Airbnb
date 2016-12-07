@@ -503,13 +503,13 @@ INSERT INTO Users (
 ;
 
 INSERT INTO address (
-   street, city, state, zip, country
+   street, city, state, zip, country, latitude, longitude
 ) VALUES
-   ("86 Heaven Lane", "Houston", "Texas", "07294", "USA"),
-   ("666 Haunted Terrace", "Newark", "New Jersey", "07032", "USA"),
-   ("24 Thirdington Road", "Newark", "New Jersey", "07032", "USA"),
-   ("99 Fourthington Place", "Newark", "New Jersey", "07032", "USA"),
-   ("68 Heaven Place", "Houston", "Texas", "07294", "USA")
+   ("500 Congress Ave", "Austin", "Texas", "78701", "USA", 30.267415, -97.743521),
+   ("150 Bleeker St", "Newark", "New Jersey", "07103", "USA", 40.743044, -74.178119),
+   ("399 Somerset St", "Harrison", "New Jersey", "07029", "USA", 40.739838, -74.156370),
+   ("100 Passaic Ave", "Harrison", "New Jersey", "07029", "USA", 40.746446, -74.164841),
+   ("4 Riverway", "Houston", "Texas", "77056", "USA", 29.761271, -95.459076)
 ;
 
 INSERT INTO place (

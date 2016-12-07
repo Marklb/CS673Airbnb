@@ -5,6 +5,7 @@ import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 're
 import _ from 'lodash';
 import $ from 'jquery';
 import UserSessionHandler from '../../user-session-handler';
+import GoogleMapsSearchPlaces from '../google-components/google-maps-search-places';
 
 // React Components
 import ReactDisqusThread from 'react-disqus-thread';
@@ -22,6 +23,9 @@ export default class RoomPage extends React.Component {
 		var p_id = this.props.params.pidanddate.split("_")[0];
 		var d_date_check_in = this.props.params.pidanddate.split("_")[1];
 		var d_date_check_out = this.props.params.pidanddate.split("_")[2];
+		var lat = this.props.params.pidanddate.split("_")[3];
+		var lng = this.props.params.pidanddate.split("_")[4];
+		var cpn = this.props.params.pidanddate.split("_")[5];
 		this.state = {
 			bidSiteActive: true,
 			reqOK: true,
@@ -81,6 +85,9 @@ export default class RoomPage extends React.Component {
 			payment_type_id: 3, //for insertion into reservation
 			bid_amount: 0,
 			bid_amount_ok: false,
+			latitude: lat,
+			longitude: lng,
+			cost_one_night: cpn,
 
 			//result
 			result: [
@@ -126,7 +133,9 @@ export default class RoomPage extends React.Component {
 					bio: 'default',
 					join_date: 'default',
 					languages: 'default',
-					amenities: 'default'
+					amenities: 'default',
+					latitude: 80.0,
+					longitude: 80.0
 				}
 			],
 
@@ -202,7 +211,7 @@ export default class RoomPage extends React.Component {
 				} else {
 					this.setState({result: data.result});
 					this.setState({cost: data.result[0].cost_per_night});
-					
+
 					if (data.result[0].bookingtype_id == "1") {
 						this.initialCheckReservation(this.context.userSessionHandler.getUserID(), this.state.placeID);
 					} else if (data.result[0].bookingtype_id == "2") {
@@ -509,13 +518,29 @@ export default class RoomPage extends React.Component {
 		);
 	}
 
+	renderMap(lat, lng, cpn) {
+		var newLat = new Number(lat);
+		var newLng = new Number(lng);
+		var gMapsDataList = [];
+			gMapsDataList.push({
+			lat: parseFloat(newLat),
+			lng: parseFloat(newLng),
+			price: cpn
+		});
+		return (
+			<GoogleMapsSearchPlaces placeMarkersData={gMapsDataList} />
+		);
+	}
+
 	mainBody() {
+		console.log("cpn = " + this.state.cost_one_night);
 		return (
 		    // this.ref.roomElem
 			<div className="roompage">
 				<h1>Room { this.state.placeID } display page</h1>
 				<br></br>
 				<img className='pic' src={this.state.result[0].pictures} />
+				{this.renderMap(this.state.latitude,this.state.longitude,this.state.cost_one_night)}
 				<br></br>
 				Title : {this.state.result[0].name}
 				<br></br>

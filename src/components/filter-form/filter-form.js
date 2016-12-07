@@ -10,19 +10,11 @@ import Rater from 'react-rater';
 
 require("./filter-form.scss");
 
-
-
 export default class FilterForm extends React.Component {
 
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			isFiltersVisible: false
-		};
-		console.log('this.props.params.place');
-		console.log(this.props.params.place);
-		console.log(this.props.location.query);
 		this.state = {
 			inputLocation : this.props.params.place,
 			latitude: this.props.location.query.lat || 0,
@@ -184,12 +176,6 @@ export default class FilterForm extends React.Component {
 			15,
 			16
 		];
-
-		this.rooms = [
-			{img: "/images/room1.jpg", title: "room1", price: "$100", roomType: "private"},
-			{img: "/images/room2.jpg", title: "room1", price: "$100", roomType: "private"},
-			{img: "/images/room3.jpg", title: "room1", price: "$100", roomType: "private"}
-		];
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -203,45 +189,11 @@ export default class FilterForm extends React.Component {
 				latitude: urlParams.lat || 0,
 				longitude: urlParams.lng || 0,
 			});
-			this.getNeighborQuery(placeString);
 			this.getPlaceQuery(placeString);
 		}
 	}
 
-	getNeighborQuery(location) {
-		$.post('/api/showneighbor', {
-  			'city': location
-  		}, (data, status) => {
-  			if(data.query_success === false) {
-				console.log('Show neighbor Not Successful');
-			} else {
-				console.log('Show neighbor is Successful');
-				this.setState({neighborhoods: data.neighborhoods});
-			}
-  		});
-	}
-
 	getPlaceQuery(location) {
-		// $.post('/api/showplace', {
-		// 	'checkbox': this.state.checkbox,
-		// 	'state': location,
-		// 	'date_start': this.state.date_start,
-		// 	'date_end': this.state.date_end,
-		// 	'numofguest': this.state.numofguest,
-		// 	'min_cost': this.state.min_cost,
-		// 	'max_cost': this.state.max_cost,
-		// 	'bedroomsize': this.state.bedroomsize,
-		// 	'bathroomsize': this.state.bathroomsize,
-		// 	'numofbeds': this.state.numofbeds
-  	// 	}, (data, status) => {
-  	// 		if(data.query_success === false) {
-		// 		console.log('Show place Not Successful');
-		// 	} else {
-		// 		console.log('Show place is Successful');
-		// 		this.setState({result: data.result});
-		// 	}
-  	// 	});
-
 		$.post('/api/get_places', {
 			'checkbox': this.state.checkbox,
 			'state': location,
@@ -263,117 +215,96 @@ export default class FilterForm extends React.Component {
 		});
 	}
 
-	renderCheckBox(neighbor) {
-		var rows = [];
-		for (var i=0; i < neighbor.length; i++) {
-			rows.push(<MyCheckBox street={neighbor[i].street} />);
-		}
+	renderResult(result) {
 		return (
 			<form>
-				Neighborhoods
-				<br></br>
-				{rows.length === 0 ? 'None' : rows}
-			</form>
-		);
-	}
-
-	renderResult(result) {
-		var rows = [];
-		let gMapsDataList = [];
-		for (var i=0; i < result.length; i++) {
-			rows.push(<MyResult key={i} name={result[i].name} />);
-			gMapsDataList.push({
-				lat: result[i].latitude,
-				lng: result[i].longitude,
-				price: result[i].cost_per_night
-			});
-		}
-		console.log(gMapsDataList);
-		return (
-			<form className="f">
 				<center><h1>-----Filter Result-----</h1></center>
-				{this.renderPicture()}
-				{(gMapsDataList.length > 0) ? 
-					<GoogleMapsSearchPlaces placeMarkersData={gMapsDataList} /> : null}
+				{this.renderDetails()}
 			</form>
 		);
 	}
 
 	render() {
 		return (
-			<div>
-				<div className="filter">
-					<form className="f">
-						Dates
-						<input name='date_start' defaultValue='2016-12-09' onChange={this.onChange.bind(this)} className="t1" type="date"></input>
-						<input name='date_end' defaultValue='2016-12-12' onChange={this.onChange.bind(this)} className="t" type="date"></input>
-						<select name='numofguest' onChange={this.onChange.bind(this)} className="t">
-							<option>Number of guest(default 1)</option>
+			<div className="filter">
+				<div>
+					<div className='form'>
+						<div className='text'>Date and number of guest</div>
+						<br></br>
+						<div className='Boxes'>Check in date <input className='box' name='date_start' defaultValue='2016-12-09' onChange={this.onChange.bind(this)} type="date"></input></div>
+						<div className='Boxes'>Check out date <input className='box' name='date_end' defaultValue='2016-12-12' onChange={this.onChange.bind(this)} type="date"></input></div>
+						<div className='Boxes'>No of guest <select className='box' name='numofguest' onChange={this.onChange.bind(this)}>
+							<option>Choose</option>
 							{this.numofpeople.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
-						</select>
-					</form>
+						</select></div>
+					</div>
 
-					<form className="f">
-						Room type
-						{this.state.checkbox.roomtype.map((val, i) => {
-							return <label key={i}><br></br><input name='roomtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
-						})}
-					</form>
-
-					<form className="f">
-						Price min: <b>${this.state.min_cost}</b>
-						<input name='min_cost' className="slide" type="range" min="10" max="1000" defaultValue="10" onChange={this.onChange.bind(this)}></input>
+					<div className='form'>
+						<div className='text'>Room type</div>
 						<br></br>
-						Price max: <b>${this.state.max_cost}</b>
-						<input name='max_cost' className="slide" type="range" min="10" max="1000" defaultValue="1000" onChange={this.onChange.bind(this)}></input>
-					</form>
+						{this.state.checkbox.roomtype.map((val, i) => {
+							return <label className='checkBoxes' key={i}><input name='roomtype' value={i} type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+						})}
+					</div>
 
-					<form className="f">
-						Size
-						<select name='bedroomsize' onChange={this.onChange.bind(this)} className="sizeBedRoom">
-							<option>Bedrooms</option>
+					<div className='form'>
+						<div className='text'>Price min</div>
+						<br></br>
+						<input className='checkBoxes' name='min_cost' type="range" min="10" max="1000" defaultValue="10" onChange={this.onChange.bind(this)}></input> <b>${this.state.min_cost}</b>
+						<br></br>
+						<br></br>
+						<div className='text'>Price max</div>
+						<br></br>
+						<input className='checkBoxes' name='max_cost' type="range" min="10" max="1000" defaultValue="1000" onChange={this.onChange.bind(this)}></input> <b>${this.state.max_cost}</b>
+					</div>
+
+					<div className='form'>
+						<div className='text'>Size</div>
+						<br></br>
+						<div className='Boxes'>Badrooms <select className='box' name='bedroomsize' onChange={this.onChange.bind(this)}>
+							<option>Choose</option>
 							{this.bedroomsize.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
-						</select>
-						<select name='bathroomsize' onChange={this.onChange.bind(this)} className="sizeBath">
-							<option>Bathrooms</option>
+						</select></div>
+						<div className='Boxes'>Bathrooms <select className='box' name='bathroomsize' onChange={this.onChange.bind(this)}>
+							<option>Choose</option>
 							{this.bathroomsize.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
-						</select>
-						<select name='numofbeds' onChange={this.onChange.bind(this)} className="sizeBed">
-							<option>Beds</option>
+						</select></div>
+						<div className='Boxes'>Beds <select className='box' name='numofbeds' onChange={this.onChange.bind(this)}>
+							<option>Choose</option>
 							{this.numofbeds.map((val, i) => {
 								return <option key={i}>{val}</option>;
 							})}
-						</select>
-					</form>
+						</select></div>
+					</div>
 
-					<form className="f">
-						Booking Type
+					<div className='form'>
+						<div className='text'>Booking type</div>
 						{this.state.checkbox.bookingtype.map((val, i) => {
-							return <label key={i}><br></br><input name='bookingtype' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label className='checkBoxes' key={i}><br></br><input name='bookingtype' value={i} type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
-					</form>
+					</div>
 
-					<form className="f">
-						Amenities
+					<div className='form'>
+						<div className='text'>Amenities</div>
 						{this.state.checkbox.amenity.map((val, i) => {
-							return <label key={i}><br></br><input name='amenity' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label className='checkBoxes' key={i}><br></br><input name='amenity' value={i} type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
-					</form>
+					</div>
 
-					<form className="f">
-						Host Language
+					<div className='form'>
+						<div className='text'>Host Language</div>
 						{this.state.checkbox.hostlanguage.map((val, i) => {
-							return <label key={i}><br></br><input name='hostlanguage' value={i} className="t3" type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
+							return <label className='checkBoxes' key={i}><br></br><input name='hostlanguage' value={i} type="checkbox" onChange={this.onChange.bind(this)} />{val.name}</label>;
 						})}
-					</form>
+					</div>
 
-					<button name='apply_filter' type="button" onClick={this.onClickApplyFilter.bind(this)}>Apply Filter</button>
+					<center><button className='button' name='apply_filter' type="button" onClick={this.onClickApplyFilter.bind(this)}>Apply Filter</button></center>
 
 					{this.renderResult(this.state.result)}
 
@@ -383,43 +314,44 @@ export default class FilterForm extends React.Component {
 		);
 	}
 
-	renderPicture() {
+	renderDetails() {
 		return (
-			<div>
-				<div className="filterResult">
-					{this.state.result.map((val, i) => {
-						return (
-							<div key={i} className="f">
+			<div className="filter">
+				{this.state.result.map((val, i) => {
+					var gMapsDataList = [];
+					gMapsDataList.push({
+						lat: val.latitude,
+						lng: val.longitude,
+						price: val.cost_per_night
+					});
+					return (
+						<div className="form" key={i}>
+							<center><div><h1>{val.name}</h1></div></center>
+							<div className="fig">
 								<img className="pic" src={val.pictures} onClick={this.onClickShowRoom.bind(this, i)} />
-								<br></br>
-								Title<input className="r1" type="text" placeholder={val.name}></input>
-								<br></br>
-								Price<input className="r2" type="text" placeholder={val.cost_per_night}></input>
-								<br></br>
-								BookingType<input className="r3" type="text" placeholder={this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}></input>
-								<br></br>
-								RoomType<input className="r3" type="text" placeholder={this.state.checkbox.roomtype[val.roomtype_id - 1].name}></input>
-								<br></br>
-								Rating <Rater interactive={false} rating={val.rating}/>
-								<br></br>
+								<div className="map">
+									<GoogleMapsSearchPlaces placeMarkersData={gMapsDataList} />
+								</div>
 							</div>
-						);
-					})}
-				</div>
+							<center><div className='dcrb'>Price  :  ${val.cost_per_night}</div></center>
+							<center><div className='dcrb'>BookingType  :  {this.state.checkbox.bookingtype[val.bookingtype_id - 1].name}</div></center>
+							<center><div className='dcrb'>RoomType  :  {this.state.checkbox.roomtype[val.roomtype_id - 1].name}</div></center>
+							<center><div className='dcrb'>Rating  :  <Rater interactive={false} rating={val.rating}/></div></center>
+							<br></br>
+						</div>
+					);
+				})}
 			</div>
 		);
 	}
 
-	onClickShowFilters(e){
-		let newState = this.state;
-		newState.isFiltersVisible = !newState.isFiltersVisible;
-		this.setState(newState);
-	}
-
 	onClickShowRoom(indx, e){
 		var place_id = this.state.result[indx].place_id;
+		var lat = this.state.result[indx].latitude;
+		var lng = this.state.result[indx].longitude;
+		var cpn = this.state.result[indx].cost_per_night;
 		console.log("place_id = " + place_id);
-		let url = `/roomdetail/${place_id}_${this.state.date_start}_${this.state.date_end}`;
+		let url = `/roomdetail/${place_id}_${this.state.date_start}_${this.state.date_end}_${lat}_${lng}_${cpn}`;
 		browserHistory.push(url);
 	}
 
@@ -466,19 +398,5 @@ export default class FilterForm extends React.Component {
 
 	onClickApplyFilter() {
 		this.getPlaceQuery(this.state.inputLocation);
-		console.log(this.state.checkbox.roomtype[0].checked);
-		console.log(this.state.checkbox.bookingtype[0].checked);
-		console.log(this.state.checkbox.amenity[0].checked);
-		console.log(this.state.checkbox.hostlanguage[0].checked);
-		console.log(this.state.date_start);
-		console.log(this.state.date_end);
-		console.log(this.state.numofguest);
-		console.log(this.state.rating);
-		console.log(this.state.min_cost);
-		console.log(this.state.max_cost);
-		console.log(this.state.bedroomsize);
-		console.log(this.state.bathroomsize);
-		console.log(this.state.numofbeds);
-		console.log(this.state.checkbox.bookingtype);
 	}
 }

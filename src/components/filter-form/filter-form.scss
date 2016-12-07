@@ -1,66 +1,65 @@
 .filter {
 	padding : 30px;
-	.t {
+	.form {
+		margin-top : 10px;
+		border-style: ridge;
 		padding : 10px;
-		margin-left : 30px;
+		.fig {
+			text-align: center;
+		}
 	}
 
-	.t1 {
-		padding : 10px;
-		margin-left : 70px;
+	.text {
+		font-size: 150%;
+		color: #8B0000;
+		font-weight: bold;
 	}
 
-	.t2 {
-		padding : 10px;
-		margin-left : 35px;
+	.Boxes {
+		display : inline-block;
+		padding : 5px;
+		margin-left : 20px;
+	}
+	
+	.checkBoxes {
+		display : inline-block;
+		margin-left : 20px;
 	}
 
-	.t3 {
-		padding : 20px;
-		margin-left : 40px;
+	.button {
+		margin-top : 10px;
+		width : 170px;
+		height : 35px;
+		font-size : 100%;
+		background-color: #4CAF50;
+		border: none;
+		color: white;
 	}
 
-	.t4 {
-		padding : 10px;
-		margin-left : 100px;
-	}
+}
 
-	.slide {
-		width: 555px;
-		margin-left : 35px;
-		vertical-align: middle;
-	}
-
-	.sizeBedRoom {
-		padding : 10px;
-		margin-left : 80px;
-	}
-
-	.sizeBath {
-		padding : 10px;
-		margin-left : 60px;
-	}
-
-	.sizeBed {
-		padding : 10px;
-		margin-left : 65px;
-	}
-
-	.instantBook {
-		padding : 10px;
-		margin-left : 65px;
-	}
-
-	.f {
-		padding : 20px;
-	}
+.box {
+	width : 130px;
+	height : 25px;
 }
 
 .pic {
+	display : inline-block;
 	cursor:pointer;
-	height: 200px;
-	width: 200px;
+    max-height: 250px;
+    max-width: 250px;
 }
+
+.map {
+	display : inline-block;
+	margin-left : 30px;
+}
+
+.dcrb {
+	color: blue;
+	font-size: 150%;
+}
+
 
 $react-rater-link: #ccc !default;
 $react-rater-hover: #666 !default;
