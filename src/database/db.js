@@ -17,7 +17,6 @@ var db = function(app){
 	var conn = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'root',
-		// password : '9993kuo',
 		password : '',
 		database : 'mokbnb'
 	});
@@ -298,9 +297,10 @@ var db = function(app){
 	app.post("/api/getUserTrips",function(req,res){
 			var clientID = req.body.clientID;
 			//Returns place_id, room_name, pictures, booked_date_start, booked_date_end
-			var placeQuerySQL = "SELECT reservation.place_id, IFNULL(ratings.rating, 0) as rating, name as room_name, pictures, booked_date_start, booked_date_end FROM reservation"+
+			var placeQuerySQL = "SELECT reservation.place_id, IFNULL(ratings.rating, 0) as rating, name as room_name, pictures, booked_date_start, booked_date_end, latitude, longitude, amt_paid FROM reservation"+
 			" NATURAL JOIN hostplacelisting"+
 			" NATURAL JOIN place"+
+			" NATURAL JOIN address"+
             " LEFT JOIN ratings ON ratings.user_id = reservation.client_id AND ratings.place_id = reservation.place_id" +
 			" WHERE client_id = " + clientID;
 			console.log(placeQuerySQL);

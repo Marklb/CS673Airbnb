@@ -109,8 +109,21 @@ export default class UsersTrips extends React.Component {
 
   	onClickShowRoom(indx, e){
 		var place_id = this.state.result[indx].place_id;
+		var lat = this.state.result[indx].latitude;
+		var lng = this.state.result[indx].longitude;
+		var amp = this.state.result[indx].amt_paid;
+		var bds_r = new Date(this.state.result[indx].booked_date_start);
+		var bds = bds_r.getFullYear() + "-" + (((bds_r.getMonth()+1) < 10)?"0":"") + (bds_r.getMonth()+1)  + "-" + ((bds_r.getDate() < 10)?"0":"") + bds_r.getDate();
+		var bde_r = new Date(this.state.result[indx].booked_date_end);
+		var bde = bde_r.getFullYear() + "-" + (((bde_r.getMonth()+1) < 10)?"0":"") + (bde_r.getMonth()+1)  + "-" + ((bde_r.getDate() < 10)?"0":"") + bde_r.getDate();
+		var yt = 'yourtrips'
+		console.log("lat = " + lat);
+		console.log("lng = " + lng);
+		console.log("amp = " + amp);
+		console.log("bds = " + bds);
+		console.log("bde = " + bde);
 		console.log("place_id = " + place_id);
-		let url = `/roomdetail/${place_id}`;
+		let url = `/roomdetail/${place_id}_${bds}_${bde}_${lat}_${lng}_${amp}_${yt}`;
 		browserHistory.push(url);
 	}
 

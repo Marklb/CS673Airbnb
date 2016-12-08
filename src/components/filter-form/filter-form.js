@@ -351,7 +351,7 @@ export default class FilterForm extends React.Component {
 		var lng = this.state.result[indx].longitude;
 		var cpn = this.state.result[indx].cost_per_night;
 		console.log("place_id = " + place_id);
-		let url = `/roomdetail/${place_id}_${this.state.date_start}_${this.state.date_end}_${lat}_${lng}_${cpn}`;
+		let url = `/roomdetail/${place_id}_${this.state.date_start}_${this.state.date_end}_${lat}_${lng}_${cpn}_list`;
 		browserHistory.push(url);
 	}
 

@@ -196,7 +196,32 @@ DROP TABLE IF EXISTS `Amenity` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `Amenity` (
   `amenity_id` int(5) NOT NULL,
-  `amenity_name` enum('Wireless Internet','Pool','Kitchen','24-hour check-in','Air conditioning','Buzzer/wireless intercom','Cable TV','Carbon monoxide detector','Doorman','Doorman Entry','Dryer','Elevator in building','Essentials','Family/kid friendly','Fire extinguisher','First aid kit','Free parking on premises','Free parking on street','Gym','Hair dryer','Hangers','Heating','Hot tub','Indoor fireplace','Internet','Iron','Keypad','Laptop friendly workspace','Lock on bedroom door','Lockbox','Pets allowed','Safety card','Shampoo','Smartlock','Smoke detector','Smoking allowed','Suitable for events','TV','Washer','Wheelchair accessible') DEFAULT NULL,
+  `amenity_name` enum(
+'Wireless Internet',
+'Pool','Kitchen',
+'24-hour check-in',
+'Air conditioning',
+'Buzzer/wireless intercom',
+'Cable TV',
+'Carbon monoxide detector',
+'Doorman','Doorman Entry',
+'Dryer','Elevator in building',
+'Essentials','Family/kid friendly',
+'Fire extinguisher','First aid kit',
+'Free parking on premises',
+'Free parking on street',
+'Gym','Hair dryer',
+'Hangers','Heating',
+'Hot tub','Indoor fireplace',
+'Internet','Iron','Keypad',
+'Laptop friendly workspace',
+'Lock on bedroom door','Lockbox',
+'Pets allowed','Safety card',
+'Shampoo','Smartlock','Smoke detector',
+'Smoking allowed',
+'Suitable for events',
+'TV','Washer',
+'Wheelchair accessible') DEFAULT NULL,
   PRIMARY KEY (`amenity_id`))
 ENGINE=InnoDB;
 
@@ -205,12 +230,10 @@ SHOW WARNINGS;
 
 INSERT INTO `Amenity` (`amenity_id`,`amenity_name`) VALUES
 (1, 'Wireless Internet'),
-(2, 'Pool'),
-(3, 'Kitchen'),
+(2, 'Pool'),(3, 'Kitchen'),
 (4, '24-hour check-in'),
 (5, 'Air conditioning'),
-(6, 'Buzzer/wireless intercom'),
-(7, 'Cable TV'),
+(6, 'Buzzer/wireless intercom'),(7, 'Cable TV'),
 (8, 'Carbon monoxide detector'),
 (9, 'Doorman'),
 (10, 'Doorman Entry'),
@@ -622,14 +645,13 @@ INSERT INTO PlaceAmenity (
    place_id, amenity_id
 ) VALUES
    (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19), (1, 20), (1, 21), (1, 22), (1, 23), (1, 24), (1, 25), (1, 26), (1, 27), (1, 28), (1, 29), (1, 30),
-   (2, 20), (2, 21), (2, 22), (2, 23), (2, 24), (2, 25), (2, 27), (2, 28), (2, 29), (2, 30), (2, 31), (2, 32), (2, 33), (2, 34), (2, 35), (2, 36), (2, 37), (2, 38), (2, 39), (2, 40)
+   (2, 20), (2, 21), (2, 22), (2, 23), (2, 24), (2, 25), (2, 27), (2, 28), (2, 29), (2, 30), (2, 31), (2, 32), (2, 33), (2, 34), (2, 35), (2, 36), (2, 37), (2, 38), (2, 39), (2, 40), (3, 1), (3, 2), (3, 3), (3, 4), (3, 37), (3, 38), (3, 39), (3, 40), (4, 5), (4, 6), (4, 7), (4, 8), (4, 33), (4, 34), (4, 35), (4, 36), (5, 9), (5, 10), (5, 11), (5, 12), (5, 29), (5, 30), (5, 31), (5, 32)
 ;
 
 INSERT INTO UserLanguage (
   user_id, language_id
 ) VALUES
-   (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13),
-   (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18), (2, 19)
+   (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18), (2, 19), (3, 8), (3, 9), (3, 10), (3, 11), (3, 12), (4, 9), (4, 10), (4, 14), (4, 7), (5, 7), (5, 14), (5, 16), (5, 13)
 ;
 
 INSERT INTO ClientPlaceRequest (

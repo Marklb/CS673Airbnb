@@ -26,6 +26,7 @@ export default class RoomPage extends React.Component {
 		var lat = this.props.params.pidanddate.split("_")[3];
 		var lng = this.props.params.pidanddate.split("_")[4];
 		var cpn = this.props.params.pidanddate.split("_")[5];
+		var tag = this.props.params.pidanddate.split("_")[6];
 		this.state = {
 			bidSiteActive: true,
 			reqOK: true,
@@ -88,6 +89,7 @@ export default class RoomPage extends React.Component {
 			latitude: lat,
 			longitude: lng,
 			cost_one_night: cpn,
+			urltag: tag,
 
 			//result
 			result: [
@@ -574,7 +576,9 @@ export default class RoomPage extends React.Component {
 				<br></br>
 				<br></br>
 				Booking type ({this.state.result[0].bookingtype_name})
-				{(this.state.reqOK && this.state.reservedOK)? this.bookingSection() : this.bookingStatus()}
+				{
+					this.state.urltag == 'list' ? ((this.state.reqOK && this.state.reservedOK)? this.bookingSection() : this.bookingStatus()) : null
+				}
 
 				{/* Disqus example start */}
 				<div id="disqus_thread"></div>
