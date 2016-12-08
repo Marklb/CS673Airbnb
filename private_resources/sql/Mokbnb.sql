@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `addr_id` INT NULL,
   `gender` VARCHAR(45) NULL,
   `birth_date` VARCHAR(45) NOT NULL,
-  `profile_pic` VARCHAR(45) NULL,
+  `profile_pic` VARCHAR(4096) NULL,
   `bio` VARCHAR(45) NULL,
   `join_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `disabled` BIT NOT NULL DEFAULT 0,

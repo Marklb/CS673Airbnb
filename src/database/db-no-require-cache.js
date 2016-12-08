@@ -333,7 +333,7 @@ module.exports.api_get_user_reservations = function(req,res,conn){
   FROM ((place NATURAL JOIN Reservation)
         JOIN Users U ON host_id = U.user_id)
         JOIN Users S ON client_id = S.user_id
-  WHERE host_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
+  WHERE host_id = (SELECT Distinct user_id FROM UserSession WHERE user_id = ? )
   `;
 
   conn.query(query_str, [user_id],
@@ -360,7 +360,7 @@ module.exports.api_get_user_reservations2 = function(req,res,conn){
   var query_str = `
   SELECT place_id, place.name as room_name, host_id, U.name as host_name, client_id, S.name as client_name, booked_date_start, booked_date_end, amt_paid, paid_date
   FROM ((place NATURAL JOIN Reservation)  JOIN Users U ON host_id = U.user_id) JOIN Users S ON client_id = S.user_id
-  WHERE client_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
+  WHERE client_id = (SELECT Distinct user_id FROM UserSession WHERE user_id = ? )
 
   `;
 
@@ -388,7 +388,7 @@ module.exports.api_get_user_income = function(req,res,conn){
   var query_str = `
   SELECT SUM(amt_paid) AS income
   FROM Reservation
-  WHERE host_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
+  WHERE host_id = (SELECT Distinct user_id FROM UserSession WHERE user_id = ? )
 
   `;
 
@@ -416,7 +416,7 @@ module.exports.api_get_user_expense = function(req,res,conn){
   var query_str = `
   SELECT SUM(amt_paid) AS expense
   FROM Reservation
-  WHERE client_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
+  WHERE client_id = (SELECT Distinct user_id FROM UserSession WHERE user_id = ? )
 
   `;
 
@@ -611,7 +611,7 @@ module.exports.update_listing_data = function(req,res,conn){
     VALUES ?
     `;
 
-    let vals4 = [];
+    var vals4 = [];
     if(amenity_ids_to_add !== undefined){
       console.log(amenity_ids_to_add);
       for(var i = 0; i < amenity_ids_to_add.length; i++){
