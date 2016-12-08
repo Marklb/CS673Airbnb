@@ -327,16 +327,16 @@ module.exports.api_get_user_reservations = function(req,res,conn){
   var user_id = req.body.user_id;
   console.log(req.body.user_id+"---------");
   var query_str = `
-  SELECT place_id, place.name as room_name, host_id, U.name as host_name, client_id, S.name as client_name, booked_date_start, booked_date_end, amt_paid, paid_date
-  FROM ((place NATURAL JOIN Reservation)  JOIN Users U ON host_id = U.user_id) JOIN Users S ON client_id = S.user_id
-  WHERE host_id = (SELECT DISTINCT user_id
-                   FROM UserSession
-                   ORDER by 'date' desc
-                   LIMIT 0,1
-                   )
+  SELECT place_id, place.name as room_name, host_id, U.name as host_name,
+        client_id, S.name as client_name, booked_date_start, booked_date_end,
+        amt_paid, paid_date
+  FROM ((place NATURAL JOIN Reservation)
+        JOIN Users U ON host_id = U.user_id)
+        JOIN Users S ON client_id = S.user_id
+  WHERE host_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
   `;
 
-  conn.query(query_str, [authType, authToken],
+  conn.query(query_str, [user_id],
     function (err, rows, fields) {
       if (err) {
         console.log(err);
@@ -356,17 +356,15 @@ module.exports.api_get_user_reservations2 = function(req,res,conn){
   // console.log('/api/get_user_reservations');
   var authToken = req.query.authToken;
   var authType = req.query.authType;
+  var user_id = req.body.user_id;
   var query_str = `
   SELECT place_id, place.name as room_name, host_id, U.name as host_name, client_id, S.name as client_name, booked_date_start, booked_date_end, amt_paid, paid_date
   FROM ((place NATURAL JOIN Reservation)  JOIN Users U ON host_id = U.user_id) JOIN Users S ON client_id = S.user_id
-  WHERE client_id = (SELECT user_id
-                   FROM UserSession
-                   ORDER by 'date' desc
-                   LIMIT 0,1)
+  WHERE client_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
 
   `;
 
-  conn.query(query_str, [authType, authToken],
+  conn.query(query_str, [user_id],
     function (err, rows, fields) {
       if (err) {
         console.log(err);
@@ -386,18 +384,15 @@ module.exports.api_get_user_income = function(req,res,conn){
   // console.log('/api/get_user_reservations');
   var authToken = req.query.authToken;
   var authType = req.query.authType;
-
+  var user_id = req.body.user_id;
   var query_str = `
   SELECT SUM(amt_paid) AS income
   FROM Reservation
-  WHERE host_id = (SELECT user_id
-                   FROM UserSession
-                   ORDER by 'date' desc
-                   LIMIT 0,1)
+  WHERE host_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
 
   `;
 
-  conn.query(query_str, [authType, authToken],
+  conn.query(query_str, [user_id],
     function (err, rows, fields) {
       if (err) {
         console.log(err);
@@ -417,17 +412,15 @@ module.exports.api_get_user_expense = function(req,res,conn){
   // console.log('/api/get_user_reservations');
   var authToken = req.query.authToken;
   var authType = req.query.authType;
-
+  var user_id = req.body.user_id;
   var query_str = `
   SELECT SUM(amt_paid) AS expense
   FROM Reservation
-  WHERE client_id = (SELECT user_id
-                   FROM UserSession
-                   LIMIT 0,1)
+  WHERE client_id = (SELECT user_id FROM UserSession WHERE user_id = ? )
 
   `;
 
-  conn.query(query_str, [authType, authToken],
+  conn.query(query_str, [user_id],
     function (err, rows, fields) {
       if (err) {
         console.log(err);
@@ -509,9 +502,9 @@ module.exports.update_listing_data = function(req,res,conn){
   console.log('----------------2-------------------');
   var query_str1 = `
   Update HostPlaceListing SET ?
-  WHERE 
-    host_id = @authed_user_id 
-  AND 
+  WHERE
+    host_id = @authed_user_id
+  AND
     place_id = ?
   `;
   var vals1 = {};
@@ -523,7 +516,7 @@ module.exports.update_listing_data = function(req,res,conn){
   }
   console.log('----------------3-------------------');
   console.log(vals1);
-  console.log('----------------4-------------------');  
+  console.log('----------------4-------------------');
   query_str1 = query_str1.replace('@authed_user_id', get_user_id_query_str)
   console.log(query_str1);
   console.log('----------------5-------------------');
@@ -552,7 +545,7 @@ module.exports.update_listing_data = function(req,res,conn){
   Update Place SET ?
   WHERE place_id = ?
   `;
-  var vals2 = {}; 
+  var vals2 = {};
   if(roomtype_id !== undefined)vals2['roomtype_id'] = parseInt(roomtype_id);
   if(room_name !== undefined)vals2['name'] = room_name;
   if(room_description !== undefined)vals2['description'] = room_description;
@@ -583,7 +576,7 @@ module.exports.update_listing_data = function(req,res,conn){
   Update Address SET ?
   WHERE addr_id = (SELECT P.addr_id FROM Place AS P WHERE P.place_id = ?)
   `;
-  var vals3 = {}; 
+  var vals3 = {};
   if(street !== undefined)vals3['street'] = street;
   if(city !== undefined)vals3['city'] = city;
   if(state !== undefined)vals3['state'] = state;
@@ -617,7 +610,7 @@ module.exports.update_listing_data = function(req,res,conn){
     INSERT INTO PlaceAmenity (place_id, amenity_id)
     VALUES ?
     `;
-    
+
     let vals4 = [];
     if(amenity_ids_to_add !== undefined){
       console.log(amenity_ids_to_add);
@@ -648,7 +641,7 @@ module.exports.update_listing_data = function(req,res,conn){
   if(req.body.paidExtrasToDel !== undefined){
     var query_str5 = `
     DELETE FROM PlaceExtraAmenity
-    WHERE  
+    WHERE
     `;
     // place_id = ? AND name = ? AND cost = ?
     var s = [];
@@ -684,14 +677,14 @@ module.exports.update_listing_data = function(req,res,conn){
     });
     promises.push(p5);
   }
-  
+
   if(req.body.paidExtrasToAdd !== undefined){
     console.log(req.body.paidExtrasToAdd);
     var query_str6 = `
     INSERT INTO PlaceExtraAmenity (place_id, name, cost)
-    VALUES  
+    VALUES
     `;
-    
+
     var s = [];
     for(var i = 0; i < req.body.paidExtrasToAdd.length; i++){
       s.push(`(place_id = ${parseInt(place_id)}, name = '${req.body.paidExtrasToAdd[i].name}', cost = ${req.body.paidExtrasToAdd[i].cost})`);
